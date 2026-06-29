@@ -10,6 +10,7 @@ import 'package:urbano_manage/features/yeu_cau_cu_dan/Views/yeu_cau_cu_dan_view.
 import 'package:urbano_manage/features/cu_dan/Views/cu_dan_list_view.dart';
 import 'package:urbano_manage/features/hoa_don/Views/hoa_don_list_view.dart';
 import 'package:urbano_manage/features/thong_bao/Views/thong_bao_list_view.dart';
+import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_list_view.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -105,7 +106,7 @@ class _MainShellState extends State<MainShell> {
       case 6:
         return const ThongBaoListView();
       case 7:
-        return const _PlaceholderPage(title: 'Nhân viên');
+        return const NhanVienListView();
       default:
         return DashboardView(onNavigate: _onNavigate);
     }
