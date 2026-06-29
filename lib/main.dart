@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/features/yeu_cau_cu_dan/ViewModels/yeu_cau_cu_dan_viewmodel.dart';
 import 'package:urbano_manage/features/auth/ViewModels/login_viewmodel.dart';
-import 'package:urbano_manage/features/auth/Views/login_view.dart';
+import 'package:urbano_manage/features/auth/Views/auth_gate.dart';
 import 'package:urbano_manage/features/dashboard/ViewModels/dashboard_viewmodel.dart';
 
 void main() {
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginView(),
+      home: const AuthGate(),
     );
   }
 }
