@@ -40,83 +40,37 @@ class _CuDanListViewState extends State<CuDanListView> {
           c.email.toLowerCase().contains(query);
     }).toList();
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.tealPrimary,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CuDanFormView()),
-          );
-        },
-        child: const Icon(Icons.add_rounded, color: Colors.white),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildAppbar(),
-              _buildSearchBox(),
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.tealPrimary,
-                  backgroundColor: AppColors.bgMid,
-                  onRefresh: () => viewModel.fetchCuDans(),
-                  child: _buildContent(viewModel, filteredList),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppbar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Row(
-        children: [
-          Builder(
-            builder: (context) => GestureDetector(
-              onTap: () => Scaffold.of(context).openDrawer(),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderButton),
-                ),
-                child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
+    return Stack(
+      children: [
+        Column(
+          children: [
+            _buildSearchBox(),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.tealPrimary,
+                backgroundColor: AppColors.bgMid,
+                onRefresh: () => viewModel.fetchCuDans(),
+                child: _buildContent(viewModel, filteredList),
               ),
             ),
+          ],
+        ),
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton(
+            heroTag: 'cu_dan_add_fab',
+            backgroundColor: AppColors.tealPrimary,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CuDanFormView()),
+              );
+            },
+            child: const Icon(Icons.add_rounded, color: Colors.white),
           ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Text(
-              'Cư dân',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

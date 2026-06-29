@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/features/dashboard/ViewModels/dashboard_viewmodel.dart';
+import 'package:urbano_manage/core/constants/navigation_tabs.dart';
 
 class DashboardView extends StatefulWidget {
   final Function(int) onNavigate;
@@ -24,82 +24,13 @@ class _DashboardViewState extends State<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent,
-      ),
-    );
-
     final viewModel = context.watch<DashboardViewModel>();
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAppbar(),
-              const SizedBox(height: 24),
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.tealPrimary,
-                  backgroundColor: AppColors.bgMid,
-                  onRefresh: () => viewModel.fetchDashboardData(),
-                  child: _buildContent(viewModel),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppbar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Row(
-        children: [
-          Builder(
-            builder: (context) => GestureDetector(
-              onTap: () => Scaffold.of(context).openDrawer(),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderButton),
-                ),
-                child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Text(
-              'Tổng quan',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return RefreshIndicator(
+      color: AppColors.tealPrimary,
+      backgroundColor: AppColors.bgMid,
+      onRefresh: () => viewModel.fetchDashboardData(),
+      child: _buildContent(viewModel),
     );
   }
 
@@ -158,28 +89,28 @@ class _DashboardViewState extends State<DashboardView> {
           value: residentVal,
           icon: Icons.people_alt_rounded,
           color: AppColors.blue,
-          onTap: () => widget.onNavigate(1),
+          onTap: () => widget.onNavigate(NavigationTabs.cuDan),
         ),
         _StatCard(
           title: 'Số căn hộ',
           value: apartmentVal,
           icon: Icons.apartment_rounded,
           color: AppColors.amber,
-          onTap: () => widget.onNavigate(2),
+          onTap: () => widget.onNavigate(NavigationTabs.canHo),
         ),
         _StatCard(
           title: 'Hóa đơn chưa trả',
           value: unpaidVal,
           icon: Icons.receipt_long_rounded,
           color: AppColors.red,
-          onTap: () => widget.onNavigate(3),
+          onTap: () => widget.onNavigate(NavigationTabs.hoaDon),
         ),
         _StatCard(
           title: 'Yêu cầu chờ xử lý',
           value: pendingVal,
           icon: Icons.pending_actions_rounded,
           color: AppColors.pink,
-          onTap: () => widget.onNavigate(5),
+          onTap: () => widget.onNavigate(NavigationTabs.yeuCauCuDan),
         ),
       ],
     );

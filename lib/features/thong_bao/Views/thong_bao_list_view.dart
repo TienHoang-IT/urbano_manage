@@ -78,74 +78,11 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ThongBaoViewModel>();
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAppbar(),
-              const SizedBox(height: 16),
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.tealPrimary,
-                  backgroundColor: AppColors.bgMid,
-                  onRefresh: () => viewModel.fetchThongBaos(),
-                  child: _buildContent(viewModel),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppbar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Row(
-        children: [
-          Builder(
-            builder: (context) => GestureDetector(
-              onTap: () => Scaffold.of(context).openDrawer(),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderButton),
-                ),
-                child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Text(
-              'Thông báo',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return RefreshIndicator(
+      color: AppColors.tealPrimary,
+      backgroundColor: AppColors.bgMid,
+      onRefresh: () => viewModel.fetchThongBaos(),
+      child: _buildContent(viewModel),
     );
   }
 

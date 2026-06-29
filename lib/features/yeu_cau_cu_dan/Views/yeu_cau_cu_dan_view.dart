@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
@@ -25,81 +24,22 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent,
-      ),
-    );
-
     final viewModel = context.watch<YeuCauCuDanViewModel>();
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          stops: [0.0, 0.5, 1.0],
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildAppbar(),
-            const SizedBox(height: 16),
-            _buildTabs(viewModel),
-            const SizedBox(height: 12),
-            Expanded(
-              child: RefreshIndicator(
-                color: AppColors.tealPrimary,
-                backgroundColor: AppColors.bgMid,
-                onRefresh: () => viewModel.fetchRequests(),
-                child: _buildContent(viewModel),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppbar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Scaffold.of(context).openDrawer(),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderButton),
-              ),
-              child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTabs(viewModel),
+        const SizedBox(height: 12),
+        Expanded(
+          child: RefreshIndicator(
+            color: AppColors.tealPrimary,
+            backgroundColor: AppColors.bgMid,
+            onRefresh: () => viewModel.fetchRequests(),
+            child: _buildContent(viewModel),
           ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Text(
-              'Yêu cầu Cư dân',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

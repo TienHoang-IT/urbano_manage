@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
+import 'package:urbano_manage/core/constants/navigation_tabs.dart';
 import 'package:urbano_manage/Models/nhan_vien_model.dart';
 import 'package:urbano_manage/features/auth/Views/login_view.dart';
 import 'package:urbano_manage/features/dashboard/Views/dashboard_view.dart';
@@ -20,7 +21,7 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  int _currentIndex = 0;
+  int _currentIndex = NavigationTabs.dashboard;
   String _employeeName = '';
   String _employeeCode = '';
 
@@ -89,34 +90,122 @@ class _MainShellState extends State<MainShell> {
     });
   }
 
-  Widget _buildBody() {
+  Widget _buildAppBar() {
+    String title = '';
     switch (_currentIndex) {
-      case 0:
-        return DashboardView(onNavigate: _onNavigate);
-      case 1:
-        return const CuDanListView();
-      case 2:
-        return const _PlaceholderPage(title: 'Căn hộ');
-      case 3:
-        return const HoaDonListView();
-      case 4:
-        return const _PlaceholderPage(title: 'Phí dịch vụ');
-      case 5:
-        return const YeuCauCuDanView();
-      case 6:
-        return const ThongBaoListView();
-      case 7:
-        return const NhanVienListView();
-      default:
-        return DashboardView(onNavigate: _onNavigate);
+      case NavigationTabs.dashboard:
+        title = 'Tổng quan';
+        break;
+      case NavigationTabs.cuDan:
+        title = 'Cư dân';
+        break;
+      case NavigationTabs.canHo:
+        title = 'Căn hộ';
+        break;
+      case NavigationTabs.hoaDon:
+        title = 'Hóa đơn';
+        break;
+      case NavigationTabs.phiDichVu:
+        title = 'Phí dịch vụ';
+        break;
+      case NavigationTabs.yeuCauCuDan:
+        title = 'Yêu cầu cư dân';
+        break;
+      case NavigationTabs.thongBao:
+        title = 'Thông báo';
+        break;
+      case NavigationTabs.nhanVien:
+        title = 'Nhân viên';
+        break;
     }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: Row(
+        children: [
+          Builder(
+            builder: (context) => GestureDetector(
+              onTap: () => Scaffold.of(context).openDrawer(),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderButton),
+                ),
+                child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return IndexedStack(
+      index: _currentIndex,
+      children: [
+        DashboardView(onNavigate: _onNavigate),
+        const CuDanListView(),
+        const _PlaceholderPage(title: 'Căn hộ'),
+        const HoaDonListView(),
+        const _PlaceholderPage(title: 'Phí dịch vụ'),
+        const YeuCauCuDanView(),
+        const ThongBaoListView(),
+        const NhanVienListView(),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        statusBarColor: Colors.transparent,
+      ),
+    );
+
     return Scaffold(
+      backgroundColor: AppColors.bgDark,
       drawer: _buildDrawer(),
-      body: _buildBody(),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            stops: [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildAppBar(),
+              const SizedBox(height: 16),
+              Expanded(
+                child: _buildBody(),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -130,14 +219,14 @@ class _MainShellState extends State<MainShell> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                _buildDrawerItem(0, 'Tổng quan', Icons.dashboard_rounded),
-                _buildDrawerItem(1, 'Cư dân', Icons.people_alt_rounded),
-                _buildDrawerItem(2, 'Căn hộ', Icons.apartment_rounded),
-                _buildDrawerItem(3, 'Hóa đơn', Icons.receipt_long_rounded),
-                _buildDrawerItem(4, 'Phí dịch vụ', Icons.monetization_on_rounded),
-                _buildDrawerItem(5, 'Yêu cầu cư dân', Icons.support_agent_rounded),
-                _buildDrawerItem(6, 'Thông báo', Icons.notifications_rounded),
-                _buildDrawerItem(7, 'Nhân viên', Icons.badge_rounded),
+                _buildDrawerItem(NavigationTabs.dashboard, 'Tổng quan', Icons.dashboard_rounded),
+                _buildDrawerItem(NavigationTabs.cuDan, 'Cư dân', Icons.people_alt_rounded),
+                _buildDrawerItem(NavigationTabs.canHo, 'Căn hộ', Icons.apartment_rounded),
+                _buildDrawerItem(NavigationTabs.hoaDon, 'Hóa đơn', Icons.receipt_long_rounded),
+                _buildDrawerItem(NavigationTabs.phiDichVu, 'Phí dịch vụ', Icons.monetization_on_rounded),
+                _buildDrawerItem(NavigationTabs.yeuCauCuDan, 'Yêu cầu cư dân', Icons.support_agent_rounded),
+                _buildDrawerItem(NavigationTabs.thongBao, 'Thông báo', Icons.notifications_rounded),
+                _buildDrawerItem(NavigationTabs.nhanVien, 'Nhân viên', Icons.badge_rounded),
                 const Divider(color: AppColors.borderButton, height: 20, thickness: 1),
                 ListTile(
                   leading: const Icon(Icons.logout_rounded, color: AppColors.red),
@@ -259,93 +348,29 @@ class _PlaceholderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent,
-      ),
-    );
-
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.construction_rounded, size: 48, color: AppColors.tealPrimary),
+          const SizedBox(height: 16),
+          const Text(
+            'Đang phát triển',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                child: Row(
-                  children: [
-                    Builder(
-                      builder: (context) => GestureDetector(
-                        onTap: () => Scaffold.of(context).openDrawer(),
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: AppColors.inputFill,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.borderButton),
-                          ),
-                          child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.construction_rounded, size: 48, color: AppColors.tealPrimary),
-                      SizedBox(height: 16),
-                      Text(
-                        'Đang phát triển',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Tính năng này đang được xây dựng',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          const SizedBox(height: 4),
+          Text(
+            'Tính năng này đang được xây dựng',
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.textMuted,
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

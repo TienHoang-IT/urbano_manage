@@ -39,9 +39,12 @@ Quy ước đặt tên file: `snake_case.dart`. Class: `PascalCase`. Mỗi featu
 mục riêng trong `features/`.
 
 ## 3. baseUrl & gọi API
-- Backend hiện trỏ tới `http://103.116.39.175/api`. Service đặt URL dạng
-  `static const String apiUrl = 'http://103.116.39.175/api/<TenController>';`
+- **Luôn lấy URL từ `ApiConfig.baseUrl`** (`lib/core/constants/api_config.dart`),
+  KHÔNG hardcode IP trong Service. Endpoint dạng `'${ApiConfig.baseUrl}/<TenController>'`
   khớp route `api/[controller]` của ASP.NET (vd `YeuCauCuDan`, `NhanVien`, `CanHo`).
+- **LẤY TÊN FIELD CHÍNH XÁC TỪ SWAGGER**: trước khi viết Model, mở Swagger UI tại
+  **http://localhost:5080/swagger/index.html** (API chạy local), xem schema response
+  thật của endpoint để dùng đúng tên field camelCase. TUYỆT ĐỐI không đoán tên field.
 - **Luôn decode UTF-8**: `jsonDecode(utf8.decode(response.bodyBytes))` để không lỗi
   tiếng Việt (đừng dùng `response.body` cho dữ liệu có dấu).
 - Response list có thể là **mảng trần** hoặc `{ "value": [...] }` — xử lý cả hai
@@ -49,7 +52,27 @@ mục riêng trong `features/`.
 - Thành công đọc: `statusCode == 200`. Thành công ghi (PUT/DELETE): chấp nhận
   `200 || 204`. Thất bại: `throw Exception('Thông báo tiếng Việt (${response.statusCode})')`.
 
-## 4. Công thức thêm một feature `X` (vd: quản lý Căn hộ)
+## 3b. ĐIỀU HƯỚNG — MainShell (LUẬT BẮT BUỘC)
+
+App quản lý dùng **một khung `MainShell`** giữ thanh điều hướng (Drawer/NavigationRail/
+BottomNav). **MỌI màn chức năng là "body" hiển thị BÊN TRONG MainShell**, không phải
+route toàn màn hình riêng.
+
+- **KHÔNG** dùng `Navigator.push(MaterialPageRoute(...))` để mở một màn chức năng
+  (Cư dân, Hóa đơn, ...) như trang mới — làm vậy sẽ tạo Scaffold riêng và **mất thanh
+  điều hướng**. Đây chính là lỗi "trang này bấm được nav, trang kia không".
+- Chuyển màn bằng cách **đổi nội dung body của MainShell** (vd `IndexedStack` +
+  chỉ số mục đang chọn, hoặc một biến `selectedItem` rồi `switch` ra widget tương ứng).
+- Mỗi màn chức năng chỉ trả về **phần nội dung** (body), KHÔNG tự bọc `Scaffold` có
+  Drawer riêng. `Scaffold` + `AppBar` + Drawer là của MainShell, dùng chung.
+- Cần điều hướng từ trong một màn (vd bấm thẻ Dashboard sang Cư dân) → gọi hàm đổi mục
+  của MainShell (truyền callback hoặc dùng một controller/Provider điều hướng), KHÔNG push.
+- Chi tiết một bản ghi (vd xem 1 cư dân) có thể mở dạng dialog/bottom-sheet, hoặc nếu
+  push trang chi tiết thì trang đó có nút back rõ ràng — nhưng các MỤC CHÍNH luôn ở
+  trong shell.
+
+> Khi thêm màn mới: đăng ký nó như một mục trong MainShell, đừng tạo route rời.
+
 
 ### Bước 1 — Model (`lib/Models/can_ho_model.dart`)
 Theo khuôn `Models/yeu_cau_cu_dan_model.dart`:

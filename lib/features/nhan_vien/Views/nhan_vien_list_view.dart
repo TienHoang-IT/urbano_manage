@@ -56,73 +56,18 @@ class _NhanVienListViewState extends State<NhanVienListView> {
           n.email.toLowerCase().contains(query);
     }).toList();
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
+    return Column(
+      children: [
+        _buildSearchBox(),
+        Expanded(
+          child: RefreshIndicator(
+            color: AppColors.tealPrimary,
+            backgroundColor: AppColors.bgMid,
+            onRefresh: () => viewModel.fetchNhanViens(),
+            child: _buildContent(viewModel, filteredList),
           ),
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildAppbar(),
-              _buildSearchBox(),
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.tealPrimary,
-                  backgroundColor: AppColors.bgMid,
-                  onRefresh: () => viewModel.fetchNhanViens(),
-                  child: _buildContent(viewModel, filteredList),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppbar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Row(
-        children: [
-          Builder(
-            builder: (context) => GestureDetector(
-              onTap: () => Scaffold.of(context).openDrawer(),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderButton),
-                ),
-                child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Text(
-              'Nhân viên',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
