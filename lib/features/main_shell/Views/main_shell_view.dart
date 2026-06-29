@@ -8,6 +8,7 @@ import 'package:urbano_manage/features/auth/Views/login_view.dart';
 import 'package:urbano_manage/features/dashboard/Views/dashboard_view.dart';
 import 'package:urbano_manage/features/yeu_cau_cu_dan/Views/yeu_cau_cu_dan_view.dart';
 import 'package:urbano_manage/features/cu_dan/Views/cu_dan_list_view.dart';
+import 'package:urbano_manage/features/hoa_don/Views/hoa_don_list_view.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -95,7 +96,7 @@ class _MainShellState extends State<MainShell> {
       case 2:
         return const _PlaceholderPage(title: 'Căn hộ');
       case 3:
-        return const _PlaceholderPage(title: 'Hóa đơn');
+        return const HoaDonListView();
       case 4:
         return const _PlaceholderPage(title: 'Phí dịch vụ');
       case 5:
