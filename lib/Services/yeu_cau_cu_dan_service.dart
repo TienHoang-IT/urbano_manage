@@ -3,8 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:urbano_manage/Models/yeu_cau_cu_dan_model.dart';
 import 'package:urbano_manage/Models/loai_yeu_cau_model.dart';
 
+import 'package:urbano_manage/core/constants/api_config.dart';
+import 'package:urbano_manage/core/network/auth_http.dart';
+
 class YeuCauCuDanService {
-  static const String apiUrl = 'http://103.116.39.175/api/YeuCauCuDan';
+  static const String apiUrl = '${ApiConfig.baseUrl}/YeuCauCuDan';
 
   /// Fetches resident requests list, optionally filtered by status
   Future<List<YeuCauCuDan>> fetchYeuCaus({int? trangThai}) async {
@@ -13,7 +16,8 @@ class YeuCauCuDanService {
       url = '$apiUrl?trangThai=$trangThai';
     }
 
-    final response = await http.get(Uri.parse(url));
+    final headers = await AuthHttp.getHeaders();
+    final response = await http.get(Uri.parse(url), headers: headers);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -37,9 +41,10 @@ class YeuCauCuDanService {
       'nhanVienXuLy': nhanVienXuLy,
     });
 
+    final headers = await AuthHttp.getHeaders();
     final response = await http.put(
       Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
+      headers: headers,
       body: body,
     );
 
@@ -49,7 +54,8 @@ class YeuCauCuDanService {
   /// Fetches request types list
   Future<List<LoaiYeuCau>> fetchLoaiYeuCaus() async {
     final url = '$apiUrl/loai-yeu-cau';
-    final response = await http.get(Uri.parse(url));
+    final headers = await AuthHttp.getHeaders();
+    final response = await http.get(Uri.parse(url), headers: headers);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));

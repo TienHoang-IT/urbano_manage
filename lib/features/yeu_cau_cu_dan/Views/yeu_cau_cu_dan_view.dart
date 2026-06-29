@@ -34,36 +34,34 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
 
     final viewModel = context.watch<YeuCauCuDanViewModel>();
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
-          ),
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          stops: [0.0, 0.5, 1.0],
         ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAppbar(),
-              const SizedBox(height: 16),
-              _buildTabs(viewModel),
-              const SizedBox(height: 12),
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.tealPrimary,
-                  backgroundColor: AppColors.bgMid,
-                  onRefresh: () => viewModel.fetchRequests(),
-                  child: _buildContent(viewModel),
-                ),
+      ),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildAppbar(),
+            const SizedBox(height: 16),
+            _buildTabs(viewModel),
+            const SizedBox(height: 12),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.tealPrimary,
+                backgroundColor: AppColors.bgMid,
+                onRefresh: () => viewModel.fetchRequests(),
+                child: _buildContent(viewModel),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -74,15 +72,19 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.inputFill,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderButton),
+          GestureDetector(
+            onTap: () => Scaffold.of(context).openDrawer(),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.inputFill,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderButton),
+              ),
+              child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
             ),
-            child: const Icon(Icons.support_agent_rounded, size: 22, color: AppColors.tealPrimary),
           ),
           const SizedBox(width: 14),
           const Expanded(

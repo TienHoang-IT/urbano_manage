@@ -8,7 +8,7 @@ class LoginResultNhanVien {
 
   factory LoginResultNhanVien.fromJson(Map<String, dynamic> json) {
     return LoginResultNhanVien(
-      token: json['accessToken'] as String,
+      token: json['token'] as String,
       nhanVien: NhanVien.fromJson(json['user']),
     );
   }
