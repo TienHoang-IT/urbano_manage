@@ -78,11 +78,14 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ThongBaoViewModel>();
 
-    return RefreshIndicator(
-      color: AppColors.tealPrimary,
-      backgroundColor: AppColors.bgMid,
-      onRefresh: () => viewModel.fetchThongBaos(),
-      child: _buildContent(viewModel),
+    return Material(
+      type: MaterialType.transparency,
+      child: RefreshIndicator(
+        color: AppColors.tealPrimary,
+        backgroundColor: AppColors.bgMid,
+        onRefresh: () => viewModel.fetchThongBaos(),
+        child: _buildContent(viewModel),
+      ),
     );
   }
 
@@ -129,14 +132,14 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
         final t = viewModel.thongBaos[index];
         final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(t.createdAt.toLocal());
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.nenContainer,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderButton),
-          ),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
           child: ListTile(
+            tileColor: AppColors.nenContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: AppColors.borderButton),
+            ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: Container(
               padding: const EdgeInsets.all(10),

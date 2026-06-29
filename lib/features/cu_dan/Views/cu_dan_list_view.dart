@@ -40,37 +40,40 @@ class _CuDanListViewState extends State<CuDanListView> {
           c.email.toLowerCase().contains(query);
     }).toList();
 
-    return Stack(
-      children: [
-        Column(
-          children: [
-            _buildSearchBox(),
-            Expanded(
-              child: RefreshIndicator(
-                color: AppColors.tealPrimary,
-                backgroundColor: AppColors.bgMid,
-                onRefresh: () => viewModel.fetchCuDans(),
-                child: _buildContent(viewModel, filteredList),
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              _buildSearchBox(),
+              Expanded(
+                child: RefreshIndicator(
+                  color: AppColors.tealPrimary,
+                  backgroundColor: AppColors.bgMid,
+                  onRefresh: () => viewModel.fetchCuDans(),
+                  child: _buildContent(viewModel, filteredList),
+                ),
               ),
-            ),
-          ],
-        ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton(
-            heroTag: 'cu_dan_add_fab',
-            backgroundColor: AppColors.tealPrimary,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CuDanFormView()),
-              );
-            },
-            child: const Icon(Icons.add_rounded, color: Colors.white),
+            ],
           ),
-        ),
-      ],
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              heroTag: 'cu_dan_add_fab',
+              backgroundColor: AppColors.tealPrimary,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CuDanFormView()),
+                );
+              },
+              child: const Icon(Icons.add_rounded, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -163,14 +166,14 @@ class _CuDanListViewState extends State<CuDanListView> {
         final c = filteredList[index];
         final initial = c.ten.isNotEmpty ? c.ten[0].toUpperCase() : 'C';
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.nenContainer,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderButton),
-          ),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
           child: ListTile(
+            tileColor: AppColors.nenContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: AppColors.borderButton),
+            ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
               radius: 22,

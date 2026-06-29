@@ -25,20 +25,23 @@ class _HoaDonListViewState extends State<HoaDonListView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HoaDonViewModel>();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTabs(viewModel),
-        const SizedBox(height: 12),
-        Expanded(
-          child: RefreshIndicator(
-            color: AppColors.tealPrimary,
-            backgroundColor: AppColors.bgMid,
-            onRefresh: () => viewModel.fetchHoaDons(),
-            child: _buildContent(viewModel),
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTabs(viewModel),
+          const SizedBox(height: 12),
+          Expanded(
+            child: RefreshIndicator(
+              color: AppColors.tealPrimary,
+              backgroundColor: AppColors.bgMid,
+              onRefresh: () => viewModel.fetchHoaDons(),
+              child: _buildContent(viewModel),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -143,14 +146,14 @@ class _HoaDonListViewState extends State<HoaDonListView> {
             statusColor = AppColors.amber;
         }
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.nenContainer,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderButton),
-          ),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
           child: ListTile(
+            tileColor: AppColors.nenContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: AppColors.borderButton),
+            ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

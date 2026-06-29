@@ -26,11 +26,14 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<DashboardViewModel>();
 
-    return RefreshIndicator(
-      color: AppColors.tealPrimary,
-      backgroundColor: AppColors.bgMid,
-      onRefresh: () => viewModel.fetchDashboardData(),
-      child: _buildContent(viewModel),
+    return Material(
+      type: MaterialType.transparency,
+      child: RefreshIndicator(
+        color: AppColors.tealPrimary,
+        backgroundColor: AppColors.bgMid,
+        onRefresh: () => viewModel.fetchDashboardData(),
+        child: _buildContent(viewModel),
+      ),
     );
   }
 

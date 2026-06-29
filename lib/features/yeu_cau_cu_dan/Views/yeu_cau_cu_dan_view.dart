@@ -26,20 +26,23 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<YeuCauCuDanViewModel>();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTabs(viewModel),
-        const SizedBox(height: 12),
-        Expanded(
-          child: RefreshIndicator(
-            color: AppColors.tealPrimary,
-            backgroundColor: AppColors.bgMid,
-            onRefresh: () => viewModel.fetchRequests(),
-            child: _buildContent(viewModel),
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTabs(viewModel),
+          const SizedBox(height: 12),
+          Expanded(
+            child: RefreshIndicator(
+              color: AppColors.tealPrimary,
+              backgroundColor: AppColors.bgMid,
+              onRefresh: () => viewModel.fetchRequests(),
+              child: _buildContent(viewModel),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -164,25 +167,29 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
 
     final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(yc.ngayGui.toLocal());
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => YeuCauCuDanDetailView(yeuCau: yc),
-          ),
-        );
-      },
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: AppColors.nenContainer,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: AppColors.nenContainer,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.borderButton),
-        ),
-        child: Column(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => YeuCauCuDanDetailView(yeuCau: yc),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.borderButton),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -281,6 +288,8 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
               ],
             ),
           ],
+        ),
+      ),
         ),
       ),
     );
