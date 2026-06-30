@@ -1,9 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:urbano_manage/features/dashboard/ViewModels/dashboard_viewmodel.dart';
+import 'package:urbano_manage/Services/dashboard_service.dart';
 import 'package:urbano_manage/Services/cu_dan_service.dart';
 import 'package:urbano_manage/Services/hoa_don_service.dart';
 import 'package:urbano_manage/Services/yeu_cau_cu_dan_service.dart';
 import 'package:urbano_manage/Models/yeu_cau_cu_dan_model.dart';
+
+class FakeDashboardService extends DashboardService {
+  final bool shouldFail;
+  final Map<String, dynamic>? response;
+  FakeDashboardService({this.shouldFail = true, this.response});
+
+  @override
+  Future<Map<String, dynamic>> fetchStatistics() async {
+    if (shouldFail) throw Exception('API not implemented');
+    return response ?? {};
+  }
+}
 
 class FakeCuDanService extends CuDanService {
   final int count;
@@ -42,8 +55,11 @@ class FakeYeuCauCuDanService extends YeuCauCuDanService {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('DashboardViewModel Tests', () {
     test('fetchDashboardData successfully updates counts', () async {
+      final dashboardService = FakeDashboardService(shouldFail: true);
       final cuDanService = FakeCuDanService(count: 10);
       final hoaDonService = FakeHoaDonService(count: 5);
       final yeuCauService = FakeYeuCauCuDanService(list: [
@@ -68,6 +84,7 @@ void main() {
       ]);
 
       final viewModel = DashboardViewModel(
+        dashboardService: dashboardService,
         cuDanService: cuDanService,
         hoaDonService: hoaDonService,
         yeuCauService: yeuCauService,
@@ -82,17 +99,19 @@ void main() {
       expect(viewModel.isLoading, isFalse);
       expect(viewModel.error, isNull);
       expect(viewModel.residentCount, 10);
-      expect(viewModel.apartmentCount, isNull); // Always null due to no API
+      expect(viewModel.apartmentCount, 45); // Fallback mock value
       expect(viewModel.unpaidBillCount, 5);
       expect(viewModel.pendingRequestCount, 1);
     });
 
     test('fetchDashboardData handles error gracefully', () async {
+      final dashboardService = FakeDashboardService(shouldFail: true);
       final cuDanService = FakeCuDanService(count: 10, shouldFail: true);
       final hoaDonService = FakeHoaDonService(count: 5);
       final yeuCauService = FakeYeuCauCuDanService(list: []);
 
       final viewModel = DashboardViewModel(
+        dashboardService: dashboardService,
         cuDanService: cuDanService,
         hoaDonService: hoaDonService,
         yeuCauService: yeuCauService,

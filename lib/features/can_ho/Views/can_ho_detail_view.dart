@@ -3,58 +3,42 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_confirm_dialog.dart';
-import 'package:urbano_manage/Models/nhan_vien_model.dart';
-import 'package:urbano_manage/features/nhan_vien/ViewModels/nhan_vien_viewmodel.dart';
-import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_form_view.dart';
+import 'package:urbano_manage/Models/can_ho_model.dart';
+import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
+import 'package:urbano_manage/features/can_ho/Views/can_ho_form_view.dart';
 
-class NhanVienDetailView extends StatefulWidget {
-  final NhanVien nhanVien;
+class CanHoDetailView extends StatefulWidget {
+  final CanHo canHo;
 
-  const NhanVienDetailView({super.key, required this.nhanVien});
+  const CanHoDetailView({super.key, required this.canHo});
 
   @override
-  State<NhanVienDetailView> createState() => _NhanVienDetailViewState();
+  State<CanHoDetailView> createState() => _CanHoDetailViewState();
 }
 
-class _NhanVienDetailViewState extends State<NhanVienDetailView> {
-  late NhanVien _currentNhanVien;
+class _CanHoDetailViewState extends State<CanHoDetailView> {
+  late CanHo _currentCanHo;
 
   @override
   void initState() {
     super.initState();
-    _currentNhanVien = widget.nhanVien;
-  }
-
-  String _getChucVuText(int chucVu) {
-    switch (chucVu) {
-      case 1:
-        return 'Admin';
-      case 2:
-        return 'Kế toán';
-      case 3:
-        return 'Kỹ thuật';
-      case 4:
-        return 'Lễ tân';
-      default:
-        return 'Nhân viên';
-    }
+    _currentCanHo = widget.canHo;
   }
 
   Future<void> _navigateToEdit(BuildContext context) async {
     final result = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => NhanVienFormView(nhanVien: _currentNhanVien)),
+      MaterialPageRoute(builder: (_) => CanHoFormView(canHo: _currentCanHo)),
     );
 
-    if (result == true) {
-      // Find updated employee in view model and update local state
-      final vm = context.read<NhanVienViewModel>();
-      final updated = vm.nhanViens.firstWhere(
-        (nv) => nv.id == _currentNhanVien.id,
-        orElse: () => _currentNhanVien,
+    if (result == true && mounted) {
+      final vm = context.read<CanHoViewModel>();
+      final updated = vm.canHos.firstWhere(
+        (c) => c.id == _currentCanHo.id,
+        orElse: () => _currentCanHo,
       );
       setState(() {
-        _currentNhanVien = updated;
+        _currentCanHo = updated;
       });
     }
   }
@@ -63,15 +47,15 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
     final confirm = await AppConfirmDialog.show(
       context,
       title: 'Xác nhận xóa',
-      content: 'Bạn có chắc chắn muốn xóa nhân viên ${_currentNhanVien.hoTen} khỏi hệ thống?',
+      content: 'Bạn có chắc chắn muốn xóa căn hộ ${_currentCanHo.soCanHo} khỏi hệ thống?',
     );
 
     if (confirm == true && mounted) {
-      final success = await context.read<NhanVienViewModel>().removeNhanVien(_currentNhanVien.id);
+      final success = await context.read<CanHoViewModel>().removeCanHo(_currentCanHo.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Xóa nhân viên thành công'),
+            content: Text('Xóa căn hộ thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
         );
@@ -79,7 +63,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.read<NhanVienViewModel>().error ?? 'Không thể xóa nhân viên'),
+            content: Text(context.read<CanHoViewModel>().error ?? 'Không thể xóa căn hộ'),
             backgroundColor: AppColors.red,
           ),
         );
@@ -89,18 +73,25 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    final role = _getChucVuText(_currentNhanVien.chucVu);
-    final formattedDob = _currentNhanVien.ngaySinh != null
-        ? DateFormat('dd/MM/yyyy').format(_currentNhanVien.ngaySinh!.toLocal())
-        : 'Chưa cập nhật';
-    final formattedHiredDate = _currentNhanVien.ngayVaoLam != null
-        ? DateFormat('dd/MM/yyyy').format(_currentNhanVien.ngayVaoLam!.toLocal())
-        : 'Chưa cập nhật';
-    final formattedResignedDate = _currentNhanVien.ngayNghiLam != null
-        ? DateFormat('dd/MM/yyyy').format(_currentNhanVien.ngayNghiLam!.toLocal())
-        : 'Đang làm việc';
+    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+    final formattedPrice = _currentCanHo.gia != null ? currencyFormat.format(_currentCanHo.gia) : 'Chưa cập nhật';
+    final formattedCreatedAt = DateFormat('dd/MM/yyyy HH:mm').format(_currentCanHo.createdAt.toLocal());
+    final formattedUpdatedAt = DateFormat('dd/MM/yyyy HH:mm').format(_currentCanHo.updatedAt.toLocal());
 
-    final initial = _currentNhanVien.hoTen.isNotEmpty ? _currentNhanVien.hoTen[0].toUpperCase() : 'N';
+    Color statusColor;
+    switch (_currentCanHo.trangThaiId) {
+      case 1: // Đang ở
+        statusColor = AppColors.tealPrimary;
+        break;
+      case 2: // Trống
+        statusColor = AppColors.blue;
+        break;
+      case 3: // Bảo trì
+        statusColor = AppColors.amber;
+        break;
+      default:
+        statusColor = AppColors.red;
+    }
 
     return Scaffold(
       body: Container(
@@ -122,25 +113,20 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeaderCard(initial, role),
+                      _buildHeaderCard(statusColor),
                       const SizedBox(height: 20),
-                      _buildInfoSection('Thông tin nhân viên', [
-                        _buildInfoRow(Icons.badge_rounded, 'Mã nhân viên', _currentNhanVien.maNhanVien),
-                        _buildInfoRow(Icons.cake_rounded, 'Ngày sinh', formattedDob),
-                        _buildInfoRow(Icons.perm_identity_rounded, 'Số CCCD', _currentNhanVien.cccd.isNotEmpty ? _currentNhanVien.cccd : 'Chưa cập nhật'),
+                      _buildInfoSection('Chi tiết Căn hộ', [
+                        _buildInfoRow(Icons.business_rounded, 'Tòa nhà', _currentCanHo.tenToaNha),
+                        _buildInfoRow(Icons.layers_rounded, 'Số tầng', 'Tầng ${_currentCanHo.tang}'),
+                        _buildInfoRow(Icons.category_rounded, 'Loại căn hộ', _currentCanHo.tenLoaiCanHo),
+                        _buildInfoRow(Icons.attach_money_rounded, 'Giá bán/thuê', formattedPrice),
                       ]),
                       const SizedBox(height: 16),
-                      _buildInfoSection('Thông tin liên hệ', [
-                        _buildInfoRow(Icons.phone_rounded, 'Điện thoại', _currentNhanVien.sdt.isNotEmpty ? _currentNhanVien.sdt : 'Chưa cập nhật'),
-                        _buildInfoRow(Icons.email_rounded, 'Email', _currentNhanVien.email.isNotEmpty ? _currentNhanVien.email : 'Chưa cập nhật'),
-                      ]),
-                      const SizedBox(height: 16),
-                      _buildInfoSection('Công việc', [
-                        _buildInfoRow(Icons.work_history_rounded, 'Ngày vào làm', formattedHiredDate),
-                        _buildInfoRow(Icons.work_off_rounded, 'Ngày nghỉ làm', formattedResignedDate),
-                        _buildInfoRow(Icons.notes_rounded, 'Ghi chú', _currentNhanVien.ghiChu.isNotEmpty ? _currentNhanVien.ghiChu : 'Không có ghi chú'),
+                      _buildInfoSection('Thông tin cập nhật', [
+                        _buildInfoRow(Icons.person_outline_rounded, 'Người cập nhật', _currentCanHo.tenNguoiCapNhat.isNotEmpty ? _currentCanHo.tenNguoiCapNhat : 'Ban Quản Lý'),
+                        _buildInfoRow(Icons.calendar_today_rounded, 'Ngày khởi tạo', formattedCreatedAt),
+                        _buildInfoRow(Icons.edit_calendar_rounded, 'Cập nhật cuối', formattedUpdatedAt),
                       ]),
                     ],
                   ),
@@ -159,7 +145,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
+            onTap: () => Navigator.of(context).pop(true),
             child: Container(
               width: 40,
               height: 40,
@@ -174,7 +160,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
           const SizedBox(width: 14),
           const Expanded(
             child: Text(
-              'Chi tiết Nhân viên',
+              'Chi tiết Căn hộ',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -215,7 +201,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
     );
   }
 
-  Widget _buildHeaderCard(String initial, String role) {
+  Widget _buildHeaderCard(Color statusColor) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -232,10 +218,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
             child: CircleAvatar(
               radius: 36,
               backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
-              child: Text(
-                initial,
-                style: const TextStyle(color: AppColors.tealPrimary, fontSize: 32, fontWeight: FontWeight.bold),
-              ),
+              child: const Icon(Icons.apartment_rounded, color: AppColors.tealPrimary, size: 36),
             ),
           ),
           const SizedBox(width: 20),
@@ -244,20 +227,20 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _currentNhanVien.hoTen,
+                  'Căn hộ ${_currentCanHo.soCanHo}',
                   style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.tealPrimary.withValues(alpha: 0.15),
+                    color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.borderSide),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                   ),
                   child: Text(
-                    role,
-                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.bold),
+                    _currentCanHo.tenTrangThai.isNotEmpty ? _currentCanHo.tenTrangThai : 'Chưa cập nhật',
+                    style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

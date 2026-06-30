@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 import 'package:urbano_manage/features/hoa_don/Views/hoa_don_detail_view.dart';
+import 'package:urbano_manage/features/hoa_don/Views/hoa_don_form_view.dart';
 
 class HoaDonListView extends StatefulWidget {
   const HoaDonListView({super.key});
@@ -27,17 +28,40 @@ class _HoaDonListViewState extends State<HoaDonListView> {
 
     return Material(
       type: MaterialType.transparency,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          _buildTabs(viewModel),
-          const SizedBox(height: 12),
-          Expanded(
-            child: RefreshIndicator(
-              color: AppColors.tealPrimary,
-              backgroundColor: AppColors.bgMid,
-              onRefresh: () => viewModel.fetchHoaDons(),
-              child: _buildContent(viewModel),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTabs(viewModel),
+              const SizedBox(height: 12),
+              Expanded(
+                child: RefreshIndicator(
+                  color: AppColors.tealPrimary,
+                  backgroundColor: AppColors.bgMid,
+                  onRefresh: () => viewModel.fetchHoaDons(),
+                  child: _buildContent(viewModel),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              heroTag: 'hoa_don_add_fab',
+              backgroundColor: AppColors.tealPrimary,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HoaDonFormView()),
+                ).then((value) {
+                  if (value == true) {
+                    context.read<HoaDonViewModel>().fetchHoaDons();
+                  }
+                });
+              },
+              child: const Icon(Icons.add_rounded, color: Colors.white),
             ),
           ),
         ],
@@ -129,7 +153,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
       itemCount: viewModel.hoaDons.length,
       itemBuilder: (context, index) {
         final h = viewModel.hoaDons[index];
@@ -140,10 +164,13 @@ class _HoaDonListViewState extends State<HoaDonListView> {
             statusColor = AppColors.red;
             break;
           case 2:
+            statusColor = AppColors.amber;
+            break;
+          case 3:
             statusColor = AppColors.tealPrimary;
             break;
           default:
-            statusColor = AppColors.amber;
+            statusColor = AppColors.red;
         }
 
         return Padding(
@@ -209,7 +236,9 @@ class _HoaDonListViewState extends State<HoaDonListView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => HoaDonDetailView(hoaDon: h)),
-              );
+              ).then((value) {
+                context.read<HoaDonViewModel>().fetchHoaDons();
+              });
             },
           ),
         );

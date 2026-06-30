@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/Models/thong_bao_model.dart';
 import 'package:urbano_manage/features/thong_bao/ViewModels/thong_bao_viewmodel.dart';
+import 'package:urbano_manage/features/thong_bao/Views/thong_bao_detail_view.dart';
+import 'package:urbano_manage/features/thong_bao/Views/thong_bao_form_view.dart';
 
 class ThongBaoListView extends StatefulWidget {
   const ThongBaoListView({super.key});
@@ -21,70 +23,40 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
     });
   }
 
-  void _showFullNotification(BuildContext context, ThongBao t) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(t.createdAt.toLocal());
-        return AlertDialog(
-          backgroundColor: AppColors.bgMid,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(
-            t.tieuDe,
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.person_outline_rounded, size: 14, color: AppColors.tealPrimary),
-                    const SizedBox(width: 6),
-                    Text(
-                      t.tenNguoiTao,
-                      style: const TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.w500),
-                    ),
-                    const Spacer(),
-                    Text(
-                      formattedDate,
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const Divider(color: AppColors.borderButton, height: 1),
-                const SizedBox(height: 16),
-                Text(
-                  t.noiDung,
-                  style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.5),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Đóng', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ThongBaoViewModel>();
 
     return Material(
       type: MaterialType.transparency,
-      child: RefreshIndicator(
-        color: AppColors.tealPrimary,
-        backgroundColor: AppColors.bgMid,
-        onRefresh: () => viewModel.fetchThongBaos(),
-        child: _buildContent(viewModel),
+      child: Stack(
+        children: [
+          RefreshIndicator(
+            color: AppColors.tealPrimary,
+            backgroundColor: AppColors.bgMid,
+            onRefresh: () => viewModel.fetchThongBaos(),
+            child: _buildContent(viewModel),
+          ),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              heroTag: 'thong_bao_add_fab',
+              backgroundColor: AppColors.tealPrimary,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ThongBaoFormView()),
+                ).then((value) {
+                  if (value == true) {
+                    context.read<ThongBaoViewModel>().fetchThongBaos();
+                  }
+                });
+              },
+              child: const Icon(Icons.add_rounded, color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -126,7 +98,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
       itemCount: viewModel.thongBaos.length,
       itemBuilder: (context, index) {
         final t = viewModel.thongBaos[index];
@@ -183,14 +155,22 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
                     const Icon(Icons.person_outline_rounded, size: 12, color: AppColors.tealPrimary),
                     const SizedBox(width: 4),
                     Text(
-                      t.tenNguoiTao,
+                      t.tenNguoiTao.isNotEmpty ? t.tenNguoiTao : 'Ban Quản Lý',
                       style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
               ],
             ),
-            onTap: () => _showFullNotification(context, t),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ThongBaoDetailView(thongBao: t)),
+              ).then((value) {
+                context.read<ThongBaoViewModel>().fetchThongBaos();
+              });
+            },
           ),
         );
       },

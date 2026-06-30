@@ -3,58 +3,42 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_confirm_dialog.dart';
-import 'package:urbano_manage/Models/nhan_vien_model.dart';
-import 'package:urbano_manage/features/nhan_vien/ViewModels/nhan_vien_viewmodel.dart';
-import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_form_view.dart';
+import 'package:urbano_manage/Models/phi_dich_vu_model.dart';
+import 'package:urbano_manage/features/phi_dich_vu/ViewModels/phi_dich_vu_viewmodel.dart';
+import 'package:urbano_manage/features/phi_dich_vu/Views/phi_dich_vu_form_view.dart';
 
-class NhanVienDetailView extends StatefulWidget {
-  final NhanVien nhanVien;
+class PhiDichVuDetailView extends StatefulWidget {
+  final PhiDichVu phiDichVu;
 
-  const NhanVienDetailView({super.key, required this.nhanVien});
+  const PhiDichVuDetailView({super.key, required this.phiDichVu});
 
   @override
-  State<NhanVienDetailView> createState() => _NhanVienDetailViewState();
+  State<PhiDichVuDetailView> createState() => _PhiDichVuDetailViewState();
 }
 
-class _NhanVienDetailViewState extends State<NhanVienDetailView> {
-  late NhanVien _currentNhanVien;
+class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
+  late PhiDichVu _currentPhiDichVu;
 
   @override
   void initState() {
     super.initState();
-    _currentNhanVien = widget.nhanVien;
-  }
-
-  String _getChucVuText(int chucVu) {
-    switch (chucVu) {
-      case 1:
-        return 'Admin';
-      case 2:
-        return 'Kế toán';
-      case 3:
-        return 'Kỹ thuật';
-      case 4:
-        return 'Lễ tân';
-      default:
-        return 'Nhân viên';
-    }
+    _currentPhiDichVu = widget.phiDichVu;
   }
 
   Future<void> _navigateToEdit(BuildContext context) async {
     final result = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => NhanVienFormView(nhanVien: _currentNhanVien)),
+      MaterialPageRoute(builder: (_) => PhiDichVuFormView(phiDichVu: _currentPhiDichVu)),
     );
 
-    if (result == true) {
-      // Find updated employee in view model and update local state
-      final vm = context.read<NhanVienViewModel>();
-      final updated = vm.nhanViens.firstWhere(
-        (nv) => nv.id == _currentNhanVien.id,
-        orElse: () => _currentNhanVien,
+    if (result == true && mounted) {
+      final vm = context.read<PhiDichVuViewModel>();
+      final updated = vm.phiDichVus.firstWhere(
+        (p) => p.id == _currentPhiDichVu.id,
+        orElse: () => _currentPhiDichVu,
       );
       setState(() {
-        _currentNhanVien = updated;
+        _currentPhiDichVu = updated;
       });
     }
   }
@@ -63,15 +47,15 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
     final confirm = await AppConfirmDialog.show(
       context,
       title: 'Xác nhận xóa',
-      content: 'Bạn có chắc chắn muốn xóa nhân viên ${_currentNhanVien.hoTen} khỏi hệ thống?',
+      content: 'Bạn có chắc chắn muốn xóa phí dịch vụ "${_currentPhiDichVu.tenPhiDichVu}" khỏi hệ thống?',
     );
 
     if (confirm == true && mounted) {
-      final success = await context.read<NhanVienViewModel>().removeNhanVien(_currentNhanVien.id);
+      final success = await context.read<PhiDichVuViewModel>().removePhiDichVu(_currentPhiDichVu.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Xóa nhân viên thành công'),
+            content: Text('Xóa phí dịch vụ thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
         );
@@ -79,7 +63,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.read<NhanVienViewModel>().error ?? 'Không thể xóa nhân viên'),
+            content: Text(context.read<PhiDichVuViewModel>().error ?? 'Không thể xóa phí dịch vụ'),
             backgroundColor: AppColors.red,
           ),
         );
@@ -89,18 +73,10 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    final role = _getChucVuText(_currentNhanVien.chucVu);
-    final formattedDob = _currentNhanVien.ngaySinh != null
-        ? DateFormat('dd/MM/yyyy').format(_currentNhanVien.ngaySinh!.toLocal())
-        : 'Chưa cập nhật';
-    final formattedHiredDate = _currentNhanVien.ngayVaoLam != null
-        ? DateFormat('dd/MM/yyyy').format(_currentNhanVien.ngayVaoLam!.toLocal())
-        : 'Chưa cập nhật';
-    final formattedResignedDate = _currentNhanVien.ngayNghiLam != null
-        ? DateFormat('dd/MM/yyyy').format(_currentNhanVien.ngayNghiLam!.toLocal())
-        : 'Đang làm việc';
-
-    final initial = _currentNhanVien.hoTen.isNotEmpty ? _currentNhanVien.hoTen[0].toUpperCase() : 'N';
+    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+    final formattedPrice = currencyFormat.format(_currentPhiDichVu.donGia);
+    final formattedCreatedAt = DateFormat('dd/MM/yyyy HH:mm').format(_currentPhiDichVu.createdAt.toLocal());
+    final formattedUpdatedAt = DateFormat('dd/MM/yyyy HH:mm').format(_currentPhiDichVu.updatedAt.toLocal());
 
     return Scaffold(
       body: Container(
@@ -122,25 +98,20 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeaderCard(initial, role),
+                      _buildHeaderCard(),
                       const SizedBox(height: 20),
-                      _buildInfoSection('Thông tin nhân viên', [
-                        _buildInfoRow(Icons.badge_rounded, 'Mã nhân viên', _currentNhanVien.maNhanVien),
-                        _buildInfoRow(Icons.cake_rounded, 'Ngày sinh', formattedDob),
-                        _buildInfoRow(Icons.perm_identity_rounded, 'Số CCCD', _currentNhanVien.cccd.isNotEmpty ? _currentNhanVien.cccd : 'Chưa cập nhật'),
+                      _buildInfoSection('Chi tiết Phí Dịch Vụ', [
+                        _buildInfoRow(Icons.category_rounded, 'Loại dịch vụ', _currentPhiDichVu.tenLoaiPhiDichVu),
+                        _buildInfoRow(Icons.scale_rounded, 'Đơn vị tính', _currentPhiDichVu.tenDonViTinh),
+                        _buildInfoRow(Icons.calculate_rounded, 'Cách tính phí', _currentPhiDichVu.tenLoaiTinhPhi),
+                        _buildInfoRow(Icons.attach_money_rounded, 'Đơn giá', formattedPrice),
                       ]),
                       const SizedBox(height: 16),
-                      _buildInfoSection('Thông tin liên hệ', [
-                        _buildInfoRow(Icons.phone_rounded, 'Điện thoại', _currentNhanVien.sdt.isNotEmpty ? _currentNhanVien.sdt : 'Chưa cập nhật'),
-                        _buildInfoRow(Icons.email_rounded, 'Email', _currentNhanVien.email.isNotEmpty ? _currentNhanVien.email : 'Chưa cập nhật'),
-                      ]),
-                      const SizedBox(height: 16),
-                      _buildInfoSection('Công việc', [
-                        _buildInfoRow(Icons.work_history_rounded, 'Ngày vào làm', formattedHiredDate),
-                        _buildInfoRow(Icons.work_off_rounded, 'Ngày nghỉ làm', formattedResignedDate),
-                        _buildInfoRow(Icons.notes_rounded, 'Ghi chú', _currentNhanVien.ghiChu.isNotEmpty ? _currentNhanVien.ghiChu : 'Không có ghi chú'),
+                      _buildInfoSection('Thông tin cập nhật', [
+                        _buildInfoRow(Icons.person_outline_rounded, 'Người cập nhật', _currentPhiDichVu.tenNguoiCapNhat.isNotEmpty ? _currentPhiDichVu.tenNguoiCapNhat : 'Ban Quản Lý'),
+                        _buildInfoRow(Icons.calendar_today_rounded, 'Ngày khởi tạo', formattedCreatedAt),
+                        _buildInfoRow(Icons.edit_calendar_rounded, 'Cập nhật cuối', formattedUpdatedAt),
                       ]),
                     ],
                   ),
@@ -159,7 +130,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
+            onTap: () => Navigator.of(context).pop(true),
             child: Container(
               width: 40,
               height: 40,
@@ -174,7 +145,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
           const SizedBox(width: 14),
           const Expanded(
             child: Text(
-              'Chi tiết Nhân viên',
+              'Chi tiết Dịch vụ',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -215,7 +186,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
     );
   }
 
-  Widget _buildHeaderCard(String initial, String role) {
+  Widget _buildHeaderCard() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -232,10 +203,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
             child: CircleAvatar(
               radius: 36,
               backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
-              child: Text(
-                initial,
-                style: const TextStyle(color: AppColors.tealPrimary, fontSize: 32, fontWeight: FontWeight.bold),
-              ),
+              child: const Icon(Icons.room_service_rounded, color: AppColors.tealPrimary, size: 32),
             ),
           ),
           const SizedBox(width: 20),
@@ -244,8 +212,8 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _currentNhanVien.hoTen,
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  _currentPhiDichVu.tenPhiDichVu,
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Container(
@@ -256,7 +224,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
                     border: Border.all(color: AppColors.borderSide),
                   ),
                   child: Text(
-                    role,
+                    _currentPhiDichVu.tenLoaiPhiDichVu,
                     style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),

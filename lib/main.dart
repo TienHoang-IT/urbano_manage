@@ -10,6 +10,8 @@ import 'package:urbano_manage/features/cu_dan/ViewModels/cu_dan_viewmodel.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 import 'package:urbano_manage/features/thong_bao/ViewModels/thong_bao_viewmodel.dart';
 import 'package:urbano_manage/features/nhan_vien/ViewModels/nhan_vien_viewmodel.dart';
+import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
+import 'package:urbano_manage/features/phi_dich_vu/ViewModels/phi_dich_vu_viewmodel.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -29,6 +31,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => HoaDonViewModel()),
         ChangeNotifierProvider(create: (_) => ThongBaoViewModel()),
         ChangeNotifierProvider(create: (_) => NhanVienViewModel()),
+        ChangeNotifierProvider(create: (_) => CanHoViewModel()),
+        ChangeNotifierProvider(create: (_) => PhiDichVuViewModel()),
       ],
       child: const MyApp(),
     ),
@@ -36,11 +40,16 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  static final navigatorKey = GlobalKey<NavigatorState>();
+  static final messengerKey = GlobalKey<ScaffoldMessengerState>();
+
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
+      scaffoldMessengerKey: messengerKey,
       title: 'Urbano Manage',
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.bgDark,

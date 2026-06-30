@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
-import 'package:urbano_manage/Models/nhan_vien_model.dart';
-import 'package:urbano_manage/features/nhan_vien/ViewModels/nhan_vien_viewmodel.dart';
-import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_detail_view.dart';
-import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_form_view.dart';
+import 'package:urbano_manage/Models/can_ho_model.dart';
+import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
+import 'package:urbano_manage/features/can_ho/Views/can_ho_detail_view.dart';
+import 'package:urbano_manage/features/can_ho/Views/can_ho_form_view.dart';
 
-class NhanVienListView extends StatefulWidget {
-  const NhanVienListView({super.key});
+class CanHoListView extends StatefulWidget {
+  const CanHoListView({super.key});
 
   @override
-  State<NhanVienListView> createState() => _NhanVienListViewState();
+  State<CanHoListView> createState() => _CanHoListViewState();
 }
 
-class _NhanVienListViewState extends State<NhanVienListView> {
+class _CanHoListViewState extends State<CanHoListView> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -21,7 +21,7 @@ class _NhanVienListViewState extends State<NhanVienListView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NhanVienViewModel>().fetchNhanViens();
+      context.read<CanHoViewModel>().fetchCanHos();
     });
   }
 
@@ -31,30 +31,14 @@ class _NhanVienListViewState extends State<NhanVienListView> {
     super.dispose();
   }
 
-  String _getChucVuText(int chucVu) {
-    switch (chucVu) {
-      case 1:
-        return 'Admin';
-      case 2:
-        return 'Kế toán';
-      case 3:
-        return 'Kỹ thuật';
-      case 4:
-        return 'Lễ tân';
-      default:
-        return 'Nhân viên';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<NhanVienViewModel>();
-    final filteredList = viewModel.nhanViens.where((n) {
+    final viewModel = context.watch<CanHoViewModel>();
+    final filteredList = viewModel.canHos.where((c) {
       final query = _searchQuery.toLowerCase();
-      return n.hoTen.toLowerCase().contains(query) ||
-          n.maNhanVien.toLowerCase().contains(query) ||
-          n.sdt.contains(query) ||
-          n.email.toLowerCase().contains(query);
+      return c.soCanHo.toLowerCase().contains(query) ||
+          c.tenToaNha.toLowerCase().contains(query) ||
+          c.tenLoaiCanHo.toLowerCase().contains(query);
     }).toList();
 
     return Material(
@@ -68,7 +52,7 @@ class _NhanVienListViewState extends State<NhanVienListView> {
                 child: RefreshIndicator(
                   color: AppColors.tealPrimary,
                   backgroundColor: AppColors.bgMid,
-                  onRefresh: () => viewModel.fetchNhanViens(),
+                  onRefresh: () => viewModel.fetchCanHos(),
                   child: _buildContent(viewModel, filteredList),
                 ),
               ),
@@ -78,15 +62,15 @@ class _NhanVienListViewState extends State<NhanVienListView> {
             right: 16,
             bottom: 16,
             child: FloatingActionButton(
-              heroTag: 'nhan_vien_add_fab',
+              heroTag: 'can_ho_add_fab',
               backgroundColor: AppColors.tealPrimary,
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const NhanVienFormView()),
+                  MaterialPageRoute(builder: (_) => const CanHoFormView()),
                 ).then((value) {
                   if (value == true) {
-                    context.read<NhanVienViewModel>().fetchNhanViens();
+                    context.read<CanHoViewModel>().fetchCanHos();
                   }
                 });
               },
@@ -110,7 +94,7 @@ class _NhanVienListViewState extends State<NhanVienListView> {
         },
         style: const TextStyle(color: Colors.white, fontSize: 14),
         decoration: InputDecoration(
-          hintText: 'Tìm kiếm nhân viên (Tên, Mã NV, SĐT)...',
+          hintText: 'Tìm kiếm căn hộ (Số căn, Tòa nhà, Loại)...',
           hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
           prefixIcon: const Icon(Icons.search_rounded, color: AppColors.iconMuted),
           suffixIcon: _searchQuery.isNotEmpty
@@ -144,14 +128,14 @@ class _NhanVienListViewState extends State<NhanVienListView> {
     );
   }
 
-  Widget _buildContent(NhanVienViewModel viewModel, List<NhanVien> filteredList) {
-    if (viewModel.isLoading && viewModel.nhanViens.isEmpty) {
+  Widget _buildContent(CanHoViewModel viewModel, List<CanHo> filteredList) {
+    if (viewModel.isLoading && viewModel.canHos.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
 
-    if (viewModel.error != null && viewModel.nhanViens.isEmpty) {
+    if (viewModel.error != null && viewModel.canHos.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -163,7 +147,7 @@ class _NhanVienListViewState extends State<NhanVienListView> {
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
-              onPressed: () => viewModel.fetchNhanViens(),
+              onPressed: () => viewModel.fetchCanHos(),
               child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
             ),
           ],
@@ -174,7 +158,7 @@ class _NhanVienListViewState extends State<NhanVienListView> {
     if (filteredList.isEmpty) {
       return const Center(
         child: Text(
-          'Không tìm thấy nhân viên nào',
+          'Không tìm thấy căn hộ nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 14),
         ),
       );
@@ -184,9 +168,22 @@ class _NhanVienListViewState extends State<NhanVienListView> {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
       itemCount: filteredList.length,
       itemBuilder: (context, index) {
-        final nv = filteredList[index];
-        final initial = nv.hoTen.isNotEmpty ? nv.hoTen[0].toUpperCase() : 'N';
-        final role = _getChucVuText(nv.chucVu);
+        final ch = filteredList[index];
+
+        Color statusColor;
+        switch (ch.trangThaiId) {
+          case 1:
+            statusColor = AppColors.tealPrimary;
+            break;
+          case 2:
+            statusColor = AppColors.blue;
+            break;
+          case 3:
+            statusColor = AppColors.amber;
+            break;
+          default:
+            statusColor = AppColors.red;
+        }
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -199,18 +196,15 @@ class _NhanVienListViewState extends State<NhanVienListView> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
               radius: 22,
-              backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.1),
-              child: Text(
-                initial,
-                style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold),
-              ),
+              backgroundColor: statusColor.withValues(alpha: 0.1),
+              child: Icon(Icons.apartment_rounded, color: statusColor),
             ),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
-                    nv.hoTen,
+                    'Căn hộ ${ch.soCanHo}',
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -219,13 +213,13 @@ class _NhanVienListViewState extends State<NhanVienListView> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: AppColors.tealPrimary.withValues(alpha: 0.15),
+                    color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.borderSide),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                   ),
                   child: Text(
-                    role,
-                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 10, fontWeight: FontWeight.bold),
+                    ch.tenTrangThai.isNotEmpty ? ch.tenTrangThai : 'Chưa rõ',
+                    style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -236,18 +230,21 @@ class _NhanVienListViewState extends State<NhanVienListView> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.badge_outlined, size: 12, color: AppColors.iconMuted),
+                    const Icon(Icons.business_rounded, size: 12, color: AppColors.iconMuted),
                     const SizedBox(width: 6),
-                    Text('Mã NV: ${nv.maNhanVien}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                    Text('Tòa nhà: ${ch.tenToaNha}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                    const Spacer(),
+                    const Icon(Icons.layers_rounded, size: 12, color: AppColors.iconMuted),
+                    const SizedBox(width: 4),
+                    Text('Tầng: ${ch.tang}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
                   ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.phone_rounded, size: 12, color: AppColors.iconMuted),
+                    const Icon(Icons.category_rounded, size: 12, color: AppColors.iconMuted),
                     const SizedBox(width: 6),
-                    Text(nv.sdt.isNotEmpty ? nv.sdt : 'Chưa cập nhật SĐT',
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                    Text('Loại: ${ch.tenLoaiCanHo}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
                   ],
                 ),
               ],
@@ -256,10 +253,9 @@ class _NhanVienListViewState extends State<NhanVienListView> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => NhanVienDetailView(nhanVien: nv)),
+                MaterialPageRoute(builder: (_) => CanHoDetailView(canHo: ch)),
               ).then((value) {
-                // If anything updated or deleted, fetch list again
-                context.read<NhanVienViewModel>().fetchNhanViens();
+                context.read<CanHoViewModel>().fetchCanHos();
               });
             },
           ),
