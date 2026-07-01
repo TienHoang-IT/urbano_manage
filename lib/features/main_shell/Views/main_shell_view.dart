@@ -14,6 +14,8 @@ import 'package:urbano_manage/features/thong_bao/Views/thong_bao_list_view.dart'
 import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_list_view.dart';
 import 'package:urbano_manage/features/can_ho/Views/can_ho_list_view.dart';
 import 'package:urbano_manage/features/phi_dich_vu/Views/phi_dich_vu_list_view.dart';
+import 'package:urbano_manage/features/bang_tin/Views/bang_tin_list_view.dart';
+import 'package:urbano_manage/features/phuong_tien/Views/phuong_tien_list_view.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -119,6 +121,12 @@ class _MainShellState extends State<MainShell> {
       case NavigationTabs.nhanVien:
         title = 'Nhân viên';
         break;
+      case NavigationTabs.bangTin:
+        title = 'Bảng tin';
+        break;
+      case NavigationTabs.phuongTien:
+        title = 'Phương tiện';
+        break;
     }
 
     return Padding(
@@ -169,6 +177,8 @@ class _MainShellState extends State<MainShell> {
         const YeuCauCuDanView(),
         const ThongBaoListView(),
         const NhanVienListView(),
+        const BangTinListView(),
+        const PhuongTienListView(),
       ],
     );
   }
@@ -229,6 +239,8 @@ class _MainShellState extends State<MainShell> {
                 _buildDrawerItem(NavigationTabs.yeuCauCuDan, 'Yêu cầu cư dân', Icons.support_agent_rounded),
                 _buildDrawerItem(NavigationTabs.thongBao, 'Thông báo', Icons.notifications_rounded),
                 _buildDrawerItem(NavigationTabs.nhanVien, 'Nhân viên', Icons.badge_rounded),
+                _buildDrawerItem(NavigationTabs.bangTin, 'Bảng tin', Icons.newspaper_rounded),
+                _buildDrawerItem(NavigationTabs.phuongTien, 'Phương tiện', Icons.directions_car_rounded),
                 const Divider(color: AppColors.borderButton, height: 20, thickness: 1),
                 ListTile(
                   leading: const Icon(Icons.logout_rounded, color: AppColors.red),

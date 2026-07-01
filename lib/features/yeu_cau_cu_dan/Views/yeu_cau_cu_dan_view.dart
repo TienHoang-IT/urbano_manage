@@ -5,6 +5,7 @@ import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/Models/yeu_cau_cu_dan_model.dart';
 import 'package:urbano_manage/features/yeu_cau_cu_dan/ViewModels/yeu_cau_cu_dan_viewmodel.dart';
 import 'package:urbano_manage/features/yeu_cau_cu_dan/Views/yeu_cau_cu_dan_detail_view.dart';
+import 'package:urbano_manage/features/yeu_cau_cu_dan/Views/yeu_cau_cu_dan_form_view.dart';
 
 class YeuCauCuDanView extends StatefulWidget {
   const YeuCauCuDanView({super.key});
@@ -28,17 +29,59 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
 
     return Material(
       type: MaterialType.transparency,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          _buildTabs(viewModel),
-          const SizedBox(height: 12),
-          Expanded(
-            child: RefreshIndicator(
-              color: AppColors.tealPrimary,
-              backgroundColor: AppColors.bgMid,
-              onRefresh: () => viewModel.fetchRequests(),
-              child: _buildContent(viewModel),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTabs(viewModel),
+              const SizedBox(height: 12),
+              Expanded(
+                child: RefreshIndicator(
+                  color: AppColors.tealPrimary,
+                  backgroundColor: AppColors.bgMid,
+                  onRefresh: () => viewModel.fetchRequests(),
+                  child: _buildContent(viewModel),
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              heroTag: 'yeu_cau_add_fab',
+              backgroundColor: AppColors.tealPrimary,
+              onPressed: () async {
+                final vm = context.read<YeuCauCuDanViewModel>();
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(
+                    child: CircularProgressIndicator(color: AppColors.tealPrimary),
+                  ),
+                );
+                await vm.loadFormDropdowns();
+                if (context.mounted) {
+                  Navigator.pop(context); // Pop loading dialog
+                  if (vm.error != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(vm.error!), backgroundColor: AppColors.red),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const YeuCauCuDanFormView()),
+                    ).then((value) {
+                      if (value == true) {
+                        context.read<YeuCauCuDanViewModel>().fetchRequests();
+                      }
+                    });
+                  }
+                }
+              },
+              child: const Icon(Icons.add_rounded, color: Colors.white),
             ),
           ),
         ],

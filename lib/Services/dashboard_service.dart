@@ -13,4 +13,13 @@ class DashboardService {
     }
     throw Exception('Không thể tải dữ liệu thống kê (${response.statusCode})');
   }
+
+  /// Fetches brief dashboard count statistics.
+  Future<Map<String, dynamic>> fetchStats() async {
+    final response = await AuthHttp.get(Uri.parse('$apiUrl/stats'));
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    }
+    throw Exception('Không thể tải dữ liệu thống kê thu gọn (${response.statusCode})');
+  }
 }

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
+import 'package:urbano_manage/core/Widgets/app_confirm_dialog.dart';
 import 'package:urbano_manage/Models/yeu_cau_cu_dan_model.dart';
 import 'package:urbano_manage/Models/nhan_vien_model.dart';
 import 'package:urbano_manage/features/yeu_cau_cu_dan/ViewModels/yeu_cau_cu_dan_viewmodel.dart';
@@ -370,6 +371,34 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
     }
   }
 
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirm = await AppConfirmDialog.show(
+      context,
+      title: 'Xác nhận xóa',
+      content: 'Bạn có chắc chắn muốn xóa yêu cầu "${widget.yeuCau.tieuDe}"?',
+    );
+
+    if (confirm == true && mounted) {
+      final success = await context.read<YeuCauCuDanViewModel>().removeYeuCau(widget.yeuCau.id);
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Xóa yêu cầu thành công'),
+            backgroundColor: AppColors.tealPrimary,
+          ),
+        );
+        Navigator.of(context).pop(true);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.read<YeuCauCuDanViewModel>().error ?? 'Không thể xóa yêu cầu'),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildAppbar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
@@ -377,13 +406,28 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
         children: [
           _buildButtonBack(context),
           const SizedBox(width: 14),
-          const Text(
-            'Chi tiết Yêu cầu',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              letterSpacing: 1,
+          const Expanded(
+            child: Text(
+              'Chi tiết Yêu cầu',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _confirmDelete(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.inputFill,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderButton),
+              ),
+              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
             ),
           ),
         ],

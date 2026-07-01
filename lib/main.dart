@@ -12,6 +12,8 @@ import 'package:urbano_manage/features/thong_bao/ViewModels/thong_bao_viewmodel.
 import 'package:urbano_manage/features/nhan_vien/ViewModels/nhan_vien_viewmodel.dart';
 import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
 import 'package:urbano_manage/features/phi_dich_vu/ViewModels/phi_dich_vu_viewmodel.dart';
+import 'package:urbano_manage/features/bang_tin/ViewModels/bang_tin_viewmodel.dart';
+import 'package:urbano_manage/features/phuong_tien/ViewModels/phuong_tien_viewmodel.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -33,6 +35,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => NhanVienViewModel()),
         ChangeNotifierProvider(create: (_) => CanHoViewModel()),
         ChangeNotifierProvider(create: (_) => PhiDichVuViewModel()),
+        ChangeNotifierProvider(create: (_) => BangTinViewModel()),
+        ChangeNotifierProvider(create: (_) => PhuongTienViewModel()),
       ],
       child: const MyApp(),
     ),

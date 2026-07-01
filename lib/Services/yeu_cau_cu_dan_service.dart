@@ -70,4 +70,32 @@ class YeuCauCuDanService {
       throw Exception('Không thể tải loại yêu cầu (${response.statusCode})');
     }
   }
+
+  /// Creates a resident request.
+  Future<YeuCauCuDan> createYeuCau(Map<String, dynamic> data) async {
+    final headers = await AuthHttp.getHeaders();
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: headers,
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      return YeuCauCuDan.fromJson(decoded);
+    } else {
+      throw Exception('Không thể tạo yêu cầu mới (${response.statusCode})');
+    }
+  }
+
+  /// Deletes a resident request.
+  Future<bool> deleteYeuCau(int id) async {
+    final url = '$apiUrl/$id';
+    final headers = await AuthHttp.getHeaders();
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: headers,
+    );
+    return response.statusCode == 200 || response.statusCode == 204;
+  }
 }
