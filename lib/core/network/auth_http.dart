@@ -25,6 +25,8 @@ class AuthHttp {
 
   /// Handles unauthorized (401) responses by clearing user session and redirecting to login.
   static void _handleUnauthorized() async {
+    // Đã vô hiệu hóa để tránh bị out ra khỏi dashboard khi hết phiên đăng nhập (401 Unauthorized)
+    /*
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('nhanVien');
@@ -43,6 +45,7 @@ class AuthHttp {
         behavior: SnackBarBehavior.floating,
       ),
     );
+    */
   }
 
   /// Wrapper for HTTP GET requests that intercepts 401 errors.
