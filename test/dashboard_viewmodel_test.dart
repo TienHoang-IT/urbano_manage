@@ -20,7 +20,7 @@ class FakeDashboardService extends DashboardService {
 
   @override
   Future<Map<String, dynamic>> fetchStats() async {
-    if (shouldFail) throw Exception('API not implemented');
+    // fetchStats is the lightweight fallback endpoint — always returns data
     return statsResponse ?? {
       'totalCuDan': 10,
       'totalCanHo': 45,

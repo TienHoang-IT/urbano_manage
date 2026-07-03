@@ -1,4 +1,4 @@
-import 'dart:typed_list';
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:urbano_manage/core/constants/api_config.dart';
 import 'package:urbano_manage/core/network/auth_http.dart';
