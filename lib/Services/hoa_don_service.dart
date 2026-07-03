@@ -128,4 +128,31 @@ class HoaDonService {
       return [];
     }
   }
+
+  /// Runs auto-billing for a specific month and year.
+  Future<Map<String, dynamic>> autoBilling(int thang, int nam, int nguoiTao) async {
+    final response = await AuthHttp.post(
+      Uri.parse('$apiUrl/auto-billing'),
+      body: jsonEncode({
+        'thang': thang,
+        'nam': nam,
+        'nguoiTao': nguoiTao,
+      }),
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    }
+    throw Exception('Tự động tạo hóa đơn thất bại (${response.statusCode})');
+  }
+
+  /// Fetches an invoice details by ID.
+  Future<HoaDon> fetchHoaDonById(int id) async {
+    final response = await AuthHttp.get(Uri.parse('$apiUrl/$id'));
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      return HoaDon.fromJson(decoded);
+    } else {
+      throw Exception('Không thể tải chi tiết hóa đơn (${response.statusCode})');
+    }
+  }
 }

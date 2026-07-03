@@ -169,4 +169,23 @@ class HoaDonViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Runs auto-billing for a specific month/year.
+  Future<Map<String, dynamic>?> runAutoBilling(int thang, int nam, int nguoiTao) async {
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final result = await _service.autoBilling(thang, nam, nguoiTao);
+      await fetchHoaDons();
+      return result;
+    } catch (e) {
+      error = e.toString().replaceFirst('Exception: ', '');
+      return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }
