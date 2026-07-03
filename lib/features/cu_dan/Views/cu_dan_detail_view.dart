@@ -5,11 +5,56 @@ import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/Models/cu_dan_model.dart';
 import 'package:urbano_manage/features/cu_dan/ViewModels/cu_dan_viewmodel.dart';
 import 'package:urbano_manage/features/cu_dan/Views/cu_dan_form_view.dart';
+import 'package:urbano_manage/Models/cu_dan_can_ho_model.dart';
+import 'package:urbano_manage/Services/cu_dan_can_ho_service.dart';
+import 'package:urbano_manage/Services/can_ho_service.dart';
+import 'package:urbano_manage/features/can_ho/Views/can_ho_detail_view.dart';
 
-class CuDanDetailView extends StatelessWidget {
+class CuDanDetailView extends StatefulWidget {
   final CuDan cuDan;
 
   const CuDanDetailView({super.key, required this.cuDan});
+
+  @override
+  State<CuDanDetailView> createState() => _CuDanDetailViewState();
+}
+
+class _CuDanDetailViewState extends State<CuDanDetailView> {
+  late CuDan _currentCuDan;
+  final CuDanCanHoService _cuDanCanHoService = CuDanCanHoService();
+  final CanHoService _canHoService = CanHoService();
+  List<CuDanCanHo> _history = [];
+  bool _isLoadingHistory = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCuDan = widget.cuDan;
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    setState(() {
+      _isLoadingHistory = true;
+    });
+    try {
+      final list = await _cuDanCanHoService.fetchByCuDan(_currentCuDan.id);
+      list.sort((a, b) {
+        if (a.ngayChuyenDen == null) return 1;
+        if (b.ngayChuyenDen == null) return -1;
+        return b.ngayChuyenDen!.compareTo(a.ngayChuyenDen!);
+      });
+      setState(() {
+        _history = list;
+      });
+    } catch (e) {
+      debugPrint('Error loading resident history: $e');
+    } finally {
+      setState(() {
+        _isLoadingHistory = false;
+      });
+    }
+  }
 
   void _confirmDelete(BuildContext context) {
     showDialog(
@@ -18,7 +63,7 @@ class CuDanDetailView extends StatelessWidget {
         return AlertDialog(
           backgroundColor: AppColors.bgMid,
           title: const Text('Xác nhận xóa', style: TextStyle(color: Colors.white)),
-          content: Text('Bạn có chắc chắn muốn xóa cư dân ${cuDan.hoTen}?', style: const TextStyle(color: AppColors.textMuted)),
+          content: Text('Bạn có chắc chắn muốn xóa cư dân ${_currentCuDan.hoTen}?', style: const TextStyle(color: AppColors.textMuted)),
           actions: <Widget>[
             TextButton(
               child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
@@ -29,7 +74,7 @@ class CuDanDetailView extends StatelessWidget {
               child: const Text('Xóa'),
               onPressed: () async {
                 Navigator.of(dialogContext).pop(); // Close dialog
-                final success = await context.read<CuDanViewModel>().removeCuDan(cuDan.id);
+                final success = await context.read<CuDanViewModel>().removeCuDan(_currentCuDan.id);
                 if (context.mounted) {
                   if (success) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -53,10 +98,10 @@ class CuDanDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDob = cuDan.ngaySinh != null
-        ? DateFormat('dd/MM/yyyy').format(cuDan.ngaySinh!.toLocal())
+    final formattedDob = _currentCuDan.ngaySinh != null
+        ? DateFormat('dd/MM/yyyy').format(_currentCuDan.ngaySinh!.toLocal())
         : 'Chưa cập nhật';
-    final formattedCreatedAt = DateFormat('dd/MM/yyyy HH:mm').format(cuDan.createdAt.toLocal());
+    final formattedCreatedAt = DateFormat('dd/MM/yyyy HH:mm').format(_currentCuDan.createdAt.toLocal());
 
     return Scaffold(
       body: Container(
@@ -84,25 +129,27 @@ class CuDanDetailView extends StatelessWidget {
                       const SizedBox(height: 20),
                       _buildInfoSection('Thông tin cá nhân', [
                         _buildInfoRow(Icons.cake_rounded, 'Ngày sinh', formattedDob),
-                        _buildInfoRow(Icons.wc_rounded, 'Giới tính', cuDan.gioiTinhText.isNotEmpty ? cuDan.gioiTinhText : 'Chưa cập nhật'),
-                        _buildInfoRow(Icons.badge_rounded, 'Số CCCD', cuDan.cccd.isNotEmpty ? cuDan.cccd : 'Chưa cập nhật'),
+                        _buildInfoRow(Icons.wc_rounded, 'Giới tính', _currentCuDan.gioiTinhText.isNotEmpty ? _currentCuDan.gioiTinhText : 'Chưa cập nhật'),
+                        _buildInfoRow(Icons.badge_rounded, 'Số CCCD', _currentCuDan.cccd.isNotEmpty ? _currentCuDan.cccd : 'Chưa cập nhật'),
                       ]),
                       const SizedBox(height: 16),
                       _buildInfoSection('Thông tin liên lạc', [
-                        _buildInfoRow(Icons.phone_rounded, 'Điện thoại', cuDan.sdt.isNotEmpty ? cuDan.sdt : 'Chưa cập nhật'),
-                        _buildInfoRow(Icons.email_rounded, 'Email', cuDan.email.isNotEmpty ? cuDan.email : 'Chưa cập nhật'),
+                        _buildInfoRow(Icons.phone_rounded, 'Điện thoại', _currentCuDan.sdt.isNotEmpty ? _currentCuDan.sdt : 'Chưa cập nhật'),
+                        _buildInfoRow(Icons.email_rounded, 'Email', _currentCuDan.email.isNotEmpty ? _currentCuDan.email : 'Chưa cập nhật'),
                       ]),
                       const SizedBox(height: 16),
                       _buildInfoSection('Địa chỉ', [
-                        _buildInfoRow(Icons.location_on_rounded, 'Địa chỉ đầy đủ', cuDan.diaChiDayDu.isNotEmpty ? cuDan.diaChiDayDu : 'Chưa cập nhật'),
-                        _buildInfoRow(Icons.map_rounded, 'Phường/Xã', cuDan.xa.isNotEmpty ? cuDan.xa : 'Chưa cập nhật'),
-                        _buildInfoRow(Icons.location_city_rounded, 'Tỉnh/Thành phố', cuDan.tinh.isNotEmpty ? cuDan.tinh : 'Chưa cập nhật'),
+                        _buildInfoRow(Icons.location_on_rounded, 'Địa chỉ đầy đủ', _currentCuDan.diaChiDayDu.isNotEmpty ? _currentCuDan.diaChiDayDu : 'Chưa cập nhật'),
+                        _buildInfoRow(Icons.map_rounded, 'Phường/Xã', _currentCuDan.xa.isNotEmpty ? _currentCuDan.xa : 'Chưa cập nhật'),
+                        _buildInfoRow(Icons.location_city_rounded, 'Tỉnh/Thành phố', _currentCuDan.tinh.isNotEmpty ? _currentCuDan.tinh : 'Chưa cập nhật'),
                       ]),
                       const SizedBox(height: 16),
                       _buildInfoSection('Hệ thống', [
                         _buildInfoRow(Icons.calendar_today_rounded, 'Ngày tạo', formattedCreatedAt),
-                        _buildInfoRow(Icons.check_circle_rounded, 'Trạng thái', cuDan.trangThaiText.isNotEmpty ? cuDan.trangThaiText : 'Hoạt động'),
+                        _buildInfoRow(Icons.check_circle_rounded, 'Trạng thái', _currentCuDan.trangThaiText.isNotEmpty ? _currentCuDan.trangThaiText : 'Hoạt động'),
                       ]),
+                      const SizedBox(height: 16),
+                      _buildHistoryTimelineSection(),
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -147,11 +194,22 @@ class CuDanDetailView extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.edit_rounded, color: AppColors.tealPrimary),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final result = await Navigator.push<bool>(
                 context,
-                MaterialPageRoute(builder: (_) => CuDanFormView(cuDan: cuDan)),
+                MaterialPageRoute(builder: (_) => CuDanFormView(cuDan: _currentCuDan)),
               );
+              if (result == true) {
+                // reload current resident detail if VM was updated
+                final vm = context.read<CuDanViewModel>();
+                final updated = vm.cuDans.firstWhere(
+                  (c) => c.id == _currentCuDan.id,
+                  orElse: () => _currentCuDan,
+                );
+                setState(() {
+                  _currentCuDan = updated;
+                });
+              }
             },
           ),
           IconButton(
@@ -164,7 +222,7 @@ class CuDanDetailView extends StatelessWidget {
   }
 
   Widget _buildHeaderCard() {
-    final String initial = cuDan.ten.isNotEmpty ? cuDan.ten[0].toUpperCase() : 'C';
+    final String initial = _currentCuDan.ten.isNotEmpty ? _currentCuDan.ten[0].toUpperCase() : 'C';
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -193,7 +251,7 @@ class CuDanDetailView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  cuDan.hoTen,
+                  _currentCuDan.hoTen,
                   style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
@@ -205,7 +263,7 @@ class CuDanDetailView extends StatelessWidget {
                     border: Border.all(color: AppColors.borderSide),
                   ),
                   child: Text(
-                    cuDan.trangThaiText.isNotEmpty ? cuDan.trangThaiText : 'Hoạt động',
+                    _currentCuDan.trangThaiText.isNotEmpty ? _currentCuDan.trangThaiText : 'Hoạt động',
                     style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -266,5 +324,155 @@ class CuDanDetailView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildHistoryTimelineSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            'Lịch sử Căn hộ đã ở',
+            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.nenContainer,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.borderButton),
+          ),
+          child: _isLoadingHistory
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24.0),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+                )
+              : _history.isEmpty
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24.0),
+                      child: Center(
+                        child: Text(
+                          'Chưa từng liên kết căn hộ nào',
+                          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _history.length,
+                      itemBuilder: (context, index) {
+                        final item = _history[index];
+                        final isActive = item.ngayChuyenDi == null;
+
+                        final df = DateFormat('dd/MM/yyyy');
+                        final fromStr = item.ngayChuyenDen != null ? df.format(item.ngayChuyenDen!) : '—';
+                        final toStr = item.ngayChuyenDi != null ? df.format(item.ngayChuyenDi!) : 'Hiện tại';
+
+                        final cardColor = isActive 
+                            ? AppColors.tealPrimary.withOpacity(0.05) 
+                            : AppColors.nenContainer;
+                        final borderColor = isActive 
+                            ? AppColors.tealPrimary.withOpacity(0.25) 
+                            : AppColors.borderButton;
+
+                        return Card(
+                          color: cardColor,
+                          elevation: 0,
+                          margin: const EdgeInsets.symmetric(vertical: 6.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: borderColor),
+                          ),
+                          child: InkWell(
+                            onTap: () => _navigateCanHoDetail(item.canHoId),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Căn hộ ${item.soCanHo}',
+                                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: (isActive ? AppColors.tealPrimary : AppColors.iconMuted).withOpacity(0.15),
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                item.tenVaiTro.isNotEmpty ? item.tenVaiTro : 'Cư dân',
+                                                style: TextStyle(
+                                                  color: isActive ? AppColors.tealPrimary : AppColors.textMuted,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          'Tòa nhà: ${item.tenToaNha.isNotEmpty ? item.tenToaNha : '—'}',
+                                          style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Thời gian ở: $fromStr → $toStr',
+                                          style: TextStyle(
+                                            color: isActive ? Colors.white70 : AppColors.textMuted,
+                                            fontSize: 11,
+                                            fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.chevron_right_rounded, color: AppColors.iconMuted),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _navigateCanHoDetail(int canHoId) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+    );
+    try {
+      final canHo = await _canHoService.fetchCanHoById(canHoId);
+      if (!mounted) return;
+      Navigator.pop(context); // Dismiss loading
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => CanHoDetailView(canHo: canHo)),
+      ).then((_) => _loadHistory());
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.red),
+        );
+      }
+    }
   }
 }

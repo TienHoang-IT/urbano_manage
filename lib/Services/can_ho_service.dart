@@ -90,4 +90,15 @@ class CanHoService {
     }
     return [];
   }
+
+  /// Fetches an apartment details by ID.
+  Future<CanHo> fetchCanHoById(int id) async {
+    final response = await AuthHttp.get(Uri.parse('$apiUrl/$id'));
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      return CanHo.fromJson(decoded);
+    } else {
+      throw Exception('Không thể tải chi tiết căn hộ (${response.statusCode})');
+    }
+  }
 }

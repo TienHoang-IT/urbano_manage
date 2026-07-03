@@ -84,4 +84,16 @@ class CuDanService {
 
     return response.statusCode == 200 || response.statusCode == 204;
   }
+
+  /// Fetches a resident details by ID.
+  Future<CuDan> fetchCuDanById(int id) async {
+    final headers = await AuthHttp.getHeaders();
+    final response = await http.get(Uri.parse('$apiUrl/$id'), headers: headers);
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      return CuDan.fromJson(decoded);
+    } else {
+      throw Exception('Không thể tải chi tiết cư dân (${response.statusCode})');
+    }
+  }
 }
