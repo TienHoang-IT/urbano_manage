@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/features/dashboard/ViewModels/dashboard_viewmodel.dart';
 import 'package:urbano_manage/core/constants/navigation_tabs.dart';
+import 'package:urbano_manage/Models/dashboard_models.dart';
 
 class DashboardView extends StatefulWidget {
   final Function(int) onNavigate;
@@ -40,19 +41,13 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Widget _buildContent(DashboardViewModel viewModel) {
-    if (viewModel.isLoading &&
-        viewModel.residentCount == null &&
-        viewModel.unpaidBillCount == null &&
-        viewModel.pendingRequestCount == null) {
+    if (viewModel.isLoading && viewModel.statistics == null) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
 
-    if (viewModel.error != null &&
-        viewModel.residentCount == null &&
-        viewModel.unpaidBillCount == null &&
-        viewModel.pendingRequestCount == null) {
+    if (viewModel.error != null && viewModel.statistics == null) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -76,16 +71,18 @@ class _DashboardViewState extends State<DashboardView> {
       );
     }
 
-    final residentVal = viewModel.residentCount != null ? viewModel.residentCount.toString() : '—';
-    final apartmentVal = viewModel.apartmentCount != null ? viewModel.apartmentCount.toString() : '—';
-    final unpaidVal = viewModel.unpaidBillCount != null ? viewModel.unpaidBillCount.toString() : '—';
-    final pendingVal = viewModel.pendingRequestCount != null ? viewModel.pendingRequestCount.toString() : '—';
+    final stats = viewModel.statistics;
+    final residentVal = stats != null ? stats.tongQuan.totalCuDan.toString() : '—';
+    final apartmentVal = stats != null ? stats.tongQuan.totalCanHo.toString() : '—';
+    final unpaidVal = stats != null ? stats.tongQuan.hoaDonChuaThanhToan.toString() : '—';
+    final pendingVal = stats != null ? stats.tongQuan.yeuCauChoXuLy.toString() : '—';
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 4 summary cards
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -125,7 +122,9 @@ class _DashboardViewState extends State<DashboardView> {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
+
+          // Charts section
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
@@ -138,21 +137,77 @@ class _DashboardViewState extends State<DashboardView> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          _buildRevenueChartCard(viewModel),
-          const SizedBox(height: 16),
-          _buildRequestRatioChartCard(viewModel),
+          const SizedBox(height: 12),
+          
+          if (stats != null) ...[
+            _buildRevenue6MonthsChartCard(stats),
+            const SizedBox(height: 16),
+            _buildRequestTypeChartCard(stats),
+            const SizedBox(height: 24),
+            
+            // Warnings section
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'CẢNH BÁO HỆ THỐNG',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.red,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _buildWarningCards(stats),
+          ],
           const SizedBox(height: 32),
         ],
       ),
     );
   }
 
-  Widget _buildRevenueChartCard(DashboardViewModel vm) {
-    final currencyFormat = NumberFormat.compact(locale: 'vi_VN');
-    final total = vm.revenueTotal;
-    final paid = vm.revenuePaid;
-    final unpaid = vm.revenueUnpaid;
+  // Format Y Axis helper
+  String _formatYAxisValue(double value) {
+    if (value == 0) return '0đ';
+    if (value >= 1000000) {
+      final double mil = value / 1000000;
+      if (mil == mil.toInt().toDouble()) {
+        return '${mil.toInt()}tr';
+      } else {
+        return '${mil.toStringAsFixed(1)}tr';
+      }
+    }
+    return '${NumberFormat('#,###', 'vi_VN').format(value)}đ';
+  }
+
+  // 6 months revenue chart
+  Widget _buildRevenue6MonthsChartCard(DashboardStatistics stats) {
+    final list = stats.doanhThu6Thang;
+
+    if (list.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
+        height: 150,
+        decoration: BoxDecoration(
+          color: AppColors.nenContainer,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.borderButton),
+        ),
+        child: const Center(
+          child: Text('Không có dữ liệu doanh thu', style: TextStyle(color: AppColors.textMuted)),
+        ),
+      );
+    }
+
+    // Calculate maximum Y for scaling
+    double maxY = 1000000;
+    for (final item in list) {
+      if (item.tongTien > maxY) maxY = item.tongTien;
+      if (item.daThu > maxY) maxY = item.daThu;
+    }
+    maxY = maxY * 1.15; // 15% padding top
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -166,36 +221,36 @@ class _DashboardViewState extends State<DashboardView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Thống kê Doanh thu Hóa đơn',
+            'Doanh thu 6 tháng gần nhất',
             style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          // Legend
+          Row(
+            children: [
+              _buildLegendDot('Tổng tiền', AppColors.iconMuted),
+              const SizedBox(width: 16),
+              _buildLegendDot('Đã thu', AppColors.tealPrimary),
+            ],
           ),
           const SizedBox(height: 24),
           SizedBox(
-            height: 180,
+            height: 200,
             child: BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
-                maxY: total > 0 ? total * 1.15 : 10000000,
+                maxY: maxY,
                 barTouchData: BarTouchData(
                   enabled: true,
                   touchTooltipData: BarTouchTooltipData(
-                    tooltipBgColor: AppColors.bgMid,
                     tooltipRoundedRadius: 8,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      String label;
-                      switch (group.x) {
-                        case 0:
-                          label = 'Tổng';
-                          break;
-                        case 1:
-                          label = 'Đã thu';
-                          break;
-                        default:
-                          label = 'Chưa thu';
-                      }
-                      final valStr = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(rod.toY);
+                      final item = list[groupIndex];
+                      final isTotal = rodIndex == 0;
+                      final label = isTotal ? 'Tổng tiền' : 'Đã thu';
+                      final valStr = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ', decimalDigits: 0).format(rod.toY);
                       return BarTooltipItem(
-                        '$label\n$valStr',
+                        'Tháng ${item.thang}/${item.nam}\n$label: $valStr',
                         const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                       );
                     },
@@ -207,33 +262,32 @@ class _DashboardViewState extends State<DashboardView> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        String text = '';
-                        switch (value.toInt()) {
-                          case 0:
-                            text = 'Tổng';
-                            break;
-                          case 1:
-                            text = 'Đã thu';
-                            break;
-                          case 2:
-                            text = 'Chưa thu';
-                            break;
+                        final index = value.toInt();
+                        if (index >= 0 && index < list.length) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              'T${list[index].thang}',
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                          );
                         }
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(text, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
-                        );
+                        return const SizedBox.shrink();
                       },
                     ),
                   ),
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 45,
+                      reservedSize: 55,
                       getTitlesWidget: (value, meta) {
-                        return Text(
-                          currencyFormat.format(value),
-                          style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(
+                            _formatYAxisValue(value),
+                            style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                            textAlign: TextAlign.end,
+                          ),
                         );
                       },
                     ),
@@ -250,41 +304,26 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                 ),
                 borderData: FlBorderData(show: false),
-                barGroups: [
-                  BarChartGroupData(
-                    x: 0,
+                barGroups: List.generate(list.length, (index) {
+                  final item = list[index];
+                  return BarChartGroupData(
+                    x: index,
                     barRods: [
                       BarChartRodData(
-                        toY: total,
+                        toY: item.tongTien,
+                        color: AppColors.iconMuted,
+                        width: 10,
+                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
+                      ),
+                      BarChartRodData(
+                        toY: item.daThu,
                         color: AppColors.tealPrimary,
-                        width: 22,
+                        width: 10,
                         borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
-                      )
+                      ),
                     ],
-                  ),
-                  BarChartGroupData(
-                    x: 1,
-                    barRods: [
-                      BarChartRodData(
-                        toY: paid,
-                        color: AppColors.blue,
-                        width: 22,
-                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
-                      )
-                    ],
-                  ),
-                  BarChartGroupData(
-                    x: 2,
-                    barRods: [
-                      BarChartRodData(
-                        toY: unpaid,
-                        color: AppColors.red,
-                        width: 22,
-                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
-                      )
-                    ],
-                  ),
-                ],
+                  );
+                }),
               ),
             ),
           ),
@@ -293,14 +332,29 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildRequestRatioChartCard(DashboardViewModel vm) {
-    final pending = vm.reqPendingCount;
-    final inProgress = vm.reqInProgressCount;
-    final completed = vm.reqCompletedCount;
-    final rejected = vm.reqRejectedCount;
-    final total = pending + inProgress + completed + rejected;
+  Widget _buildLegendDot(String label, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+      ],
+    );
+  }
 
-    if (total == 0) {
+  // PieChart for request by type
+  Widget _buildRequestTypeChartCard(DashboardStatistics stats) {
+    final list = stats.yeuCauTheoLoai;
+    int totalRequests = 0;
+    for (final item in list) {
+      totalRequests += item.soLuong;
+    }
+
+    if (list.isEmpty || totalRequests == 0) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(16),
@@ -312,10 +366,25 @@ class _DashboardViewState extends State<DashboardView> {
         child: const Center(
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 24.0),
-            child: Text('Không có dữ liệu yêu cầu', style: TextStyle(color: AppColors.textMuted)),
+            child: Text('Không có dữ liệu yêu cầu theo loại', style: TextStyle(color: AppColors.textMuted)),
           ),
         ),
       );
+    }
+
+    // Colors mapping helper
+    Color getSliceColor(int index) {
+      final colors = [
+        AppColors.tealPrimary,
+        AppColors.blue,
+        AppColors.amber,
+        AppColors.pink,
+        AppColors.red,
+        Colors.purpleAccent,
+        Colors.indigoAccent,
+        Colors.orangeAccent,
+      ];
+      return colors[index % colors.length];
     }
 
     return Container(
@@ -330,10 +399,10 @@ class _DashboardViewState extends State<DashboardView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Trạng thái Yêu cầu Cư dân',
+            'Phân loại Yêu cầu Cư dân',
             style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Row(
             children: [
               Expanded(
@@ -343,37 +412,17 @@ class _DashboardViewState extends State<DashboardView> {
                   child: PieChart(
                     PieChartData(
                       sectionsSpace: 2,
-                      centerSpaceRadius: 30,
-                      sections: [
-                        PieChartSectionData(
-                          value: pending.toDouble(),
-                          color: AppColors.pink,
-                          title: pending > 0 ? '$pending' : '',
+                      centerSpaceRadius: 28,
+                      sections: List.generate(list.length, (index) {
+                        final item = list[index];
+                        return PieChartSectionData(
+                          value: item.soLuong.toDouble(),
+                          color: getSliceColor(index),
+                          title: '${item.soLuong}',
                           radius: 40,
                           titleStyle: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                        PieChartSectionData(
-                          value: inProgress.toDouble(),
-                          color: AppColors.amber,
-                          title: inProgress > 0 ? '$inProgress' : '',
-                          radius: 40,
-                          titleStyle: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                        PieChartSectionData(
-                          value: completed.toDouble(),
-                          color: AppColors.tealPrimary,
-                          title: completed > 0 ? '$completed' : '',
-                          radius: 40,
-                          titleStyle: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                        PieChartSectionData(
-                          value: rejected.toDouble(),
-                          color: AppColors.red,
-                          title: rejected > 0 ? '$rejected' : '',
-                          radius: 40,
-                          titleStyle: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                        );
+                      }),
                     ),
                   ),
                 ),
@@ -382,15 +431,31 @@ class _DashboardViewState extends State<DashboardView> {
                 flex: 5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildLegendItem('Chờ xử lý', AppColors.pink, pending, total),
-                    const SizedBox(height: 6),
-                    _buildLegendItem('Đang xử lý', AppColors.amber, inProgress, total),
-                    const SizedBox(height: 6),
-                    _buildLegendItem('Hoàn thành', AppColors.tealPrimary, completed, total),
-                    const SizedBox(height: 6),
-                    _buildLegendItem('Từ chối', AppColors.red, rejected, total),
-                  ],
+                  children: List.generate(list.length, (index) {
+                    final item = list[index];
+                    final pct = (item.soLuong / totalRequests * 100).toStringAsFixed(1);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(color: getSliceColor(index), shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '${item.tenLoai}: ${item.soLuong} ($pct%)',
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 ),
               ),
             ],
@@ -400,25 +465,110 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildLegendItem(String label, Color color, int count, int total) {
-    final pct = total > 0 ? (count / total * 100).toStringAsFixed(1) : '0';
-    return Row(
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            '$label: $count ($pct%)',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+  // Warning Cards
+  Widget _buildWarningCards(DashboardStatistics stats) {
+    final cb = stats.canhBao;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          _WarningCard(
+            title: '${cb.hoaDonQuaHan} hóa đơn quá hạn thanh toán',
+            subtitle: 'Bấm để đi đến Danh sách Hóa đơn',
+            icon: Icons.warning_amber_rounded,
+            backgroundColor: AppColors.red.withOpacity(0.08),
+            borderColor: AppColors.red.withOpacity(0.3),
+            iconColor: AppColors.red,
+            onTap: () => widget.onNavigate(NavigationTabs.hoaDon),
           ),
+          const SizedBox(height: 12),
+          _WarningCard(
+            title: '${cb.yeuCauQuaHan7Ngay} yêu cầu chờ xử lý > 7 ngày',
+            subtitle: 'Bấm để đi đến Yêu cầu Cư dân',
+            icon: Icons.hourglass_empty_rounded,
+            backgroundColor: AppColors.amber.withOpacity(0.08),
+            borderColor: AppColors.amber.withOpacity(0.3),
+            iconColor: AppColors.amber,
+            onTap: () => widget.onNavigate(NavigationTabs.yeuCauCuDan),
+          ),
+          const SizedBox(height: 12),
+          _WarningCard(
+            title: '${cb.canHoTrong} căn hộ còn trống',
+            subtitle: 'Bấm để đi đến Quản lý Căn hộ',
+            icon: Icons.meeting_room_rounded,
+            backgroundColor: AppColors.blue.withOpacity(0.08),
+            borderColor: AppColors.blue.withOpacity(0.3),
+            iconColor: AppColors.blue,
+            onTap: () => widget.onNavigate(NavigationTabs.canHo),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WarningCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color iconColor;
+  final VoidCallback onTap;
+
+  const _WarningCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.iconColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Ink(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor, width: 1),
         ),
-      ],
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: AppColors.textMuted.withOpacity(0.8), fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 20),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -460,7 +610,7 @@ class _StatCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
+                    color: color.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(icon, color: color, size: 20),

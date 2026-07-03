@@ -3,40 +3,74 @@ import 'package:urbano_manage/Services/dashboard_service.dart';
 import 'package:urbano_manage/Services/cu_dan_service.dart';
 import 'package:urbano_manage/Services/hoa_don_service.dart';
 import 'package:urbano_manage/Services/yeu_cau_cu_dan_service.dart';
+import 'package:urbano_manage/Models/dashboard_models.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   final DashboardService _dashboardService;
-  final CuDanService _cuDanService;
-  final HoaDonService _hoaDonService;
-  final YeuCauCuDanService _yeuCauService;
+  final CuDanService? _cuDanService;
+  final HoaDonService? _hoaDonService;
+  final YeuCauCuDanService? _yeuCauService;
 
   DashboardViewModel({
     DashboardService? dashboardService,
-    CuDanService? cuDanService,
-    HoaDonService? hoaDonService,
-    YeuCauCuDanService? yeuCauService,
+    dynamic cuDanService,
+    dynamic hoaDonService,
+    dynamic yeuCauService,
   })  : _dashboardService = dashboardService ?? DashboardService(),
-        _cuDanService = cuDanService ?? CuDanService(),
-        _hoaDonService = hoaDonService ?? HoaDonService(),
-        _yeuCauService = yeuCauService ?? YeuCauCuDanService();
+        _cuDanService = cuDanService as CuDanService?,
+        _hoaDonService = hoaDonService as HoaDonService?,
+        _yeuCauService = yeuCauService as YeuCauCuDanService?;
 
   bool isLoading = false;
   String? error;
 
-  int? residentCount;
-  int? apartmentCount;
-  int? unpaidBillCount;
-  int? pendingRequestCount;
+  DashboardStatistics? statistics;
+  Map<String, dynamic> _rawJson = {};
 
-  // Chart statistics data (revenue and requests status ratio)
-  double revenueTotal = 0;
-  double revenuePaid = 0;
-  double revenueUnpaid = 0;
+  // Legacy helper getters for compatibility:
+  int? get residentCount => statistics?.tongQuan.totalCuDan;
+  int? get apartmentCount => statistics?.tongQuan.totalCanHo;
+  int? get unpaidBillCount => statistics?.tongQuan.hoaDonChuaThanhToan;
+  int? get pendingRequestCount => statistics?.tongQuan.yeuCauChoXuLy;
 
-  int reqPendingCount = 0;
-  int reqInProgressCount = 0;
-  int reqCompletedCount = 0;
-  int reqRejectedCount = 0;
+  double? get revenueTotal {
+    if (_rawJson['doanhThuHoaDon'] != null) {
+      return (_rawJson['doanhThuHoaDon']['tongTienHoaDon'] as num?)?.toDouble();
+    }
+    if (statistics?.doanhThu6Thang.isNotEmpty == true) {
+      return statistics!.doanhThu6Thang.map((e) => e.tongTien).reduce((a, b) => a + b);
+    }
+    return null;
+  }
+
+  double? get revenuePaid {
+    if (_rawJson['doanhThuHoaDon'] != null) {
+      return (_rawJson['doanhThuHoaDon']['tongTienDaThu'] as num?)?.toDouble();
+    }
+    if (statistics?.doanhThu6Thang.isNotEmpty == true) {
+      return statistics!.doanhThu6Thang.map((e) => e.daThu).reduce((a, b) => a + b);
+    }
+    return null;
+  }
+
+  double? get revenueUnpaid {
+    if (_rawJson['doanhThuHoaDon'] != null) {
+      return (_rawJson['doanhThuHoaDon']['soTienChuaThu'] as num?)?.toDouble();
+    }
+    if (statistics?.doanhThu6Thang.isNotEmpty == true) {
+      final total = revenueTotal ?? 0.0;
+      final paid = revenuePaid ?? 0.0;
+      return total - paid;
+    }
+    return null;
+  }
+
+  int? get reqPendingCount {
+    if (_rawJson['yeuCauCuDanTheoTrangThai'] != null) {
+      return _rawJson['yeuCauCuDanTheoTrangThai']['Chờ xử lý'] as int?;
+    }
+    return statistics?.tongQuan.yeuCauChoXuLy;
+  }
 
   Future<void> fetchDashboardData() async {
     isLoading = true;
@@ -44,79 +78,76 @@ class DashboardViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. Attempt to fetch card metrics from the new stats API
+      final detailedStats = await _dashboardService.fetchStatistics();
+      _rawJson = detailedStats;
+
+      Map<String, dynamic> stats = {};
       try {
-        final stats = await _dashboardService.fetchStats();
-        residentCount = stats['totalCuDan'] as int?;
-        apartmentCount = stats['totalCanHo'] as int?;
-        unpaidBillCount = stats['hoaDonChuaThanhToan'] as int?;
-        pendingRequestCount = stats['yeuCauChoXuLy'] as int?;
+        stats = await _dashboardService.fetchStats();
+      } catch (_) {}
 
-        // 2. Fetch detailed stats for charts
-        try {
-          final detailedStats = await _dashboardService.fetchStatistics();
-          if (detailedStats['doanhThuHoaDon'] != null) {
-            final rev = detailedStats['doanhThuHoaDon'] as Map<String, dynamic>;
-            revenueTotal = (rev['tongTienHoaDon'] as num?)?.toDouble() ?? 0.0;
-            revenuePaid = (rev['tongTienDaThu'] as num?)?.toDouble() ?? 0.0;
-            revenueUnpaid = (rev['soTienChuaThu'] as num?)?.toDouble() ?? 0.0;
-          }
+      final tqJson = detailedStats['tongQuan'] as Map<String, dynamic>? ?? stats;
+      final cbJson = detailedStats['canhBao'] as Map<String, dynamic>? ?? {};
+      final dtList = detailedStats['doanhThu6Thang'] as List? ?? [];
+      final ycList = detailedStats['yeuCauTheoLoai'] as List? ?? [];
 
-          if (detailedStats['yeuCauCuDanTheoTrangThai'] != null) {
-            final reqMap = detailedStats['yeuCauCuDanTheoTrangThai'] as Map<String, dynamic>;
-            reqPendingCount = reqMap['Chờ xử lý'] as int? ?? 0;
-            reqInProgressCount = reqMap['Đang xử lý'] as int? ?? 0;
-            reqCompletedCount = reqMap['Hoàn thành'] as int? ?? 0;
-            reqRejectedCount = reqMap['Từ chối'] as int? ?? 0;
-          }
-        } catch (chartError) {
-          debugPrint('Error loading charts, using fallback values: $chartError');
-          revenueTotal = 150000000.0;
-          revenuePaid = 110000000.0;
-          revenueUnpaid = 40000000.0;
-
-          reqPendingCount = pendingRequestCount ?? 0;
-          reqInProgressCount = 4;
-          reqCompletedCount = 18;
-          reqRejectedCount = 1;
-        }
-
-        error = null;
-      } catch (apiError) {
-        debugPrint('Dashboard stats API error, using local fallback: $apiError');
-        
-        // Fallback: Fetch basic metrics via individual services, then mock chart data
-        final results = await Future.wait([
-          _cuDanService.getResidentCount(),
-          _hoaDonService.getUnpaidCount(),
-          _yeuCauService.fetchYeuCaus(trangThai: 1),
-        ]);
-
-        residentCount = results[0] as int;
-        unpaidBillCount = results[1] as int;
-        
-        final pendingRequests = results[2] as List;
-        pendingRequestCount = pendingRequests.length;
-        
-        apartmentCount = 45; // Mock total apartments
-        
-        revenueTotal = 150000000.0;
-        revenuePaid = 110000000.0;
-        revenueUnpaid = 40000000.0;
-
-        reqPendingCount = pendingRequestCount ?? 0;
-        reqInProgressCount = 4;
-        reqCompletedCount = 18;
-        reqRejectedCount = 1;
-
-        error = null;
-      }
+      statistics = DashboardStatistics(
+        tongQuan: TongQuan.fromJson(tqJson),
+        doanhThu6Thang: dtList.map((e) => DoanhThuThang.fromJson(e as Map<String, dynamic>)).toList(),
+        yeuCauTheoLoai: ycList.map((e) => YeuCauTheoLoai.fromJson(e as Map<String, dynamic>)).toList(),
+        canhBao: CanhBao.fromJson(cbJson),
+      );
+      error = null;
     } catch (e) {
       debugPrint('Error fetching dashboard statistics: $e');
-      error = 'Không thể tải dữ liệu thống kê. Vui lòng thử lại.';
-      residentCount = null;
-      unpaidBillCount = null;
-      pendingRequestCount = null;
+      try {
+        int? rCount;
+        int? uBillCount;
+        int? pendingReqCount;
+        int? apCount;
+
+        if (_cuDanService != null) {
+          rCount = await _cuDanService!.getResidentCount();
+        }
+        if (_hoaDonService != null) {
+          uBillCount = await _hoaDonService!.getUnpaidCount();
+        }
+        if (_yeuCauService != null) {
+          final reqs = await _yeuCauService!.fetchYeuCaus(trangThai: 1);
+          pendingReqCount = reqs.length;
+        }
+
+        Map<String, dynamic> fallbackStats = {};
+        try {
+          fallbackStats = await _dashboardService.fetchStats();
+        } catch (_) {}
+
+        apCount = fallbackStats['totalCanHo'] as int?;
+        if (rCount == null && fallbackStats['totalCuDan'] != null) {
+          rCount = fallbackStats['totalCuDan'] as int?;
+        }
+        if (uBillCount == null && fallbackStats['hoaDonChuaThanhToan'] != null) {
+          uBillCount = fallbackStats['hoaDonChuaThanhToan'] as int?;
+        }
+        if (pendingReqCount == null && fallbackStats['yeuCauChoXuLy'] != null) {
+          pendingReqCount = fallbackStats['yeuCauChoXuLy'] as int?;
+        }
+
+        statistics = DashboardStatistics(
+          tongQuan: TongQuan(
+            totalCuDan: rCount ?? 0,
+            totalCanHo: apCount ?? 0,
+            hoaDonChuaThanhToan: uBillCount ?? 0,
+            yeuCauChoXuLy: pendingReqCount ?? 0,
+          ),
+          doanhThu6Thang: [],
+          yeuCauTheoLoai: [],
+          canhBao: CanhBao(hoaDonQuaHan: 0, yeuCauQuaHan7Ngay: 0, canHoTrong: 0),
+        );
+        error = null;
+      } catch (fallbackError) {
+        error = 'Không thể tải dữ liệu thống kê. Vui lòng thử lại.';
+      }
     } finally {
       isLoading = false;
       notifyListeners();
