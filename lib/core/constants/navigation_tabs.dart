@@ -9,4 +9,5 @@ class NavigationTabs {
   static const int nhanVien = 7;
   static const int bangTin = 8;
   static const int phuongTien = 9;
+  static const int nhatKyHeThong = 10;
 }

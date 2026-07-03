@@ -35,6 +35,21 @@ class LoginViewModel extends ChangeNotifier {
       await prefs.setString('token', result.token);
       await prefs.setString('nhanVien', jsonEncode(result.nhanVien.toJson()));
       
+      // Role mapping:
+      // 1 or 6 = Quản lý / Admin
+      // 2 = Kế toán
+      // 5 = Bảo vệ
+      // others = Nhân viên
+      String role = 'Nhân viên';
+      if (result.nhanVien.chucVu == 1 || result.nhanVien.chucVu == 6) {
+        role = 'Quản lý';
+      } else if (result.nhanVien.chucVu == 2) {
+        role = 'Kế toán';
+      } else if (result.nhanVien.chucVu == 5) {
+        role = 'Bảo vệ';
+      }
+      await prefs.setString('role', role);
+      
       isLoading = false;
       notifyListeners();
       return true;

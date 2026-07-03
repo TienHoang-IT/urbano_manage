@@ -48,46 +48,60 @@ class AuthHttp {
     */
   }
 
-  /// Wrapper for HTTP GET requests that intercepts 401 errors.
+  static void _showNoPermissionSnackBar() {
+    MyApp.messengerKey.currentState?.showSnackBar(
+      const SnackBar(
+        content: Text('Bạn không có quyền'),
+        backgroundColor: AppColors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  /// Wrapper for HTTP GET requests that intercepts 401/403 errors.
   static Future<http.Response> get(Uri url, {Map<String, String>? headers}) async {
     final mergedHeaders = await getHeaders();
     if (headers != null) mergedHeaders.addAll(headers);
     final response = await http.get(url, headers: mergedHeaders);
-    if (response.statusCode == 401) {
-      _handleUnauthorized();
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      _showNoPermissionSnackBar();
+      throw Exception('Bạn không có quyền (${response.statusCode})');
     }
     return response;
   }
 
-  /// Wrapper for HTTP POST requests that intercepts 401 errors.
+  /// Wrapper for HTTP POST requests that intercepts 401/403 errors.
   static Future<http.Response> post(Uri url, {Map<String, String>? headers, Object? body}) async {
     final mergedHeaders = await getHeaders();
     if (headers != null) mergedHeaders.addAll(headers);
     final response = await http.post(url, headers: mergedHeaders, body: body);
-    if (response.statusCode == 401) {
-      _handleUnauthorized();
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      _showNoPermissionSnackBar();
+      throw Exception('Bạn không có quyền (${response.statusCode})');
     }
     return response;
   }
 
-  /// Wrapper for HTTP PUT requests that intercepts 401 errors.
+  /// Wrapper for HTTP PUT requests that intercepts 401/403 errors.
   static Future<http.Response> put(Uri url, {Map<String, String>? headers, Object? body}) async {
     final mergedHeaders = await getHeaders();
     if (headers != null) mergedHeaders.addAll(headers);
     final response = await http.put(url, headers: mergedHeaders, body: body);
-    if (response.statusCode == 401) {
-      _handleUnauthorized();
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      _showNoPermissionSnackBar();
+      throw Exception('Bạn không có quyền (${response.statusCode})');
     }
     return response;
   }
 
-  /// Wrapper for HTTP DELETE requests that intercepts 401 errors.
+  /// Wrapper for HTTP DELETE requests that intercepts 401/403 errors.
   static Future<http.Response> delete(Uri url, {Map<String, String>? headers, Object? body}) async {
     final mergedHeaders = await getHeaders();
     if (headers != null) mergedHeaders.addAll(headers);
     final response = await http.delete(url, headers: mergedHeaders, body: body);
-    if (response.statusCode == 401) {
-      _handleUnauthorized();
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      _showNoPermissionSnackBar();
+      throw Exception('Bạn không có quyền (${response.statusCode})');
     }
     return response;
   }
