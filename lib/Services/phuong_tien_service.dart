@@ -81,4 +81,15 @@ class PhuongTienService {
       throw Exception('Không thể tải loại phương tiện (${response.statusCode})');
     }
   }
+
+  /// Fetches a vehicle details by ID.
+  Future<PhuongTien> fetchById(int id) async {
+    final response = await AuthHttp.get(Uri.parse('$apiUrl/$id'));
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      return PhuongTien.fromJson(decoded);
+    } else {
+      throw Exception('Không thể tải chi tiết phương tiện (${response.statusCode})');
+    }
+  }
 }
