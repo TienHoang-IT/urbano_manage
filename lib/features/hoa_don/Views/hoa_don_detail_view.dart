@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file_plus/open_file_plus.dart';
+import 'package:urbano_manage/Services/bao_cao_service.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_confirm_dialog.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
@@ -21,13 +27,22 @@ class HoaDonDetailView extends StatefulWidget {
 
 class _HoaDonDetailViewState extends State<HoaDonDetailView> {
   late HoaDon _currentHoaDon;
+  String _role = '';
 
   @override
   void initState() {
     super.initState();
     _currentHoaDon = widget.hoaDon;
+    _loadRole();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HoaDonViewModel>().fetchChiTiets(_currentHoaDon.id);
+    });
+  }
+
+  Future<void> _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _role = prefs.getString('role') ?? '';
     });
   }
 
@@ -393,6 +408,9 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
   }
 
   Widget _buildAppbar(BuildContext context) {
+    final isQuanLy = _role == 'Quản lý';
+    final isKeToan = _role == 'Kế toán' || isQuanLy;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Row(
@@ -422,6 +440,22 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
               ),
             ),
           ),
+          if (isKeToan) ...[
+            GestureDetector(
+              onTap: _exportBienLaiPdf,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderButton),
+                ),
+                child: const Icon(Icons.picture_as_pdf_rounded, size: 18, color: AppColors.tealPrimary),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
           GestureDetector(
             onTap: () => _navigateToEdit(context),
             child: Container(
@@ -647,5 +681,49 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
         ],
       ),
     );
+  }
+
+  Future<void> _exportBienLaiPdf() async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Xuất PDF không khả dụng trên Flutter Web'), backgroundColor: AppColors.red),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+    );
+
+    try {
+      final service = BaoCaoService();
+      final bytes = await service.getBienLaiPdf(_currentHoaDon.id);
+      
+      final directory = await getTemporaryDirectory();
+      final path = '${directory.path}/BienLai_HoaDon_${_currentHoaDon.maThanhToan}.pdf';
+      final file = File(path);
+      await file.writeAsBytes(bytes);
+
+      if (!mounted) return;
+      Navigator.pop(context); // Dismiss loading
+
+      final openResult = await OpenFile.open(path);
+      if (openResult.type != ResultType.done) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Không thể mở file: ${openResult.message}'), backgroundColor: AppColors.red),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Dismiss loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.red),
+        );
+      }
+    }
   }
 }
