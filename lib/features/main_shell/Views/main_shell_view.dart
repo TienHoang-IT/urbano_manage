@@ -25,6 +25,8 @@ import 'package:urbano_manage/features/phi_dich_vu/Views/phi_dich_vu_list_view.d
 import 'package:urbano_manage/features/bang_tin/Views/bang_tin_list_view.dart';
 import 'package:urbano_manage/features/phuong_tien/Views/phuong_tien_list_view.dart';
 import 'package:urbano_manage/features/nhat_ky_he_thong/Views/nhat_ky_he_thong_list_view.dart';
+import 'package:urbano_manage/features/tien_ich/Views/tien_ich_list_view.dart';
+import 'package:urbano_manage/features/dat_lich_tien_ich/Views/dat_lich_list_view.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -148,6 +150,12 @@ class _MainShellState extends State<MainShell> {
         break;
       case NavigationTabs.nhatKyHeThong:
         title = 'Lịch sử hoạt động';
+        break;
+      case NavigationTabs.tienIch:
+        title = 'Tiện ích';
+        break;
+      case NavigationTabs.datLichTienIch:
+        title = 'Đặt lịch tiện ích';
         break;
     }
 
@@ -585,6 +593,8 @@ class _MainShellState extends State<MainShell> {
         const BangTinListView(),
         const PhuongTienListView(),
         const NhatKyHeThongListView(),
+        const TienIchListView(),
+        const DatLichListView(),
       ],
     );
   }
@@ -652,6 +662,8 @@ class _MainShellState extends State<MainShell> {
                 _buildDrawerItem(NavigationTabs.bangTin, 'Bảng tin', Icons.newspaper_rounded),
                 if (isBaoVe) _buildDrawerItem(NavigationTabs.phuongTien, 'Phương tiện', Icons.directions_car_rounded),
                 if (isQuanLy) _buildDrawerItem(NavigationTabs.nhatKyHeThong, 'Lịch sử hoạt động', Icons.history_rounded),
+                _buildDrawerItem(NavigationTabs.tienIch, 'Tiện ích', Icons.sports_soccer_rounded),
+                _buildDrawerItem(NavigationTabs.datLichTienIch, 'Đặt lịch tiện ích', Icons.event_note_rounded),
                 const Divider(color: AppColors.borderButton, height: 20, thickness: 1),
                 ListTile(
                   leading: const Icon(Icons.logout_rounded, color: AppColors.red),
