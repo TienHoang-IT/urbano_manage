@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:open_file_plus/open_file_plus.dart';
+import 'package:open_file/open_file.dart';
 import 'package:urbano_manage/Services/bao_cao_service.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 import 'package:urbano_manage/features/main_shell/Views/global_search_delegate.dart';
@@ -27,6 +27,7 @@ import 'package:urbano_manage/features/phuong_tien/Views/phuong_tien_list_view.d
 import 'package:urbano_manage/features/nhat_ky_he_thong/Views/nhat_ky_he_thong_list_view.dart';
 import 'package:urbano_manage/features/tien_ich/Views/tien_ich_list_view.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/Views/dat_lich_list_view.dart';
+import 'package:urbano_manage/core/network/signalr_service.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -35,17 +36,63 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _currentIndex = NavigationTabs.dashboard;
   String _employeeName = '';
   String _employeeCode = '';
   String _role = '';
   int _employeeId = 0;
 
+  int _lastUnreadCount = 0;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadEmployeeInfo();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final signalR = Provider.of<SignalRService>(context, listen: false);
+      if (!signalR.isConnected) signalR.connect();
+      signalR.addListener(_onSignalRUpdate);
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    if (mounted) {
+      Provider.of<SignalRService>(context, listen: false).removeListener(_onSignalRUpdate);
+    }
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (!mounted) return;
+      final signalR = Provider.of<SignalRService>(context, listen: false);
+      if (!signalR.isConnected) signalR.connect();
+    }
+  }
+
+  void _onSignalRUpdate() {
+    if (!mounted) return;
+    final signalR = Provider.of<SignalRService>(context, listen: false);
+    if (signalR.unreadCount > _lastUnreadCount) {
+       final latest = signalR.recentEvents.isNotEmpty ? signalR.recentEvents.first : null;
+       if (latest != null) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+             content: Text(latest['tieuDe'] ?? latest['message'] ?? 'Có cập nhật mới', style: const TextStyle(color: Colors.white)),
+             backgroundColor: AppColors.tealPrimary,
+             duration: const Duration(seconds: 3),
+           ),
+         );
+       }
+    }
+    _lastUnreadCount = signalR.unreadCount;
   }
 
   Future<void> _loadEmployeeInfo() async {
@@ -96,6 +143,9 @@ class _MainShellState extends State<MainShell> {
     );
 
     if (confirm == true) {
+      if (mounted) {
+        Provider.of<SignalRService>(context, listen: false).disconnect();
+      }
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
       await prefs.remove('nhanVien');
@@ -190,6 +240,20 @@ class _MainShellState extends State<MainShell> {
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
                 letterSpacing: 1,
+              ),
+            ),
+          ),
+          Consumer<SignalRService>(
+            builder: (_, signalR, __) => Badge(
+              isLabelVisible: signalR.unreadCount > 0,
+              label: Text('${signalR.unreadCount}'),
+              child: IconButton(
+                icon: const Icon(Icons.notifications_outlined, color: AppColors.tealPrimary),
+                tooltip: 'Thông báo',
+                onPressed: () {
+                   signalR.clearUnread();
+                   _onNavigate(NavigationTabs.thongBao);
+                },
               ),
             ),
           ),
@@ -625,6 +689,20 @@ class _MainShellState extends State<MainShell> {
         child: SafeArea(
           child: Column(
             children: [
+              Consumer<SignalRService>(
+                builder: (_, signalR, __) {
+                  if (!signalR.isConnected) {
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      color: AppColors.red,
+                      child: const Text('Mất kết nối', textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 11)),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
               _buildAppBar(),
               const SizedBox(height: 16),
               Expanded(
