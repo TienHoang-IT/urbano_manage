@@ -17,7 +17,7 @@ class YeuCauCuDanService {
     }
 
     final headers = await AuthHttp.getHeaders();
-    final response = await http.get(Uri.parse(url), headers: headers);
+    final response = await http.get(Uri.parse('$url${url.contains('?') ? '&' : '?'}pageSize=500'), headers: headers);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -55,7 +55,7 @@ class YeuCauCuDanService {
   Future<List<LoaiYeuCau>> fetchLoaiYeuCaus() async {
     final url = '$apiUrl/loai-yeu-cau';
     final headers = await AuthHttp.getHeaders();
-    final response = await http.get(Uri.parse(url), headers: headers);
+    final response = await http.get(Uri.parse('$url?pageSize=500'), headers: headers);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));

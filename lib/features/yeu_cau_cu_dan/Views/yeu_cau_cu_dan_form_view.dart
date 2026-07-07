@@ -7,7 +7,9 @@ import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/features/yeu_cau_cu_dan/ViewModels/yeu_cau_cu_dan_viewmodel.dart';
-
+import 'package:urbano_manage/Models/cu_dan_model.dart';
+import 'package:urbano_manage/Models/nhan_vien_model.dart';
+import 'package:urbano_manage/core/Widgets/app_searchable_picker.dart';
 class YeuCauCuDanFormView extends StatefulWidget {
   const YeuCauCuDanFormView({super.key});
 
@@ -146,18 +148,19 @@ class _YeuCauCuDanFormViewState extends State<YeuCauCuDanFormView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppDropdownField<int>(
+                      AppSearchablePicker<CuDan>(
                         label: 'CƯ DÂN PHẢN ÁNH *',
-                        value: _inputs.selectedCuDanId,
+                        value: viewModel.cuDans.where((c) => c.id == _inputs.selectedCuDanId).firstOrNull,
                         hint: 'Chọn cư dân phản ánh',
                         prefixIcon: Icons.person_rounded,
-                        onChanged: (val) => setState(() => _inputs.selectedCuDanId = val),
-                        items: viewModel.cuDans
-                            .map((c) => DropdownMenuItem<int>(
-                                  value: c.id,
-                                  child: Text('${c.hoTenDem} ${c.ten} (${c.sdt})'),
-                                ))
-                            .toList(),
+                        items: viewModel.cuDans,
+                        isLoading: viewModel.isLoading,
+                        itemAsString: (c) => '${c.hoTenDem} ${c.ten} (${c.sdt})',
+                        searchFn: (c, query) {
+                          return '${c.hoTenDem} ${c.ten}'.toLowerCase().contains(query) ||
+                              c.sdt.toLowerCase().contains(query);
+                        },
+                        onChanged: (val) => setState(() => _inputs.selectedCuDanId = val.id),
                       ),
                       const SizedBox(height: 16),
                       AppDropdownField<int>(
@@ -204,22 +207,19 @@ class _YeuCauCuDanFormViewState extends State<YeuCauCuDanFormView> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      AppDropdownField<int>(
+                      AppSearchablePicker<NhanVien?>(
                         label: 'NHÂN VIÊN XỬ LÝ (TÙY CHỌN)',
-                        value: _inputs.selectedStaffId,
+                        value: _inputs.selectedStaffId == null ? null : viewModel.nhanViens.where((nv) => nv.id == _inputs.selectedStaffId).firstOrNull,
                         hint: 'Chọn nhân viên phụ trách',
                         prefixIcon: Icons.badge_rounded,
-                        onChanged: (val) => setState(() => _inputs.selectedStaffId = val),
-                        items: [
-                          const DropdownMenuItem<int>(
-                            value: null,
-                            child: Text('Chưa phân công (BQL)'),
-                          ),
-                          ...viewModel.nhanViens.map((nv) => DropdownMenuItem<int>(
-                                value: nv.id,
-                                child: Text('${nv.hoTen} (${nv.maNhanVien})'),
-                              )),
-                        ],
+                        items: [null, ...viewModel.nhanViens],
+                        isLoading: viewModel.isLoading,
+                        itemAsString: (nv) => nv == null ? 'Chưa phân công (BQL)' : '${nv.hoTen} (${nv.maNhanVien})',
+                        searchFn: (nv, query) {
+                          if (nv == null) return 'chưa phân công (bql)'.contains(query);
+                          return nv.hoTen.toLowerCase().contains(query) || nv.maNhanVien.toLowerCase().contains(query);
+                        },
+                        onChanged: (val) => setState(() => _inputs.selectedStaffId = val?.id),
                       ),
                       const SizedBox(height: 32),
                       AppButton(

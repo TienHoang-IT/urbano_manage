@@ -31,8 +31,8 @@ import 'package:urbano_manage/features/phuong_tien/Views/phuong_tien_list_view.d
 import 'package:urbano_manage/features/nhat_ky_he_thong/Views/nhat_ky_he_thong_list_view.dart';
 import 'package:urbano_manage/features/tien_ich/Views/tien_ich_list_view.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/Views/dat_lich_list_view.dart';
+import 'package:urbano_manage/features/lich_su_thanh_toan/Views/lich_su_thanh_toan_list_view.dart';
 import 'package:urbano_manage/core/network/signalr_service.dart';
-
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -46,8 +46,9 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   String _employeeCode = '';
   String _role = '';
   int _employeeId = 0;
+  final Map<int, bool> _needsRefresh = {};
 
-  int _lastUnreadCount = 0;
+  int _lastTotalUnread = 0;
   Timer? _debounceTimer;
 
   @override
@@ -86,34 +87,38 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   void _onSignalRUpdate() {
     if (!mounted) return;
     final signalR = Provider.of<SignalRService>(context, listen: false);
-    if (signalR.unreadCount > _lastUnreadCount) {
+    if (signalR.totalUnread > _lastTotalUnread) {
        final latest = signalR.recentEvents.isNotEmpty ? signalR.recentEvents.first : null;
        if (latest != null) {
-         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-             content: Text(latest['tieuDe'] ?? latest['message'] ?? 'Có cập nhật mới', style: const TextStyle(color: Colors.white)),
-             backgroundColor: AppColors.tealPrimary,
-             duration: const Duration(seconds: 3),
-           ),
-         );
-
          final type = latest['_type']?.toString();
          if (type != null) {
            _debounceTimer?.cancel();
            _debounceTimer = Timer(const Duration(milliseconds: 1000), () {
              if (!mounted) return;
-             if (type == 'new_request' && _currentIndex == NavigationTabs.yeuCauCuDan) {
-               context.read<YeuCauCuDanViewModel>().fetchRequests();
-             } else if (type == 'notification' && _currentIndex == NavigationTabs.thongBao) {
-               context.read<ThongBaoViewModel>().fetchThongBaos();
-             } else if (type == 'new_booking' && _currentIndex == NavigationTabs.datLichTienIch) {
-               context.read<DatLichTienIchViewModel>().fetchBookings();
+             if (type == 'new_request') {
+               if (_currentIndex == NavigationTabs.yeuCauCuDan) {
+                 context.read<YeuCauCuDanViewModel>().fetchRequests();
+               } else {
+                 _needsRefresh[NavigationTabs.yeuCauCuDan] = true;
+               }
+             } else if (type == 'notification') {
+               if (_currentIndex == NavigationTabs.thongBao) {
+                 context.read<ThongBaoViewModel>().fetchThongBaos();
+               } else {
+                 _needsRefresh[NavigationTabs.thongBao] = true;
+               }
+             } else if (type == 'new_booking') {
+               if (_currentIndex == NavigationTabs.datLichTienIch) {
+                 context.read<DatLichTienIchViewModel>().fetchBookings();
+               } else {
+                 _needsRefresh[NavigationTabs.datLichTienIch] = true;
+               }
              }
            });
          }
        }
     }
-    _lastUnreadCount = signalR.unreadCount;
+    _lastTotalUnread = signalR.totalUnread;
   }
 
   Future<void> _loadEmployeeInfo() async {
@@ -184,6 +189,17 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     setState(() {
       _currentIndex = index;
     });
+
+    if (_needsRefresh[index] == true) {
+      if (index == NavigationTabs.yeuCauCuDan) {
+        context.read<YeuCauCuDanViewModel>().fetchRequests();
+      } else if (index == NavigationTabs.thongBao) {
+        context.read<ThongBaoViewModel>().fetchThongBaos();
+      } else if (index == NavigationTabs.datLichTienIch) {
+        context.read<DatLichTienIchViewModel>().fetchBookings();
+      }
+      _needsRefresh[index] = false;
+    }
   }
 
   Widget _buildAppBar() {
@@ -227,6 +243,9 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         break;
       case NavigationTabs.datLichTienIch:
         title = 'Đặt lịch tiện ích';
+        break;
+      case NavigationTabs.lichSuThanhToan:
+        title = 'Lịch sử thanh toán';
         break;
     }
 
@@ -666,6 +685,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         const NhatKyHeThongListView(),
         const TienIchListView(),
         const DatLichListView(),
+        const LichSuThanhToanListView(),
       ],
     );
   }
@@ -739,28 +759,34 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                 _buildDrawerItem(NavigationTabs.dashboard, 'Tổng quan', Icons.dashboard_rounded),
                 if (isKeToan) _buildDrawerItem(NavigationTabs.cuDan, 'Cư dân', Icons.people_alt_rounded),
                 if (isKeToan) _buildDrawerItem(NavigationTabs.canHo, 'Căn hộ', Icons.apartment_rounded),
-                if (isKeToan) _buildDrawerItem(NavigationTabs.hoaDon, 'Hóa đơn', Icons.receipt_long_rounded),
+                if (isKeToan) 
+                  Consumer<SignalRService>(
+                    builder: (_, signalR, _) => _buildDrawerItem(
+                      NavigationTabs.hoaDon,
+                      'Hóa đơn',
+                      Icons.receipt_long_rounded,
+                      trailing: (signalR.unreadCounts['hoaDon'] ?? 0) > 0 ? _buildBadge(signalR.unreadCounts['hoaDon']!) : null,
+                      onTapAction: () => signalR.clearUnreadFor('hoaDon'),
+                    ),
+                  ),
+                if (isKeToan) _buildDrawerItem(NavigationTabs.lichSuThanhToan, 'Lịch sử thanh toán', Icons.history_edu_rounded),
                 if (isKeToan) _buildDrawerItem(NavigationTabs.phiDichVu, 'Phí dịch vụ', Icons.monetization_on_rounded),
-                _buildDrawerItem(NavigationTabs.yeuCauCuDan, 'Yêu cầu cư dân', Icons.support_agent_rounded),
+                Consumer<SignalRService>(
+                  builder: (_, signalR, _) => _buildDrawerItem(
+                    NavigationTabs.yeuCauCuDan,
+                    'Yêu cầu cư dân',
+                    Icons.support_agent_rounded,
+                    trailing: (signalR.unreadCounts['yeuCau'] ?? 0) > 0 ? _buildBadge(signalR.unreadCounts['yeuCau']!) : null,
+                    onTapAction: () => signalR.clearUnreadFor('yeuCau'),
+                  ),
+                ),
                 Consumer<SignalRService>(
                   builder: (_, signalR, _) => _buildDrawerItem(
                     NavigationTabs.thongBao,
                     'Thông báo',
                     Icons.notifications_rounded,
-                    trailing: signalR.unreadCount > 0
-                        ? Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              color: AppColors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Text(
-                              '${signalR.unreadCount}',
-                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        : null,
-                    onTapAction: () => signalR.clearUnread(),
+                    trailing: (signalR.unreadCounts['thongBao'] ?? 0) > 0 ? _buildBadge(signalR.unreadCounts['thongBao']!) : null,
+                    onTapAction: () => signalR.clearUnreadFor('thongBao'),
                   ),
                 ),
                 if (isQuanLy) _buildDrawerItem(NavigationTabs.nhanVien, 'Nhân viên', Icons.badge_rounded),
@@ -768,7 +794,15 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                 if (isBaoVe) _buildDrawerItem(NavigationTabs.phuongTien, 'Phương tiện', Icons.directions_car_rounded),
                 if (isQuanLy) _buildDrawerItem(NavigationTabs.nhatKyHeThong, 'Lịch sử hoạt động', Icons.history_rounded),
                 _buildDrawerItem(NavigationTabs.tienIch, 'Tiện ích', Icons.sports_soccer_rounded),
-                _buildDrawerItem(NavigationTabs.datLichTienIch, 'Đặt lịch tiện ích', Icons.event_note_rounded),
+                Consumer<SignalRService>(
+                  builder: (_, signalR, _) => _buildDrawerItem(
+                    NavigationTabs.datLichTienIch,
+                    'Đặt lịch tiện ích',
+                    Icons.event_note_rounded,
+                    trailing: (signalR.unreadCounts['datLich'] ?? 0) > 0 ? _buildBadge(signalR.unreadCounts['datLich']!) : null,
+                    onTapAction: () => signalR.clearUnreadFor('datLich'),
+                  ),
+                ),
                 const Divider(color: AppColors.borderButton, height: 20, thickness: 1),
                 ListTile(
                   leading: const Icon(Icons.logout_rounded, color: AppColors.red),
@@ -881,6 +915,20 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         _onNavigate(index);
         Navigator.pop(context); // Close Drawer
       },
+    );
+  }
+
+  Widget _buildBadge(int count) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: const BoxDecoration(
+        color: AppColors.red,
+        shape: BoxShape.circle,
+      ),
+      child: Text(
+        '$count',
+        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

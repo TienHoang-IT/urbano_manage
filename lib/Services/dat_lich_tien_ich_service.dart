@@ -8,7 +8,7 @@ class DatLichTienIchService {
 
   /// Fetches all bookings
   Future<List<DatLichTienIch>> fetchAll() async {
-    final response = await AuthHttp.get(Uri.parse(apiUrl));
+    final response = await AuthHttp.get(Uri.parse('$apiUrl?pageSize=500'));
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));

@@ -8,7 +8,7 @@ class HoaDonService {
 
   /// Fetches the count of unpaid bills (trangThai = 1).
   Future<int> getUnpaidCount() async {
-    final response = await AuthHttp.get(Uri.parse(apiUrl));
+    final response = await AuthHttp.get(Uri.parse('$apiUrl?pageSize=500'));
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -31,7 +31,7 @@ class HoaDonService {
 
   /// Fetches the list of all invoices.
   Future<List<HoaDon>> fetchHoaDons() async {
-    final response = await AuthHttp.get(Uri.parse(apiUrl));
+    final response = await AuthHttp.get(Uri.parse('$apiUrl?pageSize=500'));
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));

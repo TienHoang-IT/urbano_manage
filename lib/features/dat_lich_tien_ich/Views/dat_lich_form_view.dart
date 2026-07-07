@@ -6,6 +6,10 @@ import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/ViewModels/dat_lich_tien_ich_viewmodel.dart';
+import 'package:urbano_manage/Models/cu_dan_model.dart';
+import 'package:urbano_manage/Models/can_ho_model.dart';
+import 'package:urbano_manage/Models/tien_ich_model.dart';
+import 'package:urbano_manage/core/Widgets/app_searchable_picker.dart';
 
 class DatLichFormView extends StatefulWidget {
   const DatLichFormView({super.key});
@@ -183,60 +187,57 @@ class _DatLichFormViewState extends State<DatLichFormView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppDropdownField<int>(
+                      AppSearchablePicker<TienIch>(
                         label: 'CHỌN TIỆN ÍCH *',
-                        value: _selectedTienIchId,
+                        value: vm.utilities.where((u) => u.id == _selectedTienIchId).firstOrNull,
                         hint: 'Chọn tiện ích',
                         prefixIcon: Icons.pool_rounded,
-                        items: vm.utilities.map((ut) {
-                          return DropdownMenuItem<int>(
-                            value: ut.id,
-                            child: Text(ut.tenTienIch),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            final ut = vm.utilities.firstWhere((element) => element.id == val);
-                            setState(() {
-                              _selectedTienIchId = val;
-                              _phiSuDung = ut.phiSuDung;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppDropdownField<int>(
-                        label: 'CƯ DÂN ĐẶT *',
-                        value: _selectedCuDanId,
-                        hint: 'Chọn cư dân',
-                        prefixIcon: Icons.person_rounded,
-                        items: vm.residents.map((cd) {
-                          return DropdownMenuItem<int>(
-                            value: cd.id,
-                            child: Text(cd.hoTen),
-                          );
-                        }).toList(),
+                        items: vm.utilities,
+                        isLoading: vm.isLoading,
+                        itemAsString: (ut) => ut.tenTienIch,
+                        searchFn: (ut, query) => ut.tenTienIch.toLowerCase().contains(query),
                         onChanged: (val) {
                           setState(() {
-                            _selectedCuDanId = val;
+                            _selectedTienIchId = val.id;
+                            _phiSuDung = val.phiSuDung;
                           });
                         },
                       ),
                       const SizedBox(height: 16),
-                      AppDropdownField<int>(
-                        label: 'CĂN HỘ',
-                        value: _selectedCanHoId,
-                        hint: 'Chọn căn hộ (nếu có)',
-                        prefixIcon: Icons.apartment_rounded,
-                        items: vm.apartments.map((ch) {
-                          return DropdownMenuItem<int>(
-                            value: ch.id,
-                            child: Text(ch.soCanHo),
-                          );
-                        }).toList(),
+                      AppSearchablePicker<CuDan>(
+                        label: 'CƯ DÂN ĐẶT *',
+                        value: vm.residents.where((c) => c.id == _selectedCuDanId).firstOrNull,
+                        hint: 'Chọn cư dân',
+                        prefixIcon: Icons.person_rounded,
+                        items: vm.residents,
+                        isLoading: vm.isLoading,
+                        itemAsString: (cd) => '${cd.hoTenDem} ${cd.ten} (${cd.sdt})',
+                        searchFn: (cd, query) {
+                          return '${cd.hoTenDem} ${cd.ten}'.toLowerCase().contains(query) ||
+                                 cd.sdt.toLowerCase().contains(query);
+                        },
                         onChanged: (val) {
                           setState(() {
-                            _selectedCanHoId = val;
+                            _selectedCuDanId = val.id;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      AppSearchablePicker<CanHo?>(
+                        label: 'CĂN HỘ',
+                        value: _selectedCanHoId == null ? null : vm.apartments.where((ch) => ch.id == _selectedCanHoId).firstOrNull,
+                        hint: 'Chọn căn hộ (nếu có)',
+                        prefixIcon: Icons.apartment_rounded,
+                        items: [null, ...vm.apartments],
+                        isLoading: vm.isLoading,
+                        itemAsString: (ch) => ch == null ? 'Không chọn căn hộ' : 'Căn hộ ${ch.soCanHo} (${ch.tenToaNha})',
+                        searchFn: (ch, query) {
+                          if (ch == null) return 'không chọn căn hộ'.contains(query);
+                          return ch.soCanHo.toLowerCase().contains(query) || ch.tenToaNha.toLowerCase().contains(query);
+                        },
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedCanHoId = val?.id;
                           });
                         },
                       ),

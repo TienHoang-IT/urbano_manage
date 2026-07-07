@@ -9,6 +9,8 @@ import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/phuong_tien_model.dart';
 import 'package:urbano_manage/features/phuong_tien/ViewModels/phuong_tien_viewmodel.dart';
 import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
+import 'package:urbano_manage/Models/can_ho_model.dart';
+import 'package:urbano_manage/core/Widgets/app_searchable_picker.dart';
 
 class PhuongTienFormView extends StatefulWidget {
   final PhuongTien? phuongTien;
@@ -197,18 +199,19 @@ class _PhuongTienFormViewState extends State<PhuongTienFormView> {
                             .toList(),
                       ),
                       const SizedBox(height: 16),
-                      AppDropdownField<int>(
+                      AppSearchablePicker<CanHo>(
                         label: 'CĂN HỘ SỞ HỮU *',
-                        value: _selectedCanHoId,
+                        value: cvm.canHos.where((c) => c.id == _selectedCanHoId).firstOrNull,
                         hint: 'Chọn căn hộ',
                         prefixIcon: Icons.apartment_rounded,
-                        onChanged: (val) => setState(() => _selectedCanHoId = val),
-                        items: cvm.canHos
-                            .map((e) => DropdownMenuItem<int>(
-                                  value: e.id,
-                                  child: Text('Căn hộ ${e.soCanHo} (${e.tenToaNha})'),
-                                ))
-                            .toList(),
+                        items: cvm.canHos,
+                        isLoading: cvm.isLoading,
+                        itemAsString: (c) => 'Căn hộ ${c.soCanHo} (${c.tenToaNha})',
+                        searchFn: (c, query) {
+                          return c.soCanHo.toLowerCase().contains(query) ||
+                              c.tenToaNha.toLowerCase().contains(query);
+                        },
+                        onChanged: (val) => setState(() => _selectedCanHoId = val.id),
                       ),
                       const SizedBox(height: 16),
                       AppDropdownField<int>(

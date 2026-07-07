@@ -4,6 +4,7 @@ import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
+import 'package:urbano_manage/core/Widgets/app_searchable_picker.dart';
 import 'package:urbano_manage/core/Widgets/app_date_picker.dart';
 import 'package:urbano_manage/Models/hoa_don_model.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
@@ -192,20 +193,23 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                       const SizedBox(height: 16),
                       _isLoadingApartments
                           ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
-                          : AppDropdownField<int>(
+                          : AppSearchablePicker<CanHo>(
                               label: 'CĂN HỘ *',
-                              value: _selectedCanHoId,
+                              value: _apartments.cast<CanHo?>().firstWhere(
+                                (c) => c?.id == _selectedCanHoId, 
+                                orElse: () => null,
+                              ),
                               hint: 'Chọn căn hộ',
                               prefixIcon: Icons.apartment_rounded,
-                              onChanged: (val) {
-                                if (val != null) setState(() => _selectedCanHoId = val);
+                              items: _apartments,
+                              itemAsString: (c) => '${c.tenToaNha} - Căn ${c.soCanHo}',
+                              searchFn: (c, query) {
+                                return c.tenToaNha.toLowerCase().contains(query) ||
+                                       c.soCanHo.toLowerCase().contains(query);
                               },
-                              items: _apartments
-                                  .map((c) => DropdownMenuItem(
-                                        value: c.id,
-                                        child: Text('${c.soCanHo} (${c.tenToaNha})'),
-                                      ))
-                                  .toList(),
+                              onChanged: (val) {
+                                setState(() => _selectedCanHoId = val.id);
+                              },
                             ),
                       const SizedBox(height: 16),
                       Row(

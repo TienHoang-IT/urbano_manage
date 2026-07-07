@@ -15,6 +15,8 @@ import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/hoa_don_model.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 import 'package:urbano_manage/features/hoa_don/Views/hoa_don_form_view.dart';
+import 'package:urbano_manage/Services/lich_su_thanh_toan_service.dart';
+import 'package:urbano_manage/Models/lich_su_thanh_toan_model.dart';
 
 class HoaDonDetailView extends StatefulWidget {
   final HoaDon hoaDon;
@@ -408,6 +410,8 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                         _buildInfoRow(Icons.person_outline_rounded, 'Người cập nhật', _currentHoaDon.tenNguoiCapNhat.isNotEmpty ? _currentHoaDon.tenNguoiCapNhat : 'N/A'),
                         _buildInfoRow(Icons.calendar_today_rounded, 'Ngày khởi tạo', formattedCreatedAt),
                       ]),
+                      const SizedBox(height: 16),
+                      _buildLichSuThanhToanSection(),
                     ],
                   ),
                 ),
@@ -601,7 +605,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: details.length,
-                  separatorBuilder: (context, index) => const Divider(color: AppColors.borderButton, height: 1),
+                  separatorBuilder: (_, __) => const Divider(color: AppColors.borderButton, height: 1),
                   itemBuilder: (context, index) {
                     final item = details[index];
                     final name = item['tenPhiDichVu'] as String? ?? 'Dịch vụ';
@@ -737,5 +741,79 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
         );
       }
     }
+  }
+
+  Widget _buildLichSuThanhToanSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            'Lịch sử thanh toán',
+            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+          ),
+        ),
+        FutureBuilder<List<LichSuThanhToan>>(
+          future: LichSuThanhToanService().fetchByHoaDon(_currentHoaDon.id),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary));
+            }
+            if (snapshot.hasError) {
+              return Text('Lỗi tải dữ liệu: ${snapshot.error}', style: const TextStyle(color: AppColors.red));
+            }
+            final list = snapshot.data ?? [];
+            if (list.isEmpty) {
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                decoration: BoxDecoration(
+                  color: AppColors.nenContainer,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.borderButton),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Chưa có giao dịch nào.',
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
+
+            return Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.nenContainer,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.borderButton),
+              ),
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: list.length,
+                separatorBuilder: (_, __) => const Divider(color: AppColors.borderButton, height: 1),
+                itemBuilder: (context, index) {
+                  final item = list[index];
+                  return ListTile(
+                    title: Text('GD: ${item.maGiaoDich}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    subtitle: Text(
+                      '${item.phuongThucThanhToan} | ${item.ngayThanhToan != null ? DateFormat('dd/MM/yyyy HH:mm').format(item.ngayThanhToan!.toLocal()) : ''}',
+                      style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                    ),
+                    trailing: Text(
+                      NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(item.soTien),
+                      style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 }

@@ -10,7 +10,7 @@ class CuDanService {
   /// Fetches the count of residents by getting the list and returning its length.
   Future<int> getResidentCount() async {
     final headers = await AuthHttp.getHeaders();
-    final response = await http.get(Uri.parse(apiUrl), headers: headers);
+    final response = await http.get(Uri.parse('$apiUrl?pageSize=500'), headers: headers);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -29,7 +29,7 @@ class CuDanService {
   /// Fetches the list of residents.
   Future<List<CuDan>> fetchCuDans() async {
     final headers = await AuthHttp.getHeaders();
-    final response = await http.get(Uri.parse(apiUrl), headers: headers);
+    final response = await http.get(Uri.parse('$apiUrl?pageSize=500'), headers: headers);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));

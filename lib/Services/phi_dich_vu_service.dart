@@ -8,7 +8,7 @@ class PhiDichVuService {
 
   /// Fetches the list of all service fees.
   Future<List<PhiDichVu>> fetchPhiDichVus() async {
-    final response = await AuthHttp.get(Uri.parse(apiUrl));
+    final response = await AuthHttp.get(Uri.parse('$apiUrl?pageSize=500'));
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));

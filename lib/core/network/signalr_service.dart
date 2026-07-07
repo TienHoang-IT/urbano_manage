@@ -6,7 +6,15 @@ import 'package:urbano_manage/core/constants/api_config.dart';
 class SignalRService extends ChangeNotifier {
   HubConnection? _connection;
   bool isConnected = false;
-  int unreadCount = 0;
+  Map<String, int> unreadCounts = {
+    'thongBao': 0,
+    'yeuCau': 0,
+    'datLich': 0,
+    'hoaDon': 0,
+  };
+
+  int get totalUnread => unreadCounts.values.fold(0, (a, b) => a + b);
+
   List<Map<String, dynamic>> recentEvents = [];
 
   Future<void> connect() async {
@@ -72,14 +80,40 @@ class SignalRService extends ChangeNotifier {
       data['_receivedAt'] = DateTime.now().toIso8601String();
       recentEvents.insert(0, data);
       if (recentEvents.length > 50) recentEvents.removeLast(); // giữ 50 event gần nhất
-      unreadCount++;
+      
+      switch (type) {
+        case 'notification':
+          unreadCounts['thongBao'] = (unreadCounts['thongBao'] ?? 0) + 1;
+          break;
+        case 'new_request':
+          unreadCounts['yeuCau'] = (unreadCounts['yeuCau'] ?? 0) + 1;
+          break;
+        case 'new_booking':
+          unreadCounts['datLich'] = (unreadCounts['datLich'] ?? 0) + 1;
+          break;
+        case 'new_invoice':
+          unreadCounts['hoaDon'] = (unreadCounts['hoaDon'] ?? 0) + 1;
+          break;
+        default:
+          unreadCounts['thongBao'] = (unreadCounts['thongBao'] ?? 0) + 1;
+      }
+      
       notifyListeners();
       debugPrint('SignalR: Received $type → ${data['tieuDe'] ?? data['id'] ?? ''}');
     };
   }
 
+  void clearUnreadFor(String key) {
+    if (unreadCounts.containsKey(key)) {
+      unreadCounts[key] = 0;
+      notifyListeners();
+    }
+  }
+
   void clearUnread() {
-    unreadCount = 0;
+    for (var key in unreadCounts.keys) {
+      unreadCounts[key] = 0;
+    }
     notifyListeners();
   }
 
@@ -87,7 +121,9 @@ class SignalRService extends ChangeNotifier {
     await _connection?.stop();
     isConnected = false;
     recentEvents.clear();
-    unreadCount = 0;
+    for (var key in unreadCounts.keys) {
+      unreadCounts[key] = 0;
+    }
     notifyListeners();
   }
 }

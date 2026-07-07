@@ -12,4 +12,5 @@ class NavigationTabs {
   static const int nhatKyHeThong = 10;
   static const int tienIch = 11;
   static const int datLichTienIch = 12;
+  static const int lichSuThanhToan = 13;
 }
