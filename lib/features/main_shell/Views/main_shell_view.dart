@@ -31,7 +31,6 @@ import 'package:urbano_manage/features/phuong_tien/Views/phuong_tien_list_view.d
 import 'package:urbano_manage/features/nhat_ky_he_thong/Views/nhat_ky_he_thong_list_view.dart';
 import 'package:urbano_manage/features/tien_ich/Views/tien_ich_list_view.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/Views/dat_lich_list_view.dart';
-import 'package:urbano_manage/features/lich_su_thanh_toan/Views/lich_su_thanh_toan_list_view.dart';
 import 'package:urbano_manage/core/network/signalr_service.dart';
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -243,9 +242,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         break;
       case NavigationTabs.datLichTienIch:
         title = 'Đặt lịch tiện ích';
-        break;
-      case NavigationTabs.lichSuThanhToan:
-        title = 'Lịch sử thanh toán';
         break;
     }
 
@@ -685,7 +681,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         const NhatKyHeThongListView(),
         const TienIchListView(),
         const DatLichListView(),
-        const LichSuThanhToanListView(),
       ],
     );
   }
@@ -759,7 +754,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                 _buildDrawerItem(NavigationTabs.dashboard, 'Tổng quan', Icons.dashboard_rounded),
                 if (isKeToan) _buildDrawerItem(NavigationTabs.cuDan, 'Cư dân', Icons.people_alt_rounded),
                 if (isKeToan) _buildDrawerItem(NavigationTabs.canHo, 'Căn hộ', Icons.apartment_rounded),
-                if (isKeToan) 
+                if (isKeToan)
                   Consumer<SignalRService>(
                     builder: (_, signalR, _) => _buildDrawerItem(
                       NavigationTabs.hoaDon,
@@ -769,7 +764,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                       onTapAction: () => signalR.clearUnreadFor('hoaDon'),
                     ),
                   ),
-                if (isKeToan) _buildDrawerItem(NavigationTabs.lichSuThanhToan, 'Lịch sử thanh toán', Icons.history_edu_rounded),
                 if (isKeToan) _buildDrawerItem(NavigationTabs.phiDichVu, 'Phí dịch vụ', Icons.monetization_on_rounded),
                 Consumer<SignalRService>(
                   builder: (_, signalR, _) => _buildDrawerItem(

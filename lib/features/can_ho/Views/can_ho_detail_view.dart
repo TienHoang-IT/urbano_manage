@@ -46,15 +46,18 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
         if (b.ngayChuyenDen == null) return -1;
         return b.ngayChuyenDen!.compareTo(a.ngayChuyenDen!);
       });
+      if (!mounted) return;
       setState(() {
         _residents = list;
       });
     } catch (e) {
       debugPrint('Error loading apartment residents: $e');
     } finally {
-      setState(() {
-        _isLoadingResidents = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingResidents = false;
+        });
+      }
     }
   }
 
@@ -649,7 +652,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       },
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -695,7 +698,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       content: 'Bạn có chắc chắn muốn ghi nhận cư dân ${item.tenCuDan} đã chuyển đi?',
     );
 
-    if (confirm == true) {
+    if (confirm == true && mounted) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -729,7 +732,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       content: 'Bạn có chắc chắn muốn xóa liên kết cư dân ${item.tenCuDan} khỏi căn hộ?',
     );
 
-    if (confirm == true) {
+    if (confirm == true && mounted) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -769,7 +772,9 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => CuDanDetailView(cuDan: cuDan)),
-      ).then((_) => _loadResidents());
+      ).then((_) {
+        if (mounted) _loadResidents();
+      });
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);

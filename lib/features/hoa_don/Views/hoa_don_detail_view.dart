@@ -15,6 +15,7 @@ import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/hoa_don_model.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 import 'package:urbano_manage/features/hoa_don/Views/hoa_don_form_view.dart';
+import 'package:urbano_manage/Services/hoa_don_service.dart';
 import 'package:urbano_manage/Services/lich_su_thanh_toan_service.dart';
 import 'package:urbano_manage/Models/lich_su_thanh_toan_model.dart';
 
@@ -95,6 +96,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
   }
 
   Future<void> _showAddChiTietDialog() async {
+    final vm = context.read<HoaDonViewModel>();
     final tenController = TextEditingController();
     final donGiaController = TextEditingController();
     final soLuongController = TextEditingController();
@@ -183,21 +185,31 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                 };
 
                 Navigator.pop(context); // Close dialog
+                if (!mounted) return;
 
-                final success = await this.context.read<HoaDonViewModel>().addChiTietItem(_currentHoaDon.id, data);
-                if (success && mounted) {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(content: Text('Thêm phí dịch vụ thành công'), backgroundColor: AppColors.tealPrimary),
-                  );
-                  // Update current invoice totals since they changed on server
-                  final vm = this.context.read<HoaDonViewModel>();
-                  final updated = vm.hoaDons.firstWhere(
-                    (h) => h.id == _currentHoaDon.id,
-                    orElse: () => _currentHoaDon,
-                  );
-                  setState(() {
-                    _currentHoaDon = updated;
-                  });
+                try {
+                  final success = await vm.addChiTietItem(_currentHoaDon.id, data);
+                  if (success && mounted) {
+                    final updated = await HoaDonService().fetchHoaDonById(_currentHoaDon.id);
+                    if (mounted) {
+                      setState(() {
+                        _currentHoaDon = updated;
+                      });
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        const SnackBar(content: Text('Thêm phí dịch vụ thành công'), backgroundColor: AppColors.tealPrimary),
+                      );
+                    }
+                  } else if (mounted) {
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(content: Text(vm.error ?? 'Không thể thêm chi tiết hóa đơn'), backgroundColor: AppColors.red),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.red),
+                    );
+                  }
                 }
               },
               child: const Text('Thêm', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
@@ -215,6 +227,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
   }
 
   Future<void> _showPayDialog() async {
+    final vm = context.read<HoaDonViewModel>();
     final amountController = TextEditingController(
       text: (_currentHoaDon.tongTien - _currentHoaDon.soTienDaThanhToan).toInt().toString(),
     );
@@ -298,6 +311,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                   final note = noteController.text.trim();
                   
                   Navigator.pop(context); // Close dialog
+                  if (!mounted) return;
 
                   final data = {
                     'soTien': amount,
@@ -306,20 +320,30 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     'ghiChu': note,
                   };
 
-                  final success = await this.context.read<HoaDonViewModel>().recordPayment(_currentHoaDon.id, data);
-                  if (success && mounted) {
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      const SnackBar(content: Text('Ghi nhận thanh toán thành công'), backgroundColor: AppColors.tealPrimary),
-                    );
-                    // Refresh view model and update current invoice details
-                    final vm = this.context.read<HoaDonViewModel>();
-                    final updated = vm.hoaDons.firstWhere(
-                      (h) => h.id == _currentHoaDon.id,
-                      orElse: () => _currentHoaDon,
-                    );
-                    setState(() {
-                      _currentHoaDon = updated;
-                    });
+                  try {
+                    final success = await vm.recordPayment(_currentHoaDon.id, data);
+                    if (success && mounted) {
+                      // Reload chi tiết từ API
+                      final updated = await HoaDonService().fetchHoaDonById(_currentHoaDon.id);
+                      if (mounted) {
+                        setState(() {
+                          _currentHoaDon = updated;
+                        });
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          const SnackBar(content: Text('Ghi nhận thanh toán thành công'), backgroundColor: AppColors.tealPrimary),
+                        );
+                      }
+                    } else if (mounted) {
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        SnackBar(content: Text(vm.error ?? 'Không thể ghi nhận thanh toán'), backgroundColor: AppColors.red),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.red),
+                      );
+                    }
                   }
                 },
                 child: const Text('Thanh toán', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),

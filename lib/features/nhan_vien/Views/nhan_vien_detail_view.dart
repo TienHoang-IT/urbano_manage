@@ -46,7 +46,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
       MaterialPageRoute(builder: (_) => NhanVienFormView(nhanVien: _currentNhanVien)),
     );
 
-    if (result == true) {
+    if (result == true && mounted) {
       // Find updated employee in view model and update local state
       final vm = context.read<NhanVienViewModel>();
       final updated = vm.nhanViens.firstWhere(

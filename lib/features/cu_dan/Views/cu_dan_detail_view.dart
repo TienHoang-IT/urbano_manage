@@ -44,15 +44,18 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
         if (b.ngayChuyenDen == null) return -1;
         return b.ngayChuyenDen!.compareTo(a.ngayChuyenDen!);
       });
+      if (!mounted) return;
       setState(() {
         _history = list;
       });
     } catch (e) {
       debugPrint('Error loading resident history: $e');
     } finally {
-      setState(() {
-        _isLoadingHistory = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingHistory = false;
+        });
+      }
     }
   }
 
@@ -73,18 +76,20 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
               style: TextButton.styleFrom(foregroundColor: AppColors.red),
               child: const Text('Xóa'),
               onPressed: () async {
+                final vm = context.read<CuDanViewModel>();
+                final messenger = ScaffoldMessenger.of(context);
+                final navigator = Navigator.of(context);
                 Navigator.of(dialogContext).pop(); // Close dialog
-                final success = await context.read<CuDanViewModel>().removeCuDan(_currentCuDan.id);
-                if (context.mounted) {
+                final success = await vm.removeCuDan(_currentCuDan.id);
+                if (mounted) {
                   if (success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       const SnackBar(content: Text('Xóa cư dân thành công')),
                     );
-                    Navigator.of(context).pop(); // Back to list view
+                    navigator.pop(); // Back to list view
                   } else {
-                    final err = context.read<CuDanViewModel>().error;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(err ?? 'Lỗi xảy ra khi xóa cư dân')),
+                    messenger.showSnackBar(
+                      SnackBar(content: Text(vm.error ?? 'Lỗi xảy ra khi xóa cư dân')),
                     );
                   }
                 }
@@ -465,7 +470,9 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => CanHoDetailView(canHo: canHo)),
-      ).then((_) => _loadHistory());
+      ).then((_) {
+        if (mounted) _loadHistory();
+      });
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);

@@ -79,6 +79,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
     setState(() => _isLoadingApartments = true);
     try {
       final apartments = await CanHoService().fetchCanHos();
+      if (!mounted) return;
       setState(() {
         _apartments = apartments;
         if (widget.hoaDon == null && apartments.isNotEmpty) {
@@ -88,7 +89,9 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
     } catch (e) {
       debugPrint('Error loading apartments: $e');
     } finally {
-      setState(() => _isLoadingApartments = false);
+      if (mounted) {
+        setState(() => _isLoadingApartments = false);
+      }
     }
   }
 

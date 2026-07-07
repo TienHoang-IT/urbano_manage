@@ -45,28 +45,34 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
       final updatedItem = await vm.fetchTienIchs().then((_) {
         return vm.items.firstWhere((element) => element.id == widget.id);
       });
+      if (!mounted) return;
       setState(() {
         _tienIch = updatedItem;
         _isLoadingTienIch = false;
       });
     } catch (e) {
-      setState(() {
-        _errorTienIch = 'Không thể tải chi tiết tiện ích';
-        _isLoadingTienIch = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorTienIch = 'Không thể tải chi tiết tiện ích';
+          _isLoadingTienIch = false;
+        });
+      }
     }
 
     try {
       final bookings = await DatLichTienIchService().getByTienIch(widget.id);
+      if (!mounted) return;
       setState(() {
         _bookings = bookings;
         _isLoadingBookings = false;
       });
     } catch (e) {
-      setState(() {
-        _errorBookings = 'Không thể tải lịch đặt';
-        _isLoadingBookings = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorBookings = 'Không thể tải lịch đặt';
+          _isLoadingBookings = false;
+        });
+      }
     }
   }
 

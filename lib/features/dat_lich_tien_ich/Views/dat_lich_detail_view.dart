@@ -58,6 +58,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
   Future<void> _reloadBooking() async {
     try {
       final updated = await DatLichTienIchService().getById(_booking.id);
+      if (!mounted) return;
       setState(() {
         _booking = updated;
       });
@@ -67,6 +68,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
   }
 
   Future<void> _handleDuyet() async {
+    final vm = context.read<DatLichTienIchViewModel>();
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => const AppConfirmDialog(
@@ -86,27 +88,26 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
         ),
       );
 
-      final vm = context.read<DatLichTienIchViewModel>();
       final success = await vm.approveBooking(_booking.id);
 
-      if (mounted) {
-        Navigator.pop(context); // Pop loading
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã duyệt yêu cầu đặt lịch'), backgroundColor: AppColors.tealPrimary),
-          );
-          _reloadBooking();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(vm.error ?? 'Lỗi khi duyệt yêu cầu'), backgroundColor: AppColors.red),
-          );
-        }
+      if (!mounted) return;
+      Navigator.pop(context); // Pop loading
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã duyệt yêu cầu đặt lịch'), backgroundColor: AppColors.tealPrimary),
+        );
+        _reloadBooking();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(vm.error ?? 'Lỗi khi duyệt yêu cầu'), backgroundColor: AppColors.red),
+        );
       }
     }
   }
 
   Future<void> _handleTuChoi() async {
     final reasonController = TextEditingController();
+    final vm = context.read<DatLichTienIchViewModel>();
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -150,9 +151,15 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       ),
     );
 
+    if (!mounted) {
+      reasonController.dispose();
+      return;
+    }
+
+    final reason = reasonController.text.trim();
     reasonController.dispose();
 
-    if (confirm == true && mounted) {
+    if (confirm == true) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -161,26 +168,25 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
         ),
       );
 
-      final vm = context.read<DatLichTienIchViewModel>();
-      final success = await vm.rejectBooking(_booking.id, reasonController.text.trim());
+      final success = await vm.rejectBooking(_booking.id, reason);
 
-      if (mounted) {
-        Navigator.pop(context); // Pop loading
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã từ chối đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
-          );
-          _reloadBooking();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(vm.error ?? 'Lỗi khi từ chối yêu cầu'), backgroundColor: AppColors.red),
-          );
-        }
+      if (!mounted) return;
+      Navigator.pop(context); // Pop loading
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã từ chối đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
+        );
+        _reloadBooking();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(vm.error ?? 'Lỗi khi từ chối yêu cầu'), backgroundColor: AppColors.red),
+        );
       }
     }
   }
 
   Future<void> _handleHuy() async {
+    final vm = context.read<DatLichTienIchViewModel>();
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => const AppConfirmDialog(
@@ -200,21 +206,19 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
         ),
       );
 
-      final vm = context.read<DatLichTienIchViewModel>();
       final success = await vm.cancelBooking(_booking.id);
 
-      if (mounted) {
-        Navigator.pop(context); // Pop loading
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã hủy đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
-          );
-          _reloadBooking();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(vm.error ?? 'Lỗi khi hủy đặt lịch'), backgroundColor: AppColors.red),
-          );
-        }
+      if (!mounted) return;
+      Navigator.pop(context); // Pop loading
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã hủy đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
+        );
+        _reloadBooking();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(vm.error ?? 'Lỗi khi hủy đặt lịch'), backgroundColor: AppColors.red),
+        );
       }
     }
   }

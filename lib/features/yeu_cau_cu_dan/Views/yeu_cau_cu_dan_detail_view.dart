@@ -487,9 +487,10 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
           ),
           onPressed: () async {
             final ok = await viewModel.updateRequestStatus(widget.yeuCau.id, 2, currentStaffId);
-            if (ok && context.mounted) {
+            if (ok && mounted) {
+              final messenger = ScaffoldMessenger.of(context);
               Navigator.pop(context, true);
-              ScaffoldMessenger.of(context).showSnackBar(
+              messenger.showSnackBar(
                 const SnackBar(content: Text('Đã nhận xử lý yêu cầu này')),
               );
             }
@@ -514,9 +515,10 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                 ),
                 onPressed: () async {
                   final ok = await viewModel.updateRequestStatus(widget.yeuCau.id, 4, currentStaffId);
-                  if (ok && context.mounted) {
+                  if (ok && mounted) {
+                    final messenger = ScaffoldMessenger.of(context);
                     Navigator.pop(context, true);
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       const SnackBar(content: Text('Đã từ chối yêu cầu này')),
                     );
                   }
@@ -539,9 +541,10 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                 ),
                 onPressed: () async {
                   final ok = await viewModel.updateRequestStatus(widget.yeuCau.id, 3, currentStaffId);
-                  if (ok && context.mounted) {
+                  if (ok && mounted) {
+                    final messenger = ScaffoldMessenger.of(context);
                     Navigator.pop(context, true);
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       const SnackBar(content: Text('Đã hoàn thành xử lý yêu cầu')),
                     );
                   }
