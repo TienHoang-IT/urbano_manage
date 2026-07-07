@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:urbano_manage/main.dart';
-import 'package:urbano_manage/features/auth/Views/login_view.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 
 class AuthHttp {

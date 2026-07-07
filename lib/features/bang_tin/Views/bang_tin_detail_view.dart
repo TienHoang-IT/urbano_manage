@@ -109,7 +109,7 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                             width: double.infinity,
                             height: 200,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const SizedBox(),
+                            errorBuilder: (_, _, _) => const SizedBox(),
                           ),
                         ),
                         const SizedBox(height: 16),

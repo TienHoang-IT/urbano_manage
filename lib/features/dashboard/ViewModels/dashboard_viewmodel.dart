@@ -107,13 +107,13 @@ class DashboardViewModel extends ChangeNotifier {
         int? apCount;
 
         if (_cuDanService != null) {
-          rCount = await _cuDanService!.getResidentCount();
+          rCount = await _cuDanService.getResidentCount();
         }
         if (_hoaDonService != null) {
-          uBillCount = await _hoaDonService!.getUnpaidCount();
+          uBillCount = await _hoaDonService.getUnpaidCount();
         }
         if (_yeuCauService != null) {
-          final reqs = await _yeuCauService!.fetchYeuCaus(trangThai: 1);
+          final reqs = await _yeuCauService.fetchYeuCaus(trangThai: 1);
           pendingReqCount = reqs.length;
         }
 

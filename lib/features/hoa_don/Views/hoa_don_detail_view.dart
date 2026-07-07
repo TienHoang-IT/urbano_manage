@@ -204,6 +204,12 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
         );
       },
     );
+
+    tenController.dispose();
+    donGiaController.dispose();
+    soLuongController.dispose();
+    chiSoCuController.dispose();
+    chiSoMoiController.dispose();
   }
 
   Future<void> _showPayDialog() async {
@@ -287,13 +293,15 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     return;
                   }
 
+                  final note = noteController.text.trim();
+                  
                   Navigator.pop(context); // Close dialog
 
                   final data = {
                     'soTien': amount,
                     'phuongThucThanhToan': method,
                     'maGiaoDich': ref,
-                    'ghiChu': noteController.text.trim(),
+                    'ghiChu': note,
                   };
 
                   final success = await this.context.read<HoaDonViewModel>().recordPayment(_currentHoaDon.id, data);
@@ -319,6 +327,10 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
         });
       },
     );
+
+    amountController.dispose();
+    refController.dispose();
+    noteController.dispose();
   }
 
   @override

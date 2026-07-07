@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -9,6 +10,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:urbano_manage/Services/bao_cao_service.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
+import 'package:urbano_manage/features/yeu_cau_cu_dan/ViewModels/yeu_cau_cu_dan_viewmodel.dart';
+import 'package:urbano_manage/features/thong_bao/ViewModels/thong_bao_viewmodel.dart';
+import 'package:urbano_manage/features/dat_lich_tien_ich/ViewModels/dat_lich_tien_ich_viewmodel.dart';
 import 'package:urbano_manage/features/main_shell/Views/global_search_delegate.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/constants/navigation_tabs.dart';
@@ -44,6 +48,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   int _employeeId = 0;
 
   int _lastUnreadCount = 0;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -61,6 +66,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     if (mounted) {
       Provider.of<SignalRService>(context, listen: false).removeListener(_onSignalRUpdate);
@@ -90,6 +96,21 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
              duration: const Duration(seconds: 3),
            ),
          );
+
+         final type = latest['_type']?.toString();
+         if (type != null) {
+           _debounceTimer?.cancel();
+           _debounceTimer = Timer(const Duration(milliseconds: 1000), () {
+             if (!mounted) return;
+             if (type == 'new_request' && _currentIndex == NavigationTabs.yeuCauCuDan) {
+               context.read<YeuCauCuDanViewModel>().fetchRequests();
+             } else if (type == 'notification' && _currentIndex == NavigationTabs.thongBao) {
+               context.read<ThongBaoViewModel>().fetchThongBaos();
+             } else if (type == 'new_booking' && _currentIndex == NavigationTabs.datLichTienIch) {
+               context.read<DatLichTienIchViewModel>().fetchBookings();
+             }
+           });
+         }
        }
     }
     _lastUnreadCount = signalR.unreadCount;
@@ -243,20 +264,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               ),
             ),
           ),
-          Consumer<SignalRService>(
-            builder: (_, signalR, __) => Badge(
-              isLabelVisible: signalR.unreadCount > 0,
-              label: Text('${signalR.unreadCount}'),
-              child: IconButton(
-                icon: const Icon(Icons.notifications_outlined, color: AppColors.tealPrimary),
-                tooltip: 'Thông báo',
-                onPressed: () {
-                   signalR.clearUnread();
-                   _onNavigate(NavigationTabs.thongBao);
-                },
-              ),
-            ),
-          ),
           IconButton(
             icon: const Icon(Icons.search_rounded, color: AppColors.tealPrimary),
             tooltip: 'Tìm kiếm toàn cục',
@@ -309,7 +316,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<int>(
-                          value: selectedMonth,
+                          initialValue: selectedMonth,
                           dropdownColor: AppColors.bgMid,
                           decoration: const InputDecoration(
                             labelText: 'Tháng',
@@ -331,7 +338,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                       const SizedBox(width: 16),
                       Expanded(
                         child: DropdownButtonFormField<int>(
-                          value: selectedYear,
+                          initialValue: selectedYear,
                           dropdownColor: AppColors.bgMid,
                           decoration: const InputDecoration(
                             labelText: 'Năm',
@@ -525,7 +532,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<int>(
-                      value: selectedMonth,
+                      initialValue: selectedMonth,
                       dropdownColor: AppColors.bgMid,
                       decoration: const InputDecoration(
                         labelText: 'Tháng',
@@ -547,7 +554,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownButtonFormField<int>(
-                      value: selectedYear,
+                      initialValue: selectedYear,
                       dropdownColor: AppColors.bgMid,
                       decoration: const InputDecoration(
                         labelText: 'Năm',
@@ -690,13 +697,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
           child: Column(
             children: [
               Consumer<SignalRService>(
-                builder: (_, signalR, __) {
+                builder: (_, signalR, _) {
                   if (!signalR.isConnected) {
                     return Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       color: AppColors.red,
-                      child: const Text('Mất kết nối', textAlign: TextAlign.center,
+                      child: const Text('Mất kết nối real-time', textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white, fontSize: 11)),
                     );
                   }
@@ -735,7 +742,27 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                 if (isKeToan) _buildDrawerItem(NavigationTabs.hoaDon, 'Hóa đơn', Icons.receipt_long_rounded),
                 if (isKeToan) _buildDrawerItem(NavigationTabs.phiDichVu, 'Phí dịch vụ', Icons.monetization_on_rounded),
                 _buildDrawerItem(NavigationTabs.yeuCauCuDan, 'Yêu cầu cư dân', Icons.support_agent_rounded),
-                _buildDrawerItem(NavigationTabs.thongBao, 'Thông báo', Icons.notifications_rounded),
+                Consumer<SignalRService>(
+                  builder: (_, signalR, _) => _buildDrawerItem(
+                    NavigationTabs.thongBao,
+                    'Thông báo',
+                    Icons.notifications_rounded,
+                    trailing: signalR.unreadCount > 0
+                        ? Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: AppColors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${signalR.unreadCount}',
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : null,
+                    onTapAction: () => signalR.clearUnread(),
+                  ),
+                ),
                 if (isQuanLy) _buildDrawerItem(NavigationTabs.nhanVien, 'Nhân viên', Icons.badge_rounded),
                 _buildDrawerItem(NavigationTabs.bangTin, 'Bảng tin', Icons.newspaper_rounded),
                 if (isBaoVe) _buildDrawerItem(NavigationTabs.phuongTien, 'Phương tiện', Icons.directions_car_rounded),
@@ -829,7 +856,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildDrawerItem(int index, String title, IconData icon) {
+  Widget _buildDrawerItem(int index, String title, IconData icon, {Widget? trailing, VoidCallback? onTapAction}) {
     final isSelected = _currentIndex == index;
     return ListTile(
       leading: Icon(
@@ -844,11 +871,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
           fontSize: 14,
         ),
       ),
+      trailing: trailing,
       selected: isSelected,
       selectedTileColor: AppColors.tealPrimary.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       onTap: () {
+        if (onTapAction != null) onTapAction();
         _onNavigate(index);
         Navigator.pop(context); // Close Drawer
       },

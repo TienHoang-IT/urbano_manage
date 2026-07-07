@@ -394,10 +394,10 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                         final toStr = item.ngayChuyenDi != null ? df.format(item.ngayChuyenDi!) : 'Hiện tại';
 
                         final cardColor = isActive 
-                            ? AppColors.tealPrimary.withOpacity(0.05) 
+                            ? AppColors.tealPrimary.withValues(alpha: 0.05) 
                             : AppColors.nenContainer;
                         final borderColor = isActive 
-                            ? AppColors.tealPrimary.withOpacity(0.25) 
+                            ? AppColors.tealPrimary.withValues(alpha: 0.25) 
                             : AppColors.borderButton;
 
                         return Card(
@@ -429,7 +429,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                               decoration: BoxDecoration(
-                                                color: (isActive ? AppColors.tealPrimary : AppColors.iconMuted).withOpacity(0.15),
+                                                color: (isActive ? AppColors.tealPrimary : AppColors.iconMuted).withValues(alpha: 0.15),
                                                 borderRadius: BorderRadius.circular(4),
                                               ),
                                               child: Text(
@@ -540,7 +540,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   DropdownButtonFormField<int>(
-                    value: selectedCuDanId,
+                    initialValue: selectedCuDanId,
                     dropdownColor: AppColors.bgMid,
                     decoration: const InputDecoration(
                       labelText: 'Chọn cư dân',
@@ -562,7 +562,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<int>(
-                    value: selectedRoleId,
+                    initialValue: selectedRoleId,
                     dropdownColor: AppColors.bgMid,
                     decoration: const InputDecoration(
                       labelText: 'Vai trò',
@@ -598,8 +598,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                 onPrimary: Colors.white,
                                 surface: AppColors.bgMid,
                                 onSurface: Colors.white,
-                              ),
-                              dialogBackgroundColor: AppColors.bgDark,
+                              ), dialogTheme: DialogThemeData(backgroundColor: AppColors.bgDark),
                             ),
                             child: child!,
                           );

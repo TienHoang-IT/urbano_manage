@@ -115,8 +115,7 @@ class _NhatKyHeThongListViewState extends State<NhatKyHeThongListView> {
           onPrimary: Colors.white,
           surface: AppColors.bgMid,
           onSurface: Colors.white,
-        ),
-        dialogBackgroundColor: AppColors.bgDark,
+        ), dialogTheme: DialogThemeData(backgroundColor: AppColors.bgDark),
       ),
       child: child!,
     );
@@ -337,7 +336,7 @@ class _NhatKyHeThongListViewState extends State<NhatKyHeThongListView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                       decoration: BoxDecoration(
-                        color: AppColors.tealPrimary.withOpacity(0.12),
+                        color: AppColors.tealPrimary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(

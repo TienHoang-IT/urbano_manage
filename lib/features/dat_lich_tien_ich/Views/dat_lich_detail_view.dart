@@ -150,6 +150,8 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       ),
     );
 
+    reasonController.dispose();
+
     if (confirm == true && mounted) {
       showDialog(
         context: context,

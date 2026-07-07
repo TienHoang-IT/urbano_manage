@@ -373,10 +373,10 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                         final toStr = item.ngayChuyenDi != null ? df.format(item.ngayChuyenDi!) : 'Hiện tại';
 
                         final cardColor = isActive 
-                            ? AppColors.tealPrimary.withOpacity(0.05) 
+                            ? AppColors.tealPrimary.withValues(alpha: 0.05) 
                             : AppColors.nenContainer;
                         final borderColor = isActive 
-                            ? AppColors.tealPrimary.withOpacity(0.25) 
+                            ? AppColors.tealPrimary.withValues(alpha: 0.25) 
                             : AppColors.borderButton;
 
                         return Card(
@@ -408,7 +408,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                               decoration: BoxDecoration(
-                                                color: (isActive ? AppColors.tealPrimary : AppColors.iconMuted).withOpacity(0.15),
+                                                color: (isActive ? AppColors.tealPrimary : AppColors.iconMuted).withValues(alpha: 0.15),
                                                 borderRadius: BorderRadius.circular(4),
                                               ),
                                               child: Text(

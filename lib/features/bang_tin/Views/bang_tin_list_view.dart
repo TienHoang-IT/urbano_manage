@@ -189,7 +189,7 @@ class _BangTinListViewState extends State<BangTinListView> {
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildPlaceholderIcon(),
+                      errorBuilder: (_, _, _) => _buildPlaceholderIcon(),
                     ),
                   )
                 : _buildPlaceholderIcon(),

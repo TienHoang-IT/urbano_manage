@@ -361,7 +361,7 @@ class _TienIchFormViewState extends State<TienIchFormView> {
                           border: Border.all(color: AppColors.borderButton),
                         ),
                         child: SwitchListTile(
-                          activeColor: AppColors.tealPrimary,
+                          activeThumbColor: AppColors.tealPrimary,
                           title: const Text(
                             'Cần đặt trước lịch sử dụng',
                             style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),

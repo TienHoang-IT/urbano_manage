@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
-import 'package:urbano_manage/Models/thong_bao_model.dart';
 import 'package:urbano_manage/features/thong_bao/ViewModels/thong_bao_viewmodel.dart';
 import 'package:urbano_manage/features/thong_bao/Views/thong_bao_detail_view.dart';
 import 'package:urbano_manage/features/thong_bao/Views/thong_bao_form_view.dart';
