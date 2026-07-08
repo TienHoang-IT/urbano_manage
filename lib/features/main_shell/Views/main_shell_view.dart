@@ -112,6 +112,12 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                } else {
                  _needsRefresh[NavigationTabs.datLichTienIch] = true;
                }
+             } else if (type == 'payment_received') {
+               if (_currentIndex == NavigationTabs.hoaDon) {
+                 context.read<HoaDonViewModel>().fetchHoaDons();
+               } else {
+                 _needsRefresh[NavigationTabs.hoaDon] = true;
+               }
              }
            });
          }
@@ -196,6 +202,8 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         context.read<ThongBaoViewModel>().fetchThongBaos();
       } else if (index == NavigationTabs.datLichTienIch) {
         context.read<DatLichTienIchViewModel>().fetchBookings();
+      } else if (index == NavigationTabs.hoaDon) {
+        context.read<HoaDonViewModel>().fetchHoaDons();
       }
       _needsRefresh[index] = false;
     }

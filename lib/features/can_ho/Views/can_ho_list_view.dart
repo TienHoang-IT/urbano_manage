@@ -176,13 +176,10 @@ class _CanHoListViewState extends State<CanHoListView> {
             statusColor = AppColors.tealPrimary;
             break;
           case 2:
-            statusColor = AppColors.blue;
-            break;
-          case 3:
             statusColor = AppColors.amber;
             break;
           default:
-            statusColor = AppColors.red;
+            statusColor = Colors.grey;
         }
 
         return Padding(

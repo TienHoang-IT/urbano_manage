@@ -1,7 +1,23 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:urbano_manage/core/constants/api_config.dart';
 import 'package:urbano_manage/core/network/auth_http.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
+
+List<CanHo> parseCanHos(String body) {
+  final decoded = jsonDecode(body);
+  List listJson = [];
+  if (decoded is List) {
+    listJson = decoded;
+  } else if (decoded is Map) {
+    if (decoded['value'] != null) {
+      listJson = decoded['value'];
+    } else if (decoded['data'] != null) {
+      listJson = decoded['data'];
+    }
+  }
+  return listJson.map((item) => CanHo.fromJson(item)).toList();
+}
 
 class CanHoService {
   static const String apiUrl = '${ApiConfig.baseUrl}/CanHo';
@@ -11,18 +27,7 @@ class CanHoService {
     final response = await AuthHttp.get(Uri.parse('$apiUrl?pageSize=500'));
 
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-      List listJson = [];
-      if (decoded is List) {
-        listJson = decoded;
-      } else if (decoded is Map) {
-        if (decoded['value'] != null) {
-          listJson = decoded['value'];
-        } else if (decoded['data'] != null) {
-          listJson = decoded['data'];
-        }
-      }
-      return listJson.map((item) => CanHo.fromJson(item)).toList();
+      return compute(parseCanHos, response.body);
     } else {
       throw Exception('Không thể tải danh sách căn hộ (${response.statusCode})');
     }

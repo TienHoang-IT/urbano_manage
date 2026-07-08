@@ -116,17 +116,14 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
 
     Color statusColor;
     switch (_currentCanHo.trangThaiId) {
-      case 1: // Đang ở
+      case 1:
         statusColor = AppColors.tealPrimary;
         break;
-      case 2: // Trống
-        statusColor = AppColors.blue;
-        break;
-      case 3: // Bảo trì
+      case 2:
         statusColor = AppColors.amber;
         break;
       default:
-        statusColor = AppColors.red;
+        statusColor = Colors.grey;
     }
 
     return Scaffold(

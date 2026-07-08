@@ -10,6 +10,7 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final Widget? suffixIcon;
   final int maxLines;
+  final bool readOnly;
 
   const AppTextField({
     super.key,
@@ -21,6 +22,7 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.suffixIcon,
     this.maxLines = 1,
+    this.readOnly = false,
   });
 
   @override
@@ -45,6 +47,7 @@ class AppTextField extends StatelessWidget {
           keyboardType: keyboardType,
           obscureText: obscureText,
           maxLines: maxLines,
+          readOnly: readOnly,
           style: const TextStyle(fontSize: 13, color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,

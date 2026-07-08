@@ -493,7 +493,7 @@ class _DashboardViewState extends State<DashboardView> {
           ),
           const SizedBox(height: 12),
           _WarningCard(
-            title: '${cb.canHoTrong} căn hộ còn trống',
+            title: '${cb.canHoTrong} căn hộ chưa có cư dân',
             subtitle: 'Bấm để đi đến Quản lý Căn hộ',
             icon: Icons.meeting_room_rounded,
             backgroundColor: AppColors.blue.withValues(alpha: 0.08),

@@ -45,7 +45,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
       _xaController.text = c.xa;
       _diaChiController.text = c.diaChi;
       _selectedGender = c.gioiTinh ?? 0;
-      _selectedStatus = c.trangThai;
+      _selectedStatus = [1, 2, 3].contains(c.trangThai) ? c.trangThai : 1;
       if (c.ngaySinh != null) {
         _selectedDob = c.ngaySinh;
         _ngaySinhController.text = DateFormat('dd/MM/yyyy').format(c.ngaySinh!.toLocal());
@@ -183,6 +183,8 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                       ),
                       const SizedBox(height: 16),
                       _buildGenderDropdown(),
+                      const SizedBox(height: 16),
+                      _buildStatusDropdown(),
                       const SizedBox(height: 16),
                       GestureDetector(
                         onTap: () => _selectDob(context),
@@ -342,6 +344,62 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                 DropdownMenuItem<int>(
                   value: 2,
                   child: Text('Khác'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'TRẠNG THÁI',
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppColors.inputFill,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.borderSide, width: 1.5),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: _selectedStatus,
+              dropdownColor: AppColors.bgMid,
+              icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+              isExpanded: true,
+              onChanged: (int? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _selectedStatus = newValue;
+                  });
+                }
+              },
+              items: const [
+                DropdownMenuItem<int>(
+                  value: 1,
+                  child: Text('Chưa xác thực'),
+                ),
+                DropdownMenuItem<int>(
+                  value: 2,
+                  child: Text('Đang ở'),
+                ),
+                DropdownMenuItem<int>(
+                  value: 3,
+                  child: Text('Đã rời đi'),
                 ),
               ],
             ),

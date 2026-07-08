@@ -45,6 +45,7 @@ class SignalRService extends ChangeNotifier {
     _connection!.on('BookingStatusChanged', _onEvent('booking_status'));
     _connection!.on('NewInvoice', _onEvent('new_invoice'));
     _connection!.on('SystemAlert', _onEvent('system_alert'));
+    _connection!.on('PaymentReceived', _onEvent('payment_received'));
 
     // === TRẠNG THÁI KẾT NỐI ===
     _connection!.onclose(({error}) {
@@ -92,6 +93,7 @@ class SignalRService extends ChangeNotifier {
           unreadCounts['datLich'] = (unreadCounts['datLich'] ?? 0) + 1;
           break;
         case 'new_invoice':
+        case 'payment_received':
           unreadCounts['hoaDon'] = (unreadCounts['hoaDon'] ?? 0) + 1;
           break;
         default:

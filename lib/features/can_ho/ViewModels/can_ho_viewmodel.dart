@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
+import 'package:urbano_manage/Models/phi_dich_vu_model.dart';
 import 'package:urbano_manage/Services/can_ho_service.dart';
+import 'package:urbano_manage/Services/phi_dich_vu_service.dart';
 
 class CanHoViewModel extends ChangeNotifier {
   final CanHoService _service;
@@ -15,6 +17,7 @@ class CanHoViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> buildings = [];
   List<Map<String, dynamic>> roomTypes = [];
   List<Map<String, dynamic>> roomStatuses = [];
+  List<PhiDichVu> serviceFees = [];
 
   Future<void> fetchCanHos() async {
     isLoading = true;
@@ -39,10 +42,12 @@ class CanHoViewModel extends ChangeNotifier {
         _service.fetchToaNhas(),
         _service.fetchLoaiCanHos(),
         _service.fetchTrangThaiCanHos(),
+        PhiDichVuService().fetchPhiDichVus(),
       ]);
-      buildings = results[0];
-      roomTypes = results[1];
-      roomStatuses = results[2];
+      buildings = results[0] as List<Map<String, dynamic>>;
+      roomTypes = results[1] as List<Map<String, dynamic>>;
+      roomStatuses = results[2] as List<Map<String, dynamic>>;
+      serviceFees = results[3] as List<PhiDichVu>;
       notifyListeners();
     } catch (e) {
       debugPrint('Error fetching lookups: $e');

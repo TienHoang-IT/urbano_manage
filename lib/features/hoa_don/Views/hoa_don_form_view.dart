@@ -59,7 +59,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
       _selectedDueDate = h.hanThanhToan;
       _selectedTrangThai = h.trangThai;
     } else {
-      _maThanhToanController.text = 'HD-${DateTime.now().millisecondsSinceEpoch}';
+      _maThanhToanController.text = 'HD${DateTime.now().millisecondsSinceEpoch}';
       _selectedDueDate = DateTime.now().add(const Duration(days: 15));
     }
   }
