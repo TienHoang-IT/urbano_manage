@@ -765,8 +765,8 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       color: AppColors.red,
-                      child: const Text('Mất kết nối real-time', textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 11)),
+                      child: const Text('Mất kết nối', textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 12)),
                     );
                   }
                   return const SizedBox.shrink();

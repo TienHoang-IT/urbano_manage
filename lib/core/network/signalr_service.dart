@@ -69,6 +69,8 @@ class SignalRService extends ChangeNotifier {
       debugPrint('SignalR: Connected to $hubUrl');
     } catch (e) {
       debugPrint('SignalR: Connection failed: $e');
+      isConnected = false;
+      notifyListeners();
     }
   }
 
