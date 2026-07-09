@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
@@ -25,75 +24,21 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent,
-      ),
-    );
-
     final viewModel = context.watch<YeuCauCuDanViewModel>();
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAppbar(),
-              const SizedBox(height: 16),
-              _buildTabs(viewModel),
-              const SizedBox(height: 12),
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.tealPrimary,
-                  backgroundColor: AppColors.bgMid,
-                  onRefresh: () => viewModel.fetchRequests(),
-                  child: _buildContent(viewModel),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppbar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      child: Row(
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.inputFill,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderButton),
-            ),
-            child: const Icon(Icons.support_agent_rounded, size: 22, color: AppColors.tealPrimary),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Text(
-              'Yêu cầu Cư dân',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
+          _buildTabs(viewModel),
+          const SizedBox(height: 12),
+          Expanded(
+            child: RefreshIndicator(
+              color: AppColors.tealPrimary,
+              backgroundColor: AppColors.bgMid,
+              onRefresh: () => viewModel.fetchRequests(),
+              child: _buildContent(viewModel),
             ),
           ),
         ],
@@ -222,25 +167,29 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
 
     final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(yc.ngayGui.toLocal());
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => YeuCauCuDanDetailView(yeuCau: yc),
-          ),
-        );
-      },
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: AppColors.nenContainer,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: AppColors.nenContainer,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.borderButton),
-        ),
-        child: Column(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => YeuCauCuDanDetailView(yeuCau: yc),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.borderButton),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -339,6 +288,8 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
               ],
             ),
           ],
+        ),
+      ),
         ),
       ),
     );

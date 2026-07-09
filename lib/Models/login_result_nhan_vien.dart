@@ -7,9 +7,10 @@ class LoginResultNhanVien {
   LoginResultNhanVien({required this.token, required this.nhanVien});
 
   factory LoginResultNhanVien.fromJson(Map<String, dynamic> json) {
+    final userJson = json['user'] ?? json['nhanVien'] ?? {};
     return LoginResultNhanVien(
-      token: json['accessToken'] as String,
-      nhanVien: NhanVien.fromJson(json['user']),
+      token: (json['accessToken'] ?? json['token']) as String? ?? '',
+      nhanVien: NhanVien.fromJson(userJson as Map<String, dynamic>),
     );
   }
 }

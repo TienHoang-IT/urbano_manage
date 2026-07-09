@@ -6,7 +6,7 @@ import 'package:urbano_manage/features/auth/ViewModels/login_viewmodel.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
-import 'package:urbano_manage/features/yeu_cau_cu_dan/Views/yeu_cau_cu_dan_view.dart';
+import 'package:urbano_manage/features/main_shell/Views/main_shell_view.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -202,7 +202,7 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
               if (result) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const YeuCauCuDanView()),
+                  MaterialPageRoute(builder: (_) => const MainShell()),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
