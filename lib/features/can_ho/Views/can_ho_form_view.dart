@@ -21,12 +21,11 @@ class _CanHoFormViewState extends State<CanHoFormView> {
   final _tangController = TextEditingController();
   final _giaController = TextEditingController();
   final _soPhongController = TextEditingController();
-  final _donGiaController = TextEditingController();
 
   int? _selectedToaNhaId;
   int? _selectedLoaiCanHoId;
   int? _selectedTrangThaiId;
-  int? _selectedFeeId;
+  final List<_SelectedFee> _selectedFees = [];
 
   @override
   void initState() {
@@ -34,6 +33,10 @@ class _CanHoFormViewState extends State<CanHoFormView> {
     
     _tangController.addListener(_updateSoCanHo);
     _soPhongController.addListener(_updateSoCanHo);
+
+    if (widget.canHo == null) {
+      _selectedFees.add(_SelectedFee(donGiaController: TextEditingController()));
+    }
 
     final vm = context.read<CanHoViewModel>();
     vm.fetchLookups().then((_) {
@@ -45,6 +48,21 @@ class _CanHoFormViewState extends State<CanHoFormView> {
           }
           if (vm.roomTypes.isNotEmpty) _selectedLoaiCanHoId = vm.roomTypes.first['id'];
           if (vm.roomStatuses.isNotEmpty) _selectedTrangThaiId = vm.roomStatuses.first['id'];
+        });
+      } else if (widget.canHo != null && mounted) {
+        vm.getFeesForCanHo(widget.canHo!.id).then((fees) {
+          if (mounted) {
+            setState(() {
+              _selectedFees.clear();
+              for (var fee in fees) {
+                final ctrl = TextEditingController(text: fee['donGia'].toString());
+                _selectedFees.add(_SelectedFee(feeId: fee['phiDichVuId'], donGiaController: ctrl));
+              }
+              if (_selectedFees.isEmpty) {
+                _selectedFees.add(_SelectedFee(donGiaController: TextEditingController()));
+              }
+            });
+          }
         });
       }
     });
@@ -66,7 +84,9 @@ class _CanHoFormViewState extends State<CanHoFormView> {
     _tangController.dispose();
     _giaController.dispose();
     _soPhongController.dispose();
-    _donGiaController.dispose();
+    for (var fee in _selectedFees) {
+      fee.donGiaController.dispose();
+    }
     super.dispose();
   }
 
@@ -145,18 +165,25 @@ class _CanHoFormViewState extends State<CanHoFormView> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập số phòng hợp lệ')));
         return;
       }
-      if (_selectedFeeId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng chọn phí dịch vụ')));
-        return;
-      }
-      final donGia = double.tryParse(_donGiaController.text.trim());
-      if (donGia == null || donGia <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập đơn giá dịch vụ hợp lệ')));
-        return;
-      }
-      data['phiDichVuId'] = _selectedFeeId;
-      data['donGia'] = donGia;
     }
+    
+    List<Map<String, dynamic>> canHoPhiDichVus = [];
+    for (var item in _selectedFees) {
+      if (item.feeId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng chọn phí dịch vụ cho tất cả các mục')));
+        return;
+      }
+      final donGia = double.tryParse(item.donGiaController.text.trim());
+      if (donGia == null || donGia < 0) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập đơn giá hợp lệ (>= 0) cho tất cả phí dịch vụ')));
+        return;
+      }
+      canHoPhiDichVus.add({
+        'phiDichVuId': item.feeId,
+        'donGia': donGia,
+      });
+    }
+    data['canHoPhiDichVus'] = canHoPhiDichVus;
 
     final viewModel = context.read<CanHoViewModel>();
     bool success;
@@ -232,6 +259,14 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                             .toList(),
                       ),
                       const SizedBox(height: 16),
+                      AppTextField(
+                        label: 'TẦNG *',
+                        hint: 'Nhập số tầng',
+                        controller: _tangController,
+                        prefixIcon: Icons.layers_rounded,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 16),
                       if (!isEdit) ...[
                         AppTextField(
                           label: 'SỐ PHÒNG *',
@@ -248,14 +283,6 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                         controller: _soCanHoController,
                         prefixIcon: Icons.tag_rounded,
                         readOnly: true,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'TẦNG *',
-                        hint: 'Nhập số tầng',
-                        controller: _tangController,
-                        prefixIcon: Icons.layers_rounded,
-                        keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 16),
                       AppDropdownField<int>(
@@ -294,38 +321,89 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 16),
-                      if (!isEdit) ...[
-                        AppDropdownField<int>(
-                          label: 'PHÍ DỊCH VỤ *',
-                          value: _selectedFeeId,
-                          hint: 'Chọn phí dịch vụ',
-                          prefixIcon: Icons.monetization_on_rounded,
-                          onChanged: (val) {
-                            setState(() {
-                              _selectedFeeId = val;
-                              if (val != null) {
-                                final fee = viewModel.serviceFees.firstWhere((f) => f.id == val);
-                                _donGiaController.text = fee.donGia.toInt().toString();
-                              }
-                            });
-                          },
-                          items: viewModel.serviceFees
-                              .map((e) => DropdownMenuItem<int>(
-                                    value: e.id,
-                                    child: Text('${e.tenPhiDichVu} (${e.tenLoaiPhiDichVu})'),
-                                  ))
-                              .toList(),
+                        const Text(
+                          'DANH SÁCH PHÍ DỊCH VỤ',
+                          style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        ..._selectedFees.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final feeItem = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.inputFill,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.borderButton),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Phí dịch vụ #${index + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      if (_selectedFees.length > 1)
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              feeItem.donGiaController.dispose();
+                                              _selectedFees.removeAt(index);
+                                            });
+                                          },
+                                          child: const Icon(Icons.delete_outline, color: AppColors.red, size: 20),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  AppDropdownField<int>(
+                                    label: 'CHỌN PHÍ *',
+                                    value: feeItem.feeId,
+                                    hint: 'Chọn phí dịch vụ',
+                                    prefixIcon: Icons.monetization_on_rounded,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        feeItem.feeId = val;
+                                        if (val != null) {
+                                          final fee = viewModel.serviceFees.firstWhere((f) => f.id == val);
+                                          feeItem.donGiaController.text = fee.donGia.toInt().toString();
+                                        }
+                                      });
+                                    },
+                                    items: viewModel.serviceFees
+                                        .map((e) => DropdownMenuItem<int>(
+                                              value: e.id,
+                                              child: Text('${e.tenPhiDichVu} (${e.tenLoaiPhiDichVu})'),
+                                            ))
+                                        .toList(),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  AppTextField(
+                                    label: 'ĐƠN GIÁ (VND) *',
+                                    hint: 'Nhập đơn giá',
+                                    controller: feeItem.donGiaController,
+                                    prefixIcon: Icons.price_change_rounded,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _selectedFees.add(_SelectedFee(donGiaController: TextEditingController()));
+                              });
+                            },
+                            icon: const Icon(Icons.add_circle_outline, color: AppColors.tealPrimary),
+                            label: const Text('Thêm phí dịch vụ', style: TextStyle(color: AppColors.tealPrimary)),
+                          ),
                         ),
                         const SizedBox(height: 16),
-                        AppTextField(
-                          label: 'ĐƠN GIÁ DỊCH VỤ *',
-                          hint: 'Nhập đơn giá dịch vụ',
-                          controller: _donGiaController,
-                          prefixIcon: Icons.price_change_rounded,
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 16),
-                      ],
                       const SizedBox(height: 32),
                       AppButton(
                         label: viewModel.isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập Nhật' : 'Thêm Mới'),
@@ -378,4 +456,10 @@ class _CanHoFormViewState extends State<CanHoFormView> {
       ),
     );
   }
+}
+
+class _SelectedFee {
+  int? feeId;
+  final TextEditingController donGiaController;
+  _SelectedFee({this.feeId, required this.donGiaController});
 }

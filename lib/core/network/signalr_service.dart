@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signalr_netcore/signalr_client.dart';
-import 'package:urbano_manage/core/constants/api_config.dart'; 
+import 'package:urbano_manage/core/constants/api_config.dart';
+import 'package:urbano_manage/core/services/local_notification_service.dart';
 
 class SignalRService extends ChangeNotifier {
   HubConnection? _connection;
@@ -71,7 +72,6 @@ class SignalRService extends ChangeNotifier {
     }
   }
 
-  /// Factory tạo handler cho mỗi loại event
   void Function(List<Object?>?) _onEvent(String type) {
     return (args) {
       final data = args?.isNotEmpty == true
@@ -82,24 +82,63 @@ class SignalRService extends ChangeNotifier {
       recentEvents.insert(0, data);
       if (recentEvents.length > 50) recentEvents.removeLast(); // giữ 50 event gần nhất
       
+      String notificationTitle = 'Thông báo mới';
+      String notificationBody = 'Bạn có một thông báo mới từ hệ thống.';
+
       switch (type) {
         case 'notification':
           unreadCounts['thongBao'] = (unreadCounts['thongBao'] ?? 0) + 1;
+          notificationTitle = data['tieuDe']?.toString() ?? 'Thông báo hệ thống';
+          notificationBody = data['noiDung']?.toString() ?? 'Có thông báo mới';
           break;
         case 'new_request':
           unreadCounts['yeuCau'] = (unreadCounts['yeuCau'] ?? 0) + 1;
+          notificationTitle = 'Yêu cầu cư dân mới';
+          notificationBody = data['tieuDe']?.toString() ?? 'Có yêu cầu mới được gửi đến';
           break;
         case 'new_booking':
           unreadCounts['datLich'] = (unreadCounts['datLich'] ?? 0) + 1;
+          notificationTitle = 'Đặt lịch mới';
+          notificationBody = 'Có một lượt đặt lịch tiện ích mới cần xem xét';
           break;
         case 'new_invoice':
+          unreadCounts['hoaDon'] = (unreadCounts['hoaDon'] ?? 0) + 1;
+          notificationTitle = 'Hóa đơn mới';
+          notificationBody = 'Hóa đơn ${data['maThanhToan'] ?? ''} vừa được tạo';
+          break;
         case 'payment_received':
           unreadCounts['hoaDon'] = (unreadCounts['hoaDon'] ?? 0) + 1;
+          notificationTitle = 'Thanh toán thành công';
+          notificationBody = 'Đã nhận thanh toán cho hóa đơn ${data['maThanhToan'] ?? ''}';
+          break;
+        case 'request_status':
+          unreadCounts['yeuCau'] = (unreadCounts['yeuCau'] ?? 0) + 1;
+          notificationTitle = 'Cập nhật yêu cầu';
+          notificationBody = 'Yêu cầu của bạn vừa được cập nhật trạng thái';
+          break;
+        case 'booking_status':
+          unreadCounts['datLich'] = (unreadCounts['datLich'] ?? 0) + 1;
+          notificationTitle = 'Cập nhật đặt lịch';
+          notificationBody = 'Lịch tiện ích của bạn đã được cập nhật';
+          break;
+        case 'system_alert':
+          unreadCounts['thongBao'] = (unreadCounts['thongBao'] ?? 0) + 1;
+          notificationTitle = 'Cảnh báo hệ thống';
+          notificationBody = data['noiDung']?.toString() ?? 'Cảnh báo từ hệ thống';
           break;
         default:
           unreadCounts['thongBao'] = (unreadCounts['thongBao'] ?? 0) + 1;
+          notificationTitle = data['tieuDe']?.toString() ?? 'Thông báo';
+          notificationBody = 'Sự kiện mới: $type';
       }
       
+      LocalNotificationService.showNotification(
+        id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+        title: notificationTitle,
+        body: notificationBody,
+        payload: type,
+      );
+
       notifyListeners();
       debugPrint('SignalR: Received $type → ${data['tieuDe'] ?? data['id'] ?? ''}');
     };

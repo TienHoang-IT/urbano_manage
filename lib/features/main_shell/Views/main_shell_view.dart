@@ -27,11 +27,14 @@ import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_list_view.dart'
 import 'package:urbano_manage/features/can_ho/Views/can_ho_list_view.dart';
 import 'package:urbano_manage/features/phi_dich_vu/Views/phi_dich_vu_list_view.dart';
 import 'package:urbano_manage/features/bang_tin/Views/bang_tin_list_view.dart';
+import 'dart:async';
 import 'package:urbano_manage/features/phuong_tien/Views/phuong_tien_list_view.dart';
 import 'package:urbano_manage/features/nhat_ky_he_thong/Views/nhat_ky_he_thong_list_view.dart';
 import 'package:urbano_manage/features/tien_ich/Views/tien_ich_list_view.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/Views/dat_lich_list_view.dart';
 import 'package:urbano_manage/core/network/signalr_service.dart';
+import 'package:urbano_manage/core/services/local_notification_service.dart';
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -49,6 +52,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
 
   int _lastTotalUnread = 0;
   Timer? _debounceTimer;
+  StreamSubscription<String?>? _notificationSub;
 
   @override
   void initState() {
@@ -61,12 +65,47 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       final signalR = Provider.of<SignalRService>(context, listen: false);
       if (!signalR.isConnected) signalR.connect();
       signalR.addListener(_onSignalRUpdate);
+
+      _notificationSub = LocalNotificationService.onNotificationTap.stream.listen((payload) {
+        if (payload != null) {
+          _handleNotificationTap(payload);
+        }
+      });
     });
+  }
+
+  void _handleNotificationTap(String payload) {
+    if (!mounted) return;
+    int? targetTab;
+    
+    switch (payload) {
+      case 'new_invoice':
+      case 'payment_received':
+        targetTab = NavigationTabs.hoaDon;
+        break;
+      case 'new_request':
+      case 'request_status':
+        targetTab = NavigationTabs.yeuCauCuDan;
+        break;
+      case 'new_booking':
+      case 'booking_status':
+        targetTab = NavigationTabs.datLichTienIch;
+        break;
+      case 'notification':
+      case 'system_alert':
+        targetTab = NavigationTabs.thongBao;
+        break;
+    }
+    
+    if (targetTab != null && _currentIndex != targetTab) {
+      _onNavigate(targetTab);
+    }
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _notificationSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     if (mounted) {
       Provider.of<SignalRService>(context, listen: false).removeListener(_onSignalRUpdate);
@@ -686,9 +725,9 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
         const NhanVienListView(),
         const BangTinListView(),
         const PhuongTienListView(),
-        const NhatKyHeThongListView(),
         const TienIchListView(),
         const DatLichListView(),
+        const NhatKyHeThongListView(),
       ],
     );
   }
@@ -794,7 +833,6 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                 if (isQuanLy) _buildDrawerItem(NavigationTabs.nhanVien, 'Nhân viên', Icons.badge_rounded),
                 _buildDrawerItem(NavigationTabs.bangTin, 'Bảng tin', Icons.newspaper_rounded),
                 if (isBaoVe) _buildDrawerItem(NavigationTabs.phuongTien, 'Phương tiện', Icons.directions_car_rounded),
-                if (isQuanLy) _buildDrawerItem(NavigationTabs.nhatKyHeThong, 'Lịch sử hoạt động', Icons.history_rounded),
                 _buildDrawerItem(NavigationTabs.tienIch, 'Tiện ích', Icons.sports_soccer_rounded),
                 Consumer<SignalRService>(
                   builder: (_, signalR, _) => _buildDrawerItem(
@@ -805,6 +843,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                     onTapAction: () => signalR.clearUnreadFor('datLich'),
                   ),
                 ),
+                if (isQuanLy) _buildDrawerItem(NavigationTabs.nhatKyHeThong, 'Lịch sử hoạt động', Icons.history_rounded),
                 const Divider(color: AppColors.borderButton, height: 20, thickness: 1),
                 ListTile(
                   leading: const Icon(Icons.logout_rounded, color: AppColors.red),

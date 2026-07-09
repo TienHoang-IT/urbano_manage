@@ -3,12 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
-import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/core/Widgets/app_searchable_picker.dart';
 import 'package:urbano_manage/core/Widgets/app_date_picker.dart';
 import 'package:urbano_manage/Models/hoa_don_model.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
 import 'package:urbano_manage/Services/can_ho_service.dart';
+import 'package:urbano_manage/Models/phi_dich_vu_model.dart';
+import 'package:urbano_manage/Services/phi_dich_vu_service.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 
 class HoaDonFormView extends StatefulWidget {
@@ -18,6 +19,34 @@ class HoaDonFormView extends StatefulWidget {
 
   @override
   State<HoaDonFormView> createState() => _HoaDonFormViewState();
+}
+
+class _ChiTietItem {
+  TextEditingController tenController;
+  TextEditingController donGiaController;
+  TextEditingController soLuongController;
+  TextEditingController chiSoCuController;
+  TextEditingController chiSoMoiController;
+
+  _ChiTietItem({
+    String ten = '',
+    String donGia = '0',
+    String soLuong = '1',
+    String? chiSoCu,
+    String? chiSoMoi,
+  })  : tenController = TextEditingController(text: ten),
+        donGiaController = TextEditingController(text: donGia),
+        soLuongController = TextEditingController(text: soLuong),
+        chiSoCuController = TextEditingController(text: chiSoCu ?? ''),
+        chiSoMoiController = TextEditingController(text: chiSoMoi ?? '');
+
+  void dispose() {
+    tenController.dispose();
+    donGiaController.dispose();
+    soLuongController.dispose();
+    chiSoCuController.dispose();
+    chiSoMoiController.dispose();
+  }
 }
 
 class _HoaDonFormViewState extends State<HoaDonFormView> {
@@ -34,11 +63,15 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
 
   List<CanHo> _apartments = [];
   bool _isLoadingApartments = false;
+  List<PhiDichVu> _phiDichVus = [];
+  List<_ChiTietItem> _chiTiets = [];
+  bool _isLoadingChiTiets = false;
 
   @override
   void initState() {
     super.initState();
     _loadApartments();
+    _loadPhiDichVus();
 
     final now = DateTime.now();
     _thangController.text = now.month.toString();
@@ -49,6 +82,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
 
     if (widget.hoaDon != null) {
       final h = widget.hoaDon!;
+      _loadChiTiets(h.id);
       _maThanhToanController.text = h.maThanhToan;
       _thangController.text = h.thang.toString();
       _namController.text = h.nam.toString();
@@ -72,7 +106,215 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
     _tongTienController.dispose();
     _daThanhToanController.dispose();
     _chiPhiController.dispose();
+    for (var item in _chiTiets) {
+      item.dispose();
+    }
     super.dispose();
+  }
+
+  Future<void> _loadChiTiets(int hoaDonId) async {
+    setState(() => _isLoadingChiTiets = true);
+    try {
+      final vm = context.read<HoaDonViewModel>();
+      await vm.fetchChiTiets(hoaDonId);
+      final details = vm.currentChiTiets;
+      if (mounted) {
+        setState(() {
+          _chiTiets = details.map((d) => _ChiTietItem(
+            ten: d['tenPhiDichVu']?.toString() ?? '',
+            donGia: d['donGia']?.toString() ?? '0',
+            soLuong: d['soLuong']?.toString() ?? '1',
+            chiSoCu: d['chiSoCu']?.toString(),
+            chiSoMoi: d['chiSoMoi']?.toString(),
+          )).toList();
+          _calculateTongTien();
+          _isLoadingChiTiets = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoadingChiTiets = false);
+    }
+  }
+
+  void _calculateTongTien() {
+    double total = 0;
+    for (var item in _chiTiets) {
+      final donGia = double.tryParse(item.donGiaController.text.trim()) ?? 0;
+      final soLuong = double.tryParse(item.soLuongController.text.trim()) ?? 0;
+      total += (donGia * soLuong);
+    }
+    _tongTienController.text = total.toStringAsFixed(0);
+  }
+
+  Future<void> _loadPhiDichVus() async {
+    try {
+      final list = await PhiDichVuService().fetchPhiDichVus();
+      if (mounted) setState(() => _phiDichVus = list);
+    } catch (_) {
+    }
+  }
+
+  Future<void> _showChiTietDialog(int? index) async {
+    final item = index != null ? _chiTiets[index] : _ChiTietItem();
+    final isNew = index == null;
+
+    final String backupTen = item.tenController.text;
+    final String backupDonGia = item.donGiaController.text;
+    final String backupSoLuong = item.soLuongController.text;
+    final String backupCu = item.chiSoCuController.text;
+    final String backupMoi = item.chiSoMoiController.text;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            void onChiSoChangedLocal() {
+              final cu = double.tryParse(item.chiSoCuController.text.trim());
+              final moi = double.tryParse(item.chiSoMoiController.text.trim());
+              if (cu != null && moi != null && moi > cu) {
+                item.soLuongController.text = (moi - cu).toStringAsFixed(0);
+              }
+              setStateDialog(() {});
+            }
+
+            return AlertDialog(
+              backgroundColor: AppColors.bgMid,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: AppColors.borderButton),
+              ),
+              title: Text(isNew ? 'Thêm phí dịch vụ' : 'Sửa phí dịch vụ', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AppSearchablePicker<PhiDichVu>(
+                      label: 'TÊN DỊCH VỤ *',
+                      hint: 'Chọn phí dịch vụ',
+                      prefixIcon: Icons.room_service_rounded,
+                      value: _phiDichVus.cast<PhiDichVu?>().firstWhere(
+                        (p) => p?.tenPhiDichVu == item.tenController.text,
+                        orElse: () => null,
+                      ),
+                      items: _phiDichVus,
+                      itemAsString: (p) => p.tenPhiDichVu,
+                      searchFn: (p, q) => p.tenPhiDichVu.toLowerCase().contains(q.toLowerCase()),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setStateDialog(() {
+                            item.tenController.text = val.tenPhiDichVu;
+                            item.donGiaController.text = val.donGia.toStringAsFixed(0);
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppTextField(
+                            label: 'ĐƠN GIÁ *',
+                            hint: 'Đơn giá',
+                            controller: item.donGiaController,
+                            prefixIcon: Icons.attach_money_rounded,
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AppTextField(
+                            label: 'SỐ LƯỢNG *',
+                            hint: 'Số lượng',
+                            controller: item.soLuongController,
+                            prefixIcon: Icons.production_quantity_limits_rounded,
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppTextField(
+                            label: 'CHỈ SỐ CŨ',
+                            hint: 'Cũ',
+                            controller: item.chiSoCuController,
+                            prefixIcon: Icons.arrow_back_rounded,
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) => onChiSoChangedLocal(),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AppTextField(
+                            label: 'CHỈ SỐ MỚI',
+                            hint: 'Mới',
+                            controller: item.chiSoMoiController,
+                            prefixIcon: Icons.arrow_forward_rounded,
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) => onChiSoChangedLocal(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    if (isNew) {
+                      item.dispose();
+                    } else {
+                      item.tenController.text = backupTen;
+                      item.donGiaController.text = backupDonGia;
+                      item.soLuongController.text = backupSoLuong;
+                      item.chiSoCuController.text = backupCu;
+                      item.chiSoMoiController.text = backupMoi;
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final name = item.tenController.text.trim();
+                    final price = double.tryParse(item.donGiaController.text.trim()) ?? 0;
+                    final qty = double.tryParse(item.soLuongController.text.trim()) ?? 0;
+                    final cu = int.tryParse(item.chiSoCuController.text.trim());
+                    final moi = int.tryParse(item.chiSoMoiController.text.trim());
+                    
+                    if (name.isEmpty || price < 0 || qty <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng điền tên, đơn giá và số lượng lớn hơn 0 cho phí dịch vụ')));
+                      return;
+                    }
+                    
+                    if (cu != null && moi != null && moi <= cu) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chỉ số mới phải lớn hơn chỉ số cũ')));
+                      return;
+                    }
+
+                    if (isNew) {
+                      setState(() {
+                        _chiTiets.add(item);
+                      });
+                    } else {
+                      setState(() {});
+                    }
+                    _calculateTongTien();
+                    Navigator.pop(context);
+                  },
+                  child: Text(isNew ? 'Thêm' : 'Cập nhật', style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    );
   }
 
   Future<void> _loadApartments() async {
@@ -120,6 +362,33 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
       return;
     }
 
+    List<Map<String, dynamic>> chiTietHoaDons = [];
+    for (var item in _chiTiets) {
+      final name = item.tenController.text.trim();
+      final price = double.tryParse(item.donGiaController.text.trim()) ?? 0;
+      final qty = double.tryParse(item.soLuongController.text.trim()) ?? 0;
+      final cu = int.tryParse(item.chiSoCuController.text.trim());
+      final moi = int.tryParse(item.chiSoMoiController.text.trim());
+      
+      if (name.isEmpty || price < 0 || qty <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng điền tên, đơn giá và số lượng lớn hơn 0 cho các phí dịch vụ')));
+        return;
+      }
+      
+      if (cu != null && moi != null && moi <= cu) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chỉ số mới phải lớn hơn chỉ số cũ')));
+        return;
+      }
+      
+      chiTietHoaDons.add({
+        'tenPhiDichVu': name,
+        'donGia': price,
+        'soLuong': qty,
+        'chiSoCu': cu,
+        'chiSoMoi': moi,
+      });
+    }
+
     final data = {
       'maThanhToan': maThanhToan,
       'canHo': _selectedCanHoId,
@@ -130,6 +399,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
       'chiPhi': chiPhi,
       'hanThanhToan': _selectedDueDate?.toIso8601String(),
       'trangThai': _selectedTrangThai,
+      'chiTietHoaDons': chiTietHoaDons,
     };
 
     final viewModel = context.read<HoaDonViewModel>();
@@ -256,35 +526,112 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'TỔNG TIỀN (VND) *',
-                        hint: 'Nhập tổng số tiền cần thanh toán',
-                        controller: _tongTienController,
-                        prefixIcon: Icons.monetization_on_rounded,
-                        keyboardType: TextInputType.number,
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'DANH SÁCH PHÍ DỊCH VỤ',
+                            style: TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _showChiTietDialog(null),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.add_circle_outline_rounded, color: AppColors.tealPrimary, size: 16),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Thêm phí',
+                                  style: TextStyle(color: AppColors.tealPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 8),
+                      _isLoadingChiTiets 
+                        ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                        : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _chiTiets.length,
+                          itemBuilder: (context, index) {
+                            final item = _chiTiets[index];
+                            final donGia = double.tryParse(item.donGiaController.text.trim()) ?? 0;
+                            final soLuong = double.tryParse(item.soLuongController.text.trim()) ?? 0;
+                            final total = donGia * soLuong;
+                            
+                            return GestureDetector(
+                              onTap: () => _showChiTietDialog(index),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.inputFill,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.borderButton),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(item.tenController.text.isEmpty ? 'Chưa chọn dịch vụ' : item.tenController.text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                                          const SizedBox(height: 4),
+                                          Text('${soLuong.toStringAsFixed(0)} x ${donGia.toStringAsFixed(0)} = ${total.toStringAsFixed(0)} VND', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                                          if (item.chiSoCuController.text.isNotEmpty && item.chiSoMoiController.text.isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 4.0),
+                                              child: Text('Chỉ số: ${item.chiSoCuController.text} ➔ ${item.chiSoMoiController.text}', style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11)),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _chiTiets.removeAt(index).dispose();
+                                          _calculateTongTien();
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.red.withAlpha(38),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Icon(Icons.delete_rounded, color: AppColors.red, size: 18),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       const SizedBox(height: 16),
                       AppTextField(
                         label: 'ĐÃ THANH TOÁN (VND)',
-                        hint: 'Nhập số tiền đã trả',
+                        hint: 'Số tiền đã trả (chỉ xem)',
                         controller: _daThanhToanController,
                         prefixIcon: Icons.price_check_rounded,
                         keyboardType: TextInputType.number,
+                        readOnly: true,
                       ),
                       const SizedBox(height: 16),
-                      AppDropdownField<int>(
-                        label: 'TRẠNG THÁI THANH TOÁN',
-                        value: _selectedTrangThai,
-                        hint: 'Chọn trạng thái',
-                        prefixIcon: Icons.payment_rounded,
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedTrangThai = val);
-                        },
-                        items: const [
-                          DropdownMenuItem(value: 1, child: Text('Chưa thanh toán')),
-                          DropdownMenuItem(value: 2, child: Text('Thanh toán một phần')),
-                          DropdownMenuItem(value: 3, child: Text('Đã thanh toán')),
-                        ],
+                      AppTextField(
+                        label: 'TỔNG TIỀN (VND) *',
+                        hint: 'Tổng số tiền tự động tính từ danh sách',
+                        controller: _tongTienController,
+                        prefixIcon: Icons.monetization_on_rounded,
+                        readOnly: true,
                       ),
                       const SizedBox(height: 32),
                       AppButton(

@@ -101,4 +101,15 @@ class CuDanService {
       throw Exception('Không thể tải chi tiết cư dân (${response.statusCode})');
     }
   }
+
+  /// Verifies a resident.
+  Future<bool> verifyCuDan(int id) async {
+    final headers = await AuthHttp.getHeaders();
+    final response = await http.put(
+      Uri.parse('$apiUrl/$id/verify'),
+      headers: headers,
+    );
+
+    return response.statusCode == 200 || response.statusCode == 204;
+  }
 }

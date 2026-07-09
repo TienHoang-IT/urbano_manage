@@ -230,7 +230,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
-                        label: 'QUẬN / HUYỆN / PHƯỜNG / XÃ',
+                        label: 'PHƯỜNG / XÃ',
                         hint: 'Nhập phường/xã/quận/huyện',
                         controller: _xaController,
                         prefixIcon: Icons.map_rounded,

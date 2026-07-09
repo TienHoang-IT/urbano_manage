@@ -82,6 +82,8 @@ class _HoaDonListViewState extends State<HoaDonListView> {
           _tabChip('Đã trả', 2, viewModel),
           const SizedBox(width: 8),
           _tabChip('Trả một phần', 3, viewModel),
+          const SizedBox(width: 8),
+          _tabChip('Quá hạn', 4, viewModel),
         ],
       ),
     );
@@ -159,7 +161,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
         final h = viewModel.hoaDons[index];
 
         Color statusColor;
-        switch (h.trangThai) {
+        switch (h.displayTrangThai) {
           case 1:
             statusColor = AppColors.red;
             break;
@@ -168,6 +170,9 @@ class _HoaDonListViewState extends State<HoaDonListView> {
             break;
           case 3:
             statusColor = AppColors.tealPrimary;
+            break;
+          case 4:
+            statusColor = AppColors.red;
             break;
           default:
             statusColor = AppColors.red;
@@ -202,7 +207,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Căn hộ ID: ${h.canHo}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                    Text('Căn hộ: ${h.soCanHo.isNotEmpty ? h.soCanHo : h.canHo}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
                     Text('Kỳ hóa đơn: T${h.thang}/${h.nam}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
                   ],
                 ),

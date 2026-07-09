@@ -19,7 +19,12 @@ import 'package:urbano_manage/features/nhat_ky_he_thong/ViewModels/nhat_ky_he_th
 import 'package:urbano_manage/features/tien_ich/ViewModels/tien_ich_viewmodel.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/ViewModels/dat_lich_tien_ich_viewmodel.dart';
 import 'package:urbano_manage/features/lich_su_thanh_toan/ViewModels/lich_su_thanh_toan_viewmodel.dart';
-void main() {
+import 'package:urbano_manage/core/services/local_notification_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocalNotificationService.initialize();
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

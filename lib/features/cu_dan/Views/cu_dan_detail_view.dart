@@ -101,6 +101,53 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
     );
   }
 
+  void _confirmVerify(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.bgMid,
+          title: const Text('Xác nhận cư dân', style: TextStyle(color: Colors.white)),
+          content: Text('Bạn có chắc chắn muốn xác thực cư dân ${_currentCuDan.hoTen} không?', style: const TextStyle(color: AppColors.textMuted)),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: AppColors.blue),
+              child: const Text('Xác thực'),
+              onPressed: () async {
+                final vm = context.read<CuDanViewModel>();
+                final messenger = ScaffoldMessenger.of(context);
+                Navigator.of(dialogContext).pop(); // Close dialog
+                final success = await vm.verifyCuDan(_currentCuDan.id);
+                if (mounted) {
+                  if (success) {
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Xác thực cư dân thành công')),
+                    );
+                    final updated = vm.cuDans.firstWhere(
+                      (c) => c.id == _currentCuDan.id,
+                      orElse: () => _currentCuDan,
+                    );
+                    setState(() {
+                      _currentCuDan = updated;
+                    });
+                  } else {
+                    messenger.showSnackBar(
+                      SnackBar(content: Text(vm.error ?? 'Lỗi xảy ra khi xác thực')),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final formattedDob = _currentCuDan.ngaySinh != null
@@ -197,6 +244,12 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
               ),
             ),
           ),
+          if (_currentCuDan.trangThai == 1)
+            IconButton(
+              icon: const Icon(Icons.verified_user_rounded, color: AppColors.blue),
+              tooltip: 'Xác thực cư dân',
+              onPressed: () => _confirmVerify(context),
+            ),
           IconButton(
             icon: const Icon(Icons.edit_rounded, color: AppColors.tealPrimary),
             onPressed: () async {

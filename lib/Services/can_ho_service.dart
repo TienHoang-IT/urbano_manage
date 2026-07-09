@@ -106,4 +106,15 @@ class CanHoService {
       throw Exception('Không thể tải chi tiết căn hộ (${response.statusCode})');
     }
   }
+
+  /// Fetches service fees for a specific apartment
+  Future<List<Map<String, dynamic>>> fetchFeesByCanHoId(int canHoId) async {
+    final response = await AuthHttp.get(Uri.parse('${ApiConfig.baseUrl}/CanHoPhiDichVu/canho/$canHoId'));
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      List list = decoded is List ? decoded : (decoded is Map && decoded['value'] != null ? decoded['value'] : []);
+      return list.map((e) => e as Map<String, dynamic>).toList();
+    }
+    return [];
+  }
 }

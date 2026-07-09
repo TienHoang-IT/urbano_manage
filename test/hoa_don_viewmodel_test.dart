@@ -22,12 +22,13 @@ void main() {
       id: 1,
       maThanhToan: 'HD1',
       canHo: 1,
+      soCanHo: '101',
       thang: 6,
       nam: 2026,
       tongTien: 100000.0,
       soTienDaThanhToan: 0.0,
       chiPhi: 100000.0,
-      hanThanhToan: DateTime.now(),
+      hanThanhToan: DateTime.now().add(const Duration(days: 1)),
       trangThai: 1,
       tenNguoiCapNhat: 'Manager',
       createdAt: DateTime.now(),
@@ -49,6 +50,11 @@ void main() {
 
       // Tab 2: Paid (should be empty for our unpaid invoice)
       viewModel.currentTab = 2;
+      await viewModel.fetchHoaDons();
+      expect(viewModel.hoaDons, isEmpty);
+
+      // Tab 4: Overdue (should be empty because test invoice is not overdue)
+      viewModel.currentTab = 4;
       await viewModel.fetchHoaDons();
       expect(viewModel.hoaDons, isEmpty);
     });

@@ -56,14 +56,17 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
     );
 
     if (result == true && mounted) {
-      final vm = context.read<HoaDonViewModel>();
-      final updated = vm.hoaDons.firstWhere(
-        (h) => h.id == _currentHoaDon.id,
-        orElse: () => _currentHoaDon,
-      );
-      setState(() {
-        _currentHoaDon = updated;
-      });
+      try {
+        final updated = await HoaDonService().fetchHoaDonById(_currentHoaDon.id);
+        if (mounted) {
+          setState(() {
+            _currentHoaDon = updated;
+          });
+          context.read<HoaDonViewModel>().fetchChiTiets(_currentHoaDon.id);
+        }
+      } catch (e) {
+        debugPrint('Error reloading invoice: $e');
+      }
     }
   }
 
@@ -95,141 +98,11 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
     }
   }
 
-  Future<void> _showAddChiTietDialog() async {
-    final vm = context.read<HoaDonViewModel>();
-    final tenController = TextEditingController();
-    final donGiaController = TextEditingController();
-    final soLuongController = TextEditingController();
-    final chiSoCuController = TextEditingController();
-    final chiSoMoiController = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.bgMid,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.borderButton),
-          ),
-          title: const Text('Thêm phí dịch vụ chi tiết', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AppTextField(
-                  hint: 'Ví dụ: Tiền nước, Tiền điện',
-                  label: 'TÊN DỊCH VỤ *',
-                  controller: tenController,
-                  prefixIcon: Icons.room_service_rounded,
-                ),
-                const SizedBox(height: 12),
-                AppTextField(
-                  hint: 'Nhập đơn giá',
-                  label: 'ĐƠN GIÁ (VND) *',
-                  controller: donGiaController,
-                  prefixIcon: Icons.attach_money_rounded,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 12),
-                AppTextField(
-                  hint: 'Nhập số lượng',
-                  label: 'SỐ LƯỢNG *',
-                  controller: soLuongController,
-                  prefixIcon: Icons.production_quantity_limits_rounded,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 12),
-                AppTextField(
-                  hint: 'Không bắt buộc',
-                  label: 'CHỈ SỐ CŨ',
-                  controller: chiSoCuController,
-                  prefixIcon: Icons.arrow_back_rounded,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 12),
-                AppTextField(
-                  hint: 'Không bắt buộc',
-                  label: 'CHỈ SỐ MỚI',
-                  controller: chiSoMoiController,
-                  prefixIcon: Icons.arrow_forward_rounded,
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
-            ),
-            TextButton(
-              onPressed: () async {
-                final name = tenController.text.trim();
-                final price = double.tryParse(donGiaController.text.trim()) ?? 0.0;
-                final qty = double.tryParse(soLuongController.text.trim()) ?? 0.0;
-
-                if (name.isEmpty || price <= 0 || qty <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Vui lòng điền đầy đủ các trường bắt buộc')),
-                  );
-                  return;
-                }
-
-                final data = {
-                  'tenPhiDichVu': name,
-                  'donGia': price,
-                  'soLuong': qty,
-                  'chiSoCu': int.tryParse(chiSoCuController.text.trim()),
-                  'chiSoMoi': int.tryParse(chiSoMoiController.text.trim()),
-                };
-
-                Navigator.pop(context); // Close dialog
-                if (!mounted) return;
-
-                try {
-                  final success = await vm.addChiTietItem(_currentHoaDon.id, data);
-                  if (success && mounted) {
-                    final updated = await HoaDonService().fetchHoaDonById(_currentHoaDon.id);
-                    if (mounted) {
-                      setState(() {
-                        _currentHoaDon = updated;
-                      });
-                      ScaffoldMessenger.of(this.context).showSnackBar(
-                        const SnackBar(content: Text('Thêm phí dịch vụ thành công'), backgroundColor: AppColors.tealPrimary),
-                      );
-                    }
-                  } else if (mounted) {
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      SnackBar(content: Text(vm.error ?? 'Không thể thêm chi tiết hóa đơn'), backgroundColor: AppColors.red),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.red),
-                    );
-                  }
-                }
-              },
-              child: const Text('Thêm', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        );
-      },
-    );
-
-    tenController.dispose();
-    donGiaController.dispose();
-    soLuongController.dispose();
-    chiSoCuController.dispose();
-    chiSoMoiController.dispose();
-  }
-
   Future<void> _showPayDialog() async {
     final vm = context.read<HoaDonViewModel>();
+    final conThieuDialog = _currentHoaDon.tongTien - _currentHoaDon.soTienDaThanhToan;
     final amountController = TextEditingController(
-      text: (_currentHoaDon.tongTien - _currentHoaDon.soTienDaThanhToan).toInt().toString(),
+      text: (conThieuDialog > 0 ? conThieuDialog.toInt() : 0).toString(),
     );
     final refController = TextEditingController(
       text: 'PAY-${DateTime.now().millisecondsSinceEpoch}',
@@ -368,7 +241,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
     final formattedCreatedAt = DateFormat('dd/MM/yyyy HH:mm').format(_currentHoaDon.createdAt.toLocal());
     
     Color statusColor;
-    switch (_currentHoaDon.trangThai) {
+    switch (_currentHoaDon.displayTrangThai) {
       case 1:
         statusColor = AppColors.red;
         break;
@@ -378,12 +251,14 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
       case 3:
         statusColor = AppColors.tealPrimary;
         break;
+      case 4:
+        statusColor = AppColors.red;
+        break;
       default:
         statusColor = AppColors.red;
     }
 
     final conThieu = _currentHoaDon.tongTien - _currentHoaDon.soTienDaThanhToan;
-    final details = context.watch<HoaDonViewModel>().currentChiTiets;
 
     return Scaffold(
       body: Container(
@@ -408,7 +283,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     children: [
                       _buildHeaderCard(statusColor, currencyFormat),
                       const SizedBox(height: 20),
-                      if (conThieu > 0) ...[
+                      if (_currentHoaDon.displayTrangThai != 3) ...[
                         AppButton(
                           label: 'Ghi Nhận Thanh Toán',
                           icon: Icons.payments_rounded,
@@ -417,7 +292,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                         const SizedBox(height: 16),
                       ],
                       _buildInfoSection('Chi tiết hóa đơn', [
-                        _buildInfoRow(Icons.apartment_rounded, 'Căn hộ ID', _currentHoaDon.canHo.toString()),
+                        _buildInfoRow(Icons.apartment_rounded, 'Căn hộ', '${_currentHoaDon.soCanHo.isNotEmpty ? _currentHoaDon.soCanHo : _currentHoaDon.canHo} (ID: ${_currentHoaDon.canHo})'),
                         _buildInfoRow(Icons.calendar_view_month_rounded, 'Kỳ hóa đơn', 'Tháng ${_currentHoaDon.thang}/${_currentHoaDon.nam}'),
                         _buildInfoRow(Icons.timer_rounded, 'Hạn thanh toán', formattedDueDate),
                       ]),
@@ -590,19 +465,6 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
               const Text(
                 'Phí dịch vụ chi tiết',
                 style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
-              ),
-              GestureDetector(
-                onTap: _showAddChiTietDialog,
-                child: const Row(
-                  children: [
-                    Icon(Icons.add_circle_outline_rounded, color: AppColors.tealPrimary, size: 16),
-                    SizedBox(width: 4),
-                    Text(
-                      'Thêm',
-                      style: TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),

@@ -216,7 +216,26 @@ class _CuDanListViewState extends State<CuDanListView> {
                 ),
               ],
             ),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (c.trangThai == 1)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.red.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'Chưa xác thực',
+                        style: TextStyle(color: AppColors.red, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
+                ],
+              ),
             onTap: () {
               Navigator.push(
                 context,

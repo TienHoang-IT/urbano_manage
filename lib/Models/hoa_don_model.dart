@@ -2,6 +2,7 @@ class HoaDon {
   final int id;
   final String maThanhToan;
   final int canHo;
+  final String soCanHo;
   final int thang;
   final int nam;
   final double tongTien;
@@ -18,6 +19,7 @@ class HoaDon {
     required this.id,
     required this.maThanhToan,
     required this.canHo,
+    required this.soCanHo,
     required this.thang,
     required this.nam,
     required this.tongTien,
@@ -36,6 +38,7 @@ class HoaDon {
       id: json['id'] as int,
       maThanhToan: json['maThanhToan'] as String? ?? '',
       canHo: json['canHo'] as int? ?? 0,
+      soCanHo: json['soCanHo'] as String? ?? '',
       thang: json['thang'] as int? ?? 0,
       nam: json['nam'] as int? ?? 0,
       tongTien: (json['tongTien'] as num? ?? 0.0).toDouble(),
@@ -55,6 +58,7 @@ class HoaDon {
       'id': id,
       'maThanhToan': maThanhToan,
       'canHo': canHo,
+      'soCanHo': soCanHo,
       'thang': thang,
       'nam': nam,
       'tongTien': tongTien,
@@ -69,14 +73,23 @@ class HoaDon {
     };
   }
 
+  int get displayTrangThai {
+    if (trangThai != 3 && hanThanhToan != null && DateTime.now().isAfter(hanThanhToan!)) {
+      return 4; // Quá hạn thanh toán
+    }
+    return trangThai;
+  }
+
   String get trangThaiText {
-    switch (trangThai) {
+    switch (displayTrangThai) {
       case 1:
         return 'Chưa thanh toán';
       case 2:
-        return 'Đã thanh toán';
-      case 3:
         return 'Thanh toán một phần';
+      case 3:
+        return 'Đã thanh toán';
+      case 4:
+        return 'Quá hạn thanh toán';
       default:
         return 'Chưa thanh toán';
     }

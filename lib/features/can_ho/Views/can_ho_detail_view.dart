@@ -27,12 +27,39 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
   final CuDanService _cuDanService = CuDanService();
   List<CuDanCanHo> _residents = [];
   bool _isLoadingResidents = false;
+  
+  List<Map<String, dynamic>> _serviceFees = [];
+  bool _isLoadingFees = false;
 
   @override
   void initState() {
     super.initState();
     _currentCanHo = widget.canHo;
     _loadResidents();
+    _loadFees();
+  }
+
+  Future<void> _loadFees() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoadingFees = true;
+    });
+    try {
+      final vm = context.read<CanHoViewModel>();
+      final list = await vm.getFeesForCanHo(_currentCanHo.id);
+      if (!mounted) return;
+      setState(() {
+        _serviceFees = list;
+      });
+    } catch (e) {
+      debugPrint('Error loading apartment fees: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingFees = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadResidents() async {
@@ -76,6 +103,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       setState(() {
         _currentCanHo = updated;
       });
+      _loadFees();
     }
   }
 
@@ -161,6 +189,8 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                         _buildInfoRow(Icons.calendar_today_rounded, 'Ngày khởi tạo', formattedCreatedAt),
                         _buildInfoRow(Icons.edit_calendar_rounded, 'Cập nhật cuối', formattedUpdatedAt),
                       ]),
+                      const SizedBox(height: 16),
+                      _buildFeesSection(),
                       const SizedBox(height: 16),
                       _buildResidentsTimelineSection(),
                     ],
@@ -334,6 +364,90 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFeesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            'Phí dịch vụ',
+            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.nenContainer,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.borderButton),
+          ),
+          child: _isLoadingFees
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24.0),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+                )
+              : _serviceFees.isEmpty
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24.0),
+                      child: Center(
+                        child: Text(
+                          'Chưa có phí dịch vụ nào',
+                          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _serviceFees.length,
+                      itemBuilder: (context, index) {
+                        final fee = _serviceFees[index];
+                        final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+                        final formattedDonGia = currencyFormat.format(fee['donGia']);
+                        
+                        return Card(
+                          color: AppColors.bgMid,
+                          elevation: 0,
+                          margin: const EdgeInsets.symmetric(vertical: 6.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: AppColors.borderButton),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.monetization_on_rounded, color: AppColors.tealPrimary, size: 24),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        fee['tenPhiDichVu'] ?? '',
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Đơn giá: $formattedDonGia/tháng',
+                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+        ),
+      ],
     );
   }
 

@@ -91,4 +91,27 @@ class CuDanViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> verifyCuDan(int id) async {
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final success = await _service.verifyCuDan(id);
+      if (success) {
+        await fetchCuDans(); // refresh list
+        return true;
+      } else {
+        error = 'Xác thực cư dân thất bại';
+        return false;
+      }
+    } catch (e) {
+      error = 'Lỗi xảy ra khi xác thực cư dân';
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

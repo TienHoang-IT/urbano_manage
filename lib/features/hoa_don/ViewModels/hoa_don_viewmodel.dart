@@ -25,11 +25,13 @@ class HoaDonViewModel extends ChangeNotifier {
       if (currentTab == 0) {
         hoaDons = allInvoices;
       } else if (currentTab == 1) {
-        hoaDons = allInvoices.where((h) => h.trangThai == 1).toList();
+        hoaDons = allInvoices.where((h) => h.displayTrangThai == 1).toList();
       } else if (currentTab == 2) {
-        hoaDons = allInvoices.where((h) => h.trangThai == 3).toList();
+        hoaDons = allInvoices.where((h) => h.displayTrangThai == 3).toList();
       } else if (currentTab == 3) {
-        hoaDons = allInvoices.where((h) => h.trangThai == 2).toList();
+        hoaDons = allInvoices.where((h) => h.displayTrangThai == 2).toList();
+      } else if (currentTab == 4) {
+        hoaDons = allInvoices.where((h) => h.displayTrangThai == 4).toList();
       }
       error = null;
     } catch (e) {
