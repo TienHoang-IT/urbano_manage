@@ -235,9 +235,30 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                                 ),
                               ],
                             ),
-                          ],
+                            if (widget.yeuCau.nhanXet != null && widget.yeuCau.nhanXet!.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.bgDark,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    widget.yeuCau.nhanXet!,
+                                    style: const TextStyle(
+                                      color: AppColors.textMuted,
+                                      fontSize: 14,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
-                      ),
+
+                      // Assign to Staff Section
                       const SizedBox(height: 16),
 
                       // Content Section

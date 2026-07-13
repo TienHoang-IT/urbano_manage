@@ -82,86 +82,101 @@ class _DashboardViewState extends State<DashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 4 summary cards
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.15,
-            children: [
-              _StatCard(
-                title: 'Số cư dân',
-                value: residentVal,
-                icon: Icons.people_alt_rounded,
-                color: AppColors.blue,
-                onTap: () => widget.onNavigate(NavigationTabs.cuDan),
-              ),
-              _StatCard(
-                title: 'Số căn hộ',
-                value: apartmentVal,
-                icon: Icons.apartment_rounded,
-                color: AppColors.amber,
-                onTap: () => widget.onNavigate(NavigationTabs.canHo),
-              ),
-              _StatCard(
-                title: 'Hóa đơn chưa trả',
-                value: unpaidVal,
-                icon: Icons.receipt_long_rounded,
-                color: AppColors.red,
-                onTap: () => widget.onNavigate(NavigationTabs.hoaDon),
-              ),
-              _StatCard(
-                title: 'Yêu cầu chờ xử lý',
-                value: pendingVal,
-                icon: Icons.pending_actions_rounded,
-                color: AppColors.pink,
-                onTap: () => widget.onNavigate(NavigationTabs.yeuCauCuDan),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Charts section
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'BIỂU ĐỒ THỐNG KÊ',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: AppColors.tealPrimary,
-                letterSpacing: 1.5,
-              ),
+          const SizedBox(height: 16),
+          // 4 summary cards (Bento layout)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        title: 'Số cư dân',
+                        value: residentVal,
+                        icon: Icons.people_alt_rounded,
+                        color: AppColors.blue,
+                        onTap: () => widget.onNavigate(NavigationTabs.cuDan),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _StatCard(
+                        title: 'Số căn hộ',
+                        value: apartmentVal,
+                        icon: Icons.apartment_rounded,
+                        color: AppColors.amber,
+                        onTap: () => widget.onNavigate(NavigationTabs.canHo),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        title: 'Hóa đơn chưa trả',
+                        value: unpaidVal,
+                        icon: Icons.receipt_long_rounded,
+                        color: AppColors.red,
+                        onTap: () => widget.onNavigate(NavigationTabs.hoaDon),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _StatCard(
+                        title: 'Yêu cầu chờ xử lý',
+                        value: pendingVal,
+                        icon: Icons.pending_actions_rounded,
+                        color: AppColors.pink,
+                        onTap: () => widget.onNavigate(NavigationTabs.yeuCauCuDan),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          
+          const SizedBox(height: 32),
+
           if (stats != null) ...[
-            _buildRevenue6MonthsChartCard(stats),
-            const SizedBox(height: 16),
-            _buildRequestTypeChartCard(stats),
-            const SizedBox(height: 24),
-            
-            // Warnings section
+            // Section Title
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'CẢNH BÁO HỆ THỐNG',
+                'Tổng quan hoạt động',
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.red,
-                  letterSpacing: 1.5,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
+            _buildRevenue6MonthsChartCard(stats),
+            const SizedBox(height: 16),
+            _buildRequestTypeChartCard(stats),
+            const SizedBox(height: 40),
+            
+            // Warnings section
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Cảnh báo hệ thống',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             _buildWarningCards(stats),
           ],
-          const SizedBox(height: 32),
+          const SizedBox(height: 48),
         ],
       ),
     );
@@ -187,12 +202,12 @@ class _DashboardViewState extends State<DashboardView> {
 
     if (list.isEmpty) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(24),
         height: 150,
         decoration: BoxDecoration(
           color: AppColors.nenContainer,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.borderButton),
         ),
         child: const Center(
@@ -210,30 +225,35 @@ class _DashboardViewState extends State<DashboardView> {
     maxY = maxY * 1.15; // 15% padding top
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.nenContainer,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.borderButton),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Doanh thu 6 tháng gần nhất',
-            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+            'Doanh thu 6 tháng',
+            style: TextStyle(
+              color: Colors.white, 
+              fontSize: 18, 
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.5,
+            ),
           ),
           const SizedBox(height: 12),
           // Legend
           Row(
             children: [
               _buildLegendDot('Tổng tiền', AppColors.iconMuted),
-              const SizedBox(width: 16),
+              const SizedBox(width: 24),
               _buildLegendDot('Đã thu', AppColors.tealPrimary),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           SizedBox(
             height: 200,
             child: BarChart(
@@ -268,7 +288,7 @@ class _DashboardViewState extends State<DashboardView> {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               'T${list[index].thang}',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w500),
                             ),
                           );
                         }
@@ -285,7 +305,7 @@ class _DashboardViewState extends State<DashboardView> {
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Text(
                             _formatYAxisValue(value),
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                            style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                             textAlign: TextAlign.end,
                           ),
                         );
@@ -312,13 +332,13 @@ class _DashboardViewState extends State<DashboardView> {
                       BarChartRodData(
                         toY: item.tongTien,
                         color: AppColors.iconMuted,
-                        width: 10,
+                        width: 8,
                         borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
                       ),
                       BarChartRodData(
                         toY: item.daThu,
                         color: AppColors.tealPrimary,
-                        width: 10,
+                        width: 8,
                         borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
                       ),
                     ],
@@ -336,12 +356,12 @@ class _DashboardViewState extends State<DashboardView> {
     return Row(
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
         ),
-        const SizedBox(width: 6),
-        Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500)),
       ],
     );
   }
@@ -356,11 +376,11 @@ class _DashboardViewState extends State<DashboardView> {
 
     if (list.isEmpty || totalRequests == 0) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: AppColors.nenContainer,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.borderButton),
         ),
         child: const Center(
@@ -388,21 +408,26 @@ class _DashboardViewState extends State<DashboardView> {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.nenContainer,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.borderButton),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Phân loại Yêu cầu Cư dân',
-            style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+            'Phân loại Yêu cầu',
+            style: TextStyle(
+              color: Colors.white, 
+              fontSize: 18, 
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.5,
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 32),
           Row(
             children: [
               Expanded(
@@ -412,45 +437,51 @@ class _DashboardViewState extends State<DashboardView> {
                   child: PieChart(
                     PieChartData(
                       sectionsSpace: 2,
-                      centerSpaceRadius: 28,
+                      centerSpaceRadius: 32,
                       sections: List.generate(list.length, (index) {
                         final item = list[index];
                         return PieChartSectionData(
                           value: item.soLuong.toDouble(),
                           color: getSliceColor(index),
                           title: '${item.soLuong}',
-                          radius: 40,
-                          titleStyle: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                          radius: 36,
+                          titleStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                         );
                       }),
                     ),
                   ),
                 ),
               ),
+              const SizedBox(width: 16),
               Expanded(
                 flex: 5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(list.length, (index) {
                     final item = list[index];
                     final pct = (item.soLuong / totalRequests * 100).toStringAsFixed(1);
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Row(
                         children: [
                           Container(
                             width: 10,
                             height: 10,
-                            decoration: BoxDecoration(color: getSliceColor(index), shape: BoxShape.circle),
+                            decoration: BoxDecoration(color: getSliceColor(index), borderRadius: BorderRadius.circular(3)),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              '${item.tenLoai}: ${item.soLuong} ($pct%)',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                              '${item.tenLoai} ($pct%)',
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
+                          ),
+                          Text(
+                            '${item.soLuong}',
+                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -469,7 +500,7 @@ class _DashboardViewState extends State<DashboardView> {
   Widget _buildWarningCards(DashboardStatistics stats) {
     final cb = stats.canhBao;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
           _WarningCard(
@@ -477,7 +508,7 @@ class _DashboardViewState extends State<DashboardView> {
             subtitle: 'Bấm để đi đến Danh sách Hóa đơn',
             icon: Icons.warning_amber_rounded,
             backgroundColor: AppColors.red.withValues(alpha: 0.08),
-            borderColor: AppColors.red.withValues(alpha: 0.3),
+            borderColor: AppColors.red.withValues(alpha: 0.25),
             iconColor: AppColors.red,
             onTap: () => widget.onNavigate(NavigationTabs.hoaDon),
           ),
@@ -487,7 +518,7 @@ class _DashboardViewState extends State<DashboardView> {
             subtitle: 'Bấm để đi đến Yêu cầu Cư dân',
             icon: Icons.hourglass_empty_rounded,
             backgroundColor: AppColors.amber.withValues(alpha: 0.08),
-            borderColor: AppColors.amber.withValues(alpha: 0.3),
+            borderColor: AppColors.amber.withValues(alpha: 0.25),
             iconColor: AppColors.amber,
             onTap: () => widget.onNavigate(NavigationTabs.yeuCauCuDan),
           ),
@@ -497,7 +528,7 @@ class _DashboardViewState extends State<DashboardView> {
             subtitle: 'Bấm để đi đến Quản lý Căn hộ',
             icon: Icons.meeting_room_rounded,
             backgroundColor: AppColors.blue.withValues(alpha: 0.08),
-            borderColor: AppColors.blue.withValues(alpha: 0.3),
+            borderColor: AppColors.blue.withValues(alpha: 0.25),
             iconColor: AppColors.blue,
             onTap: () => widget.onNavigate(NavigationTabs.canHo),
           ),
@@ -530,42 +561,57 @@ class _WarningCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(20),
       child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: borderColor, width: 1),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: iconColor, size: 22),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white, 
+                      fontSize: 15, 
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.3,
+                    ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.8), fontSize: 11),
+                    style: TextStyle(
+                      color: AppColors.textMuted, 
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 20),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_forward_rounded, color: AppColors.textMuted, size: 14),
+            ),
           ],
         ),
       ),
@@ -594,58 +640,58 @@ class _StatCard extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppColors.nenContainer,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.borderButton),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: color, size: 24),
+                ),
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: color, size: 20),
+                  child: const Icon(Icons.arrow_forward_rounded, color: AppColors.textMuted, size: 14),
                 ),
-                const Icon(Icons.arrow_forward_rounded, color: AppColors.textMuted, size: 14),
               ],
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      height: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textMuted,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+            const SizedBox(height: 24),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: -1,
+                height: 1.1,
               ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

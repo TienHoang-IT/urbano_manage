@@ -18,6 +18,8 @@ class YeuCauCuDan {
   final String tenNguoiCapNhat;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int? sao;
+  final String? nhanXet;
 
   YeuCauCuDan({
     required this.id,
@@ -39,6 +41,8 @@ class YeuCauCuDan {
     required this.tenNguoiCapNhat,
     required this.createdAt,
     required this.updatedAt,
+    this.sao,
+    this.nhanXet,
   });
 
   factory YeuCauCuDan.fromJson(Map<String, dynamic> json) {
@@ -62,6 +66,8 @@ class YeuCauCuDan {
       tenNguoiCapNhat: json['tenNguoiCapNhat'] as String? ?? '',
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : DateTime.now(),
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : DateTime.now(),
+      sao: json['sao'] as int?,
+      nhanXet: json['nhanXet'] as String?,
     );
   }
 

@@ -103,11 +103,29 @@ class CuDanService {
   }
 
   /// Verifies a resident.
-  Future<bool> verifyCuDan(int id) async {
+  Future<bool> verifyCuDan(int id, int canHoId, int vaiTroId) async {
     final headers = await AuthHttp.getHeaders();
     final response = await http.put(
       Uri.parse('$apiUrl/$id/verify'),
       headers: headers,
+      body: jsonEncode({
+        'canHoId': canHoId,
+        'vaiTroId': vaiTroId,
+      }),
+    );
+
+    return response.statusCode == 200 || response.statusCode == 204;
+  }
+
+  /// Reset password by admin.
+  Future<bool> adminResetPassword(int id, String newPassword) async {
+    final headers = await AuthHttp.getHeaders();
+    final response = await http.put(
+      Uri.parse('$apiUrl/$id/admin-reset-password'),
+      headers: headers,
+      body: jsonEncode({
+        'newPassword': newPassword,
+      }),
     );
 
     return response.statusCode == 200 || response.statusCode == 204;

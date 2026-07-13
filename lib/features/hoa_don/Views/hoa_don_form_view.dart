@@ -182,10 +182,13 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
             return AlertDialog(
               backgroundColor: AppColors.bgMid,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(24),
                 side: const BorderSide(color: AppColors.borderButton),
               ),
-              title: Text(isNew ? 'Thêm phí dịch vụ' : 'Sửa phí dịch vụ', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              title: Text(
+                isNew ? 'Thêm phí dịch vụ' : 'Sửa phí dịch vụ', 
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -263,6 +266,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                   ],
                 ),
               ),
+              actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -279,7 +283,16 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                   },
                   child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
                 ),
-                TextButton(
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.tealPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    elevation: 0,
+                  ),
                   onPressed: () {
                     final name = item.tenController.text.trim();
                     final price = double.tryParse(item.donGiaController.text.trim()) ?? 0;
@@ -307,7 +320,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                     _calculateTongTien();
                     Navigator.pop(context);
                   },
-                  child: Text(isNew ? 'Thêm' : 'Cập nhật', style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
+                  child: Text(isNew ? 'Thêm' : 'Cập nhật', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ],
             );
@@ -453,7 +466,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
               _buildAppbar(context, isEdit),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -525,38 +538,48 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                         prefixIcon: Icons.room_service_rounded,
                         keyboardType: TextInputType.number,
                       ),
-                      const SizedBox(height: 16),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 32),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'DANH SÁCH PHÍ DỊCH VỤ',
+                            'Danh sách phí dịch vụ',
                             style: TextStyle(
-                              color: AppColors.textMuted,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.8,
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.5,
                             ),
                           ),
                           GestureDetector(
                             onTap: () => _showChiTietDialog(null),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.add_circle_outline_rounded, color: AppColors.tealPrimary, size: 16),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Thêm phí',
-                                  style: TextStyle(color: AppColors.tealPrimary, fontSize: 13, fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: AppColors.tealPrimary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.tealPrimary.withValues(alpha: 0.3)),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.add_circle_outline_rounded, color: AppColors.tealPrimary, size: 18),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Thêm phí',
+                                    style: TextStyle(color: AppColors.tealPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 16),
                       _isLoadingChiTiets 
-                        ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                        ? const Center(child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: CircularProgressIndicator(color: AppColors.tealPrimary),
+                          ))
                         : ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -570,30 +593,32 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                             return GestureDetector(
                               onTap: () => _showChiTietDialog(index),
                               child: Container(
-                                margin: const EdgeInsets.only(bottom: 8),
-                                padding: const EdgeInsets.all(12),
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
                                   color: AppColors.inputFill,
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(20),
                                   border: Border.all(color: AppColors.borderButton),
                                 ),
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(item.tenController.text.isEmpty ? 'Chưa chọn dịch vụ' : item.tenController.text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                                          const SizedBox(height: 4),
-                                          Text('${soLuong.toStringAsFixed(0)} x ${donGia.toStringAsFixed(0)} = ${total.toStringAsFixed(0)} VND', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                                          Text(item.tenController.text.isEmpty ? 'Chưa chọn dịch vụ' : item.tenController.text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                                          const SizedBox(height: 6),
+                                          Text('${soLuong.toStringAsFixed(0)} x ${donGia.toStringAsFixed(0)} = ${total.toStringAsFixed(0)} VND', style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
                                           if (item.chiSoCuController.text.isNotEmpty && item.chiSoMoiController.text.isNotEmpty)
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 4.0),
-                                              child: Text('Chỉ số: ${item.chiSoCuController.text} ➔ ${item.chiSoMoiController.text}', style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11)),
+                                              padding: const EdgeInsets.only(top: 6.0),
+                                              child: Text('Chỉ số: ${item.chiSoCuController.text} ➔ ${item.chiSoMoiController.text}', style: const TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
                                             ),
                                         ],
                                       ),
                                     ),
+                                    const SizedBox(width: 12),
                                     GestureDetector(
                                       onTap: () {
                                         setState(() {
@@ -602,12 +627,12 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                                         });
                                       },
                                       child: Container(
-                                        padding: const EdgeInsets.all(8),
+                                        padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
-                                          color: AppColors.red.withAlpha(38),
-                                          borderRadius: BorderRadius.circular(8),
+                                          color: AppColors.red.withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: const Icon(Icons.delete_rounded, color: AppColors.red, size: 18),
+                                        child: const Icon(Icons.delete_rounded, color: AppColors.red, size: 20),
                                       ),
                                     ),
                                   ],
@@ -633,7 +658,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                         prefixIcon: Icons.monetization_on_rounded,
                         readOnly: true,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 40),
                       AppButton(
                         label: viewModel.isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập Nhật' : 'Tạo Mới'),
                         onPressed: viewModel.isLoading ? null : _saveForm,
@@ -653,31 +678,31 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
 
   Widget _buildAppbar(BuildContext context, bool isEdit) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
               child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
-              isEdit ? 'Sửa thông tin Hóa đơn' : 'Tạo Hóa đơn mới',
+              isEdit ? 'Sửa Hóa đơn' : 'Tạo Hóa đơn mới',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
-                letterSpacing: 1,
+                letterSpacing: -0.5,
               ),
             ),
           ),

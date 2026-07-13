@@ -58,18 +58,22 @@ class _CuDanListViewState extends State<CuDanListView> {
             ],
           ),
           Positioned(
-            right: 16,
-            bottom: 16,
+            right: 20,
+            bottom: 20,
             child: FloatingActionButton(
               heroTag: 'cu_dan_add_fab',
               backgroundColor: AppColors.tealPrimary,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const CuDanFormView()),
                 );
               },
-              child: const Icon(Icons.add_rounded, color: Colors.white),
+              child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
             ),
           ),
         ],
@@ -79,7 +83,7 @@ class _CuDanListViewState extends State<CuDanListView> {
 
   Widget _buildSearchBox() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: TextField(
         controller: _searchController,
         onChanged: (val) {
@@ -107,15 +111,15 @@ class _CuDanListViewState extends State<CuDanListView> {
           fillColor: AppColors.inputFill,
           contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: AppColors.borderButton),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: AppColors.tealPrimary),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: AppColors.borderButton),
           ),
         ),
@@ -139,11 +143,18 @@ class _CuDanListViewState extends State<CuDanListView> {
               viewModel.error!,
               style: const TextStyle(color: AppColors.red, fontSize: 14),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.tealPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                elevation: 0,
+              ),
               onPressed: () => viewModel.fetchCuDans(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+              child: const Text('Thử lại', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             )
           ],
         ),
@@ -154,94 +165,105 @@ class _CuDanListViewState extends State<CuDanListView> {
       return const Center(
         child: Text(
           'Không tìm thấy cư dân nào',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 14),
+          style: TextStyle(color: AppColors.textMuted, fontSize: 15, fontWeight: FontWeight.w500),
         ),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
       itemCount: filteredList.length,
       itemBuilder: (context, index) {
         final c = filteredList[index];
         final initial = c.ten.isNotEmpty ? c.ten[0].toUpperCase() : 'C';
 
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            tileColor: AppColors.nenContainer,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.borderButton),
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => CuDanDetailView(cuDan: c)),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.nenContainer,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.borderButton),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: CircleAvatar(
-              radius: 22,
-              backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.1),
-              child: Text(
-                initial,
-                style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold),
-              ),
-            ),
-            title: Text(
-              c.hoTen,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.phone_rounded, size: 12, color: AppColors.iconMuted),
-                    const SizedBox(width: 6),
-                    Text(c.sdt.isNotEmpty ? c.sdt : 'Chưa cập nhật SĐT',
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                  ],
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
+                  child: Text(
+                    initial,
+                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    const Icon(Icons.email_rounded, size: 12, color: AppColors.iconMuted),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        c.email.isNotEmpty ? c.email : 'Chưa cập nhật Email',
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        c.hoTen,
+                        style: const TextStyle(
+                          color: Colors.white, 
+                          fontWeight: FontWeight.w600, 
+                          fontSize: 16,
+                          letterSpacing: -0.5,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone_rounded, size: 14, color: AppColors.iconMuted),
+                          const SizedBox(width: 6),
+                          Text(c.sdt.isNotEmpty ? c.sdt : 'Chưa cập nhật SĐT',
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.email_rounded, size: 14, color: AppColors.iconMuted),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              c.email.isNotEmpty ? c.email : 'Chưa cập nhật Email',
+                              style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (c.trangThai == 1)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.red.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text(
+                          'Chưa xác thực',
+                          style: TextStyle(color: AppColors.red, fontSize: 11, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                   ],
                 ),
               ],
             ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (c.trangThai == 1)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.red.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'Chưa xác thực',
-                        style: TextStyle(color: AppColors.red, fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
-                ],
-              ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => CuDanDetailView(cuDan: c)),
-              );
-            },
           ),
         );
       },

@@ -92,13 +92,13 @@ class CuDanViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> verifyCuDan(int id) async {
+  Future<bool> verifyCuDan(int id, int canHoId, int vaiTroId) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final success = await _service.verifyCuDan(id);
+      final success = await _service.verifyCuDan(id, canHoId, vaiTroId);
       if (success) {
         await fetchCuDans(); // refresh list
         return true;
@@ -108,6 +108,28 @@ class CuDanViewModel extends ChangeNotifier {
       }
     } catch (e) {
       error = 'Lỗi xảy ra khi xác thực cư dân';
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> adminResetPassword(int id, String newPassword) async {
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final success = await _service.adminResetPassword(id, newPassword);
+      if (success) {
+        return true;
+      } else {
+        error = 'Đổi mật khẩu thất bại';
+        return false;
+      }
+    } catch (e) {
+      error = 'Lỗi xảy ra khi đổi mật khẩu';
       return false;
     } finally {
       isLoading = false;

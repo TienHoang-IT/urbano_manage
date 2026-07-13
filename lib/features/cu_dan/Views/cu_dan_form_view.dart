@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
+import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/cu_dan_model.dart';
 import 'package:urbano_manage/features/cu_dan/ViewModels/cu_dan_viewmodel.dart';
 
@@ -130,12 +131,18 @@ class _CuDanFormViewState extends State<CuDanFormView> {
     if (mounted) {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.cuDan != null ? 'Cập nhật cư dân thành công' : 'Thêm cư dân thành công')),
+          SnackBar(
+            content: Text(widget.cuDan != null ? 'Cập nhật cư dân thành công' : 'Thêm cư dân thành công'),
+            backgroundColor: AppColors.tealPrimary,
+          ),
         );
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true); // Return true to refresh
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(viewModel.error ?? 'Đã xảy ra lỗi')),
+          SnackBar(
+            content: Text(viewModel.error ?? 'Đã xảy ra lỗi'),
+            backgroundColor: AppColors.red,
+          ),
         );
       }
     }
@@ -164,7 +171,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
               _buildAppbar(context, isEdit),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -182,9 +189,43 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                         prefixIcon: Icons.person_rounded,
                       ),
                       const SizedBox(height: 16),
-                      _buildGenderDropdown(),
-                      const SizedBox(height: 16),
-                      _buildStatusDropdown(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppDropdownField<int>(
+                              label: 'GIỚI TÍNH',
+                              hint: 'Chọn giới tính',
+                              value: _selectedGender,
+                              prefixIcon: Icons.wc_rounded,
+                              onChanged: (val) {
+                                if (val != null) setState(() => _selectedGender = val);
+                              },
+                              items: const [
+                                DropdownMenuItem(value: 0, child: Text('Nam')),
+                                DropdownMenuItem(value: 1, child: Text('Nữ')),
+                                DropdownMenuItem(value: 2, child: Text('Khác')),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: AppDropdownField<int>(
+                              label: 'TRẠNG THÁI',
+                              hint: 'Chọn trạng thái',
+                              value: _selectedStatus,
+                              prefixIcon: Icons.toggle_on_rounded,
+                              onChanged: (val) {
+                                if (val != null) setState(() => _selectedStatus = val);
+                              },
+                              items: const [
+                                DropdownMenuItem(value: 1, child: Text('Chưa xác thực')),
+                                DropdownMenuItem(value: 2, child: Text('Đang ở')),
+                                DropdownMenuItem(value: 3, child: Text('Đã rời đi')),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       GestureDetector(
                         onTap: () => _selectDob(context),
@@ -250,6 +291,21 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                         onPressed: viewModel.isLoading ? null : _saveForm,
                         isLoading: viewModel.isLoading,
                       ),
+                      if (isEdit) ...[
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.borderButton),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            onPressed: viewModel.isLoading ? null : () => _showChangePasswordDialog(context),
+                            child: const Text('Đổi mật khẩu tài khoản', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -264,23 +320,23 @@ class _CuDanFormViewState extends State<CuDanFormView> {
 
   Widget _buildAppbar(BuildContext context, bool isEdit) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
               child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
               isEdit ? 'Sửa thông tin Cư dân' : 'Thêm Cư dân mới',
@@ -288,7 +344,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
-                letterSpacing: 1,
+                letterSpacing: -0.5,
               ),
             ),
           ),
@@ -297,115 +353,77 @@ class _CuDanFormViewState extends State<CuDanFormView> {
     );
   }
 
-  Widget _buildGenderDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'GIỚI TÍNH',
-          style: TextStyle(
-            fontSize: 13,
-            color: AppColors.textMuted,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 1.5,
+  void _showChangePasswordDialog(BuildContext context) {
+    final passwordController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.bgMid,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: const BorderSide(color: AppColors.borderButton),
           ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderSide, width: 1.5),
+          title: const Text('Đổi mật khẩu cư dân', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Nhập mật khẩu mới cho cư dân này:', style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              const SizedBox(height: 16),
+              AppTextField(
+                label: 'MẬT KHẨU MỚI',
+                hint: 'Nhập mật khẩu',
+                controller: passwordController,
+                prefixIcon: Icons.lock_outline_rounded,
+                obscureText: true,
+              ),
+            ],
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<int>(
-              value: _selectedGender,
-              dropdownColor: AppColors.bgMid,
-              icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-              isExpanded: true,
-              onChanged: (int? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    _selectedGender = newValue;
-                  });
+          actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          actions: [
+            TextButton(
+              child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.tealPrimary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                elevation: 0,
+              ),
+              child: const Text('Xác nhận', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              onPressed: () async {
+                final pwd = passwordController.text.trim();
+                if (pwd.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Vui lòng nhập mật khẩu mới')),
+                  );
+                  return;
+                }
+                
+                Navigator.of(dialogContext).pop(); // close dialog
+                
+                final vm = context.read<CuDanViewModel>();
+                final success = await vm.adminResetPassword(widget.cuDan!.id, pwd);
+                
+                if (mounted) {
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Đổi mật khẩu thành công'), backgroundColor: AppColors.tealPrimary),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(vm.error ?? 'Đã xảy ra lỗi'), backgroundColor: AppColors.red),
+                    );
+                  }
                 }
               },
-              items: const [
-                DropdownMenuItem<int>(
-                  value: 0,
-                  child: Text('Nam'),
-                ),
-                DropdownMenuItem<int>(
-                  value: 1,
-                  child: Text('Nữ'),
-                ),
-                DropdownMenuItem<int>(
-                  value: 2,
-                  child: Text('Khác'),
-                ),
-              ],
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatusDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'TRẠNG THÁI',
-          style: TextStyle(
-            fontSize: 13,
-            color: AppColors.textMuted,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.borderSide, width: 1.5),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<int>(
-              value: _selectedStatus,
-              dropdownColor: AppColors.bgMid,
-              icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-              isExpanded: true,
-              onChanged: (int? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    _selectedStatus = newValue;
-                  });
-                }
-              },
-              items: const [
-                DropdownMenuItem<int>(
-                  value: 1,
-                  child: Text('Chưa xác thực'),
-                ),
-                DropdownMenuItem<int>(
-                  value: 2,
-                  child: Text('Đang ở'),
-                ),
-                DropdownMenuItem<int>(
-                  value: 3,
-                  child: Text('Đã rời đi'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

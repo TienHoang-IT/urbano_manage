@@ -117,10 +117,13 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
           return AlertDialog(
             backgroundColor: AppColors.bgMid,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(24),
               side: const BorderSide(color: AppColors.borderButton),
             ),
-            title: const Text('Ghi nhận thanh toán', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            title: const Text(
+              'Ghi nhận thanh toán', 
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)
+            ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -132,7 +135,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     prefixIcon: Icons.price_check_rounded,
                     keyboardType: TextInputType.number,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   AppDropdownField<String>(
                     label: 'PHƯƠNG THỨC *',
                     value: method,
@@ -147,14 +150,14 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                       DropdownMenuItem(value: 'Ví điện tử', child: Text('Ví điện tử')),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   AppTextField(
                     hint: 'Nhập mã giao dịch',
                     label: 'MÃ GIAO DỊCH',
                     controller: refController,
                     prefixIcon: Icons.receipt_rounded,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   AppTextField(
                     hint: 'Nhập ghi chú',
                     label: 'GHI CHÚ',
@@ -164,12 +167,22 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                 ],
               ),
             ),
+            actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
               ),
-              TextButton(
+              const SizedBox(width: 8),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.tealPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  elevation: 0,
+                ),
                 onPressed: () async {
                   final amount = double.tryParse(amountController.text.trim()) ?? 0.0;
                   final ref = refController.text.trim();
@@ -219,7 +232,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     }
                   }
                 },
-                child: const Text('Thanh toán', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
+                child: const Text('Thanh toán', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -278,39 +291,41 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
               _buildAppbar(context),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildHeaderCard(statusColor, currencyFormat),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       if (_currentHoaDon.displayTrangThai != 3) ...[
                         AppButton(
                           label: 'Ghi Nhận Thanh Toán',
                           icon: Icons.payments_rounded,
                           onPressed: _showPayDialog,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                       ],
                       _buildInfoSection('Chi tiết hóa đơn', [
                         _buildInfoRow(Icons.apartment_rounded, 'Căn hộ', '${_currentHoaDon.soCanHo.isNotEmpty ? _currentHoaDon.soCanHo : _currentHoaDon.canHo} (ID: ${_currentHoaDon.canHo})'),
                         _buildInfoRow(Icons.calendar_view_month_rounded, 'Kỳ hóa đơn', 'Tháng ${_currentHoaDon.thang}/${_currentHoaDon.nam}'),
                         _buildInfoRow(Icons.timer_rounded, 'Hạn thanh toán', formattedDueDate),
                       ]),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       _buildChiTietSection(currencyFormat),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       _buildInfoSection('Thông tin thanh toán', [
                         _buildInfoRow(Icons.price_change_rounded, 'Chi phí dịch vụ', currencyFormat.format(_currentHoaDon.chiPhi)),
                         _buildInfoRow(Icons.payment_rounded, 'Đã thanh toán', currencyFormat.format(_currentHoaDon.soTienDaThanhToan)),
                         _buildInfoRow(Icons.money_off_rounded, 'Còn thiếu', currencyFormat.format(conThieu < 0 ? 0.0 : conThieu)),
                       ]),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       _buildInfoSection('Thông tin cập nhật', [
                         _buildInfoRow(Icons.person_outline_rounded, 'Người cập nhật', _currentHoaDon.tenNguoiCapNhat.isNotEmpty ? _currentHoaDon.tenNguoiCapNhat : 'N/A'),
                         _buildInfoRow(Icons.calendar_today_rounded, 'Ngày khởi tạo', formattedCreatedAt),
                       ]),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       _buildLichSuThanhToanSection(),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
@@ -327,23 +342,23 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
     final isKeToan = _role == 'Kế toán' || isQuanLy;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Navigator.of(context).pop(true), // Return true to refresh list if needed
             child: Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
               child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           const Expanded(
             child: Text(
               'Chi tiết Hóa đơn',
@@ -351,7 +366,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
-                letterSpacing: 1,
+                letterSpacing: -0.5,
               ),
             ),
           ),
@@ -359,43 +374,43 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
             GestureDetector(
               onTap: _exportBienLaiPdf,
               child: Container(
-                width: 40,
-                height: 40,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.borderButton),
                 ),
-                child: const Icon(Icons.picture_as_pdf_rounded, size: 18, color: AppColors.tealPrimary),
+                child: const Icon(Icons.picture_as_pdf_rounded, size: 20, color: AppColors.tealPrimary),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
           ],
           GestureDetector(
             onTap: () => _navigateToEdit(context),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
+              child: const Icon(Icons.edit_rounded, size: 20, color: AppColors.tealPrimary),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           GestureDetector(
             onTap: () => _confirmDelete(context),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
+              child: const Icon(Icons.delete_rounded, size: 20, color: AppColors.red),
             ),
           ),
         ],
@@ -406,10 +421,10 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
   Widget _buildHeaderCard(Color statusColor, NumberFormat currencyFormat) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.nenContainer,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.borderButton),
       ),
       child: Column(
@@ -420,31 +435,30 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
             children: [
               Text(
                 _currentHoaDon.maThanhToan,
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   _currentHoaDon.trangThaiText,
-                  style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           const Text(
-            'TỔNG TIỀN THANH TOÁN',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 0.8),
+            'Tổng tiền thanh toán',
+            style: TextStyle(color: AppColors.textMuted, fontSize: 14, fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             currencyFormat.format(_currentHoaDon.tongTien),
-            style: TextStyle(color: statusColor, fontSize: 32, fontWeight: FontWeight.bold),
+            style: TextStyle(color: statusColor, fontSize: 36, fontWeight: FontWeight.w700, letterSpacing: -1, height: 1.1),
           ),
         ],
       ),
@@ -457,32 +471,27 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Phí dịch vụ chi tiết',
-                style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
-              ),
-            ],
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'Phí dịch vụ chi tiết',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, letterSpacing: -0.5),
           ),
         ),
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
             color: AppColors.nenContainer,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: AppColors.borderButton),
           ),
           child: details.isEmpty
               ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                  padding: EdgeInsets.symmetric(vertical: 32.0, horizontal: 20.0),
                   child: Center(
                     child: Text(
-                      'Chưa có dịch vụ chi tiết nào cho hóa đơn này.',
-                      style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                      'Chưa có dịch vụ chi tiết nào.',
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -507,22 +516,23 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     }
 
                     return Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                                Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
                                 const SizedBox(height: 4),
-                                Text(subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                                Text(subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
                               ],
                             ),
                           ),
                           Text(
                             currencyFormat.format(total),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
                           ),
                         ],
                       ),
@@ -539,17 +549,17 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             sectionTitle,
-            style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, letterSpacing: -0.5),
           ),
         ),
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
             color: AppColors.nenContainer,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(color: AppColors.borderButton),
           ),
           child: Column(
@@ -562,22 +572,33 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.iconMuted, size: 18),
-          const SizedBox(width: 12),
-          Text(
-            '$label:',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: AppColors.textMuted, size: 18),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 16),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.right,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+              ],
             ),
           ),
         ],
@@ -634,17 +655,20 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 8),
+          padding: EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             'Lịch sử thanh toán',
-            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, letterSpacing: -0.5),
           ),
         ),
         FutureBuilder<List<LichSuThanhToan>>(
           future: LichSuThanhToanService().fetchByHoaDon(_currentHoaDon.id),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary));
+              return const Center(child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: CircularProgressIndicator(color: AppColors.tealPrimary),
+              ));
             }
             if (snapshot.hasError) {
               return Text('Lỗi tải dữ liệu: ${snapshot.error}', style: const TextStyle(color: AppColors.red));
@@ -653,16 +677,16 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
             if (list.isEmpty) {
               return Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 20.0),
                 decoration: BoxDecoration(
                   color: AppColors.nenContainer,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: AppColors.borderButton),
                 ),
                 child: const Center(
                   child: Text(
                     'Chưa có giao dịch nào.',
-                    style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -673,7 +697,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: AppColors.nenContainer,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: AppColors.borderButton),
               ),
               child: ListView.separated(
@@ -683,15 +707,29 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                 separatorBuilder: (_, __) => const Divider(color: AppColors.borderButton, height: 1),
                 itemBuilder: (context, index) {
                   final item = list[index];
-                  return ListTile(
-                    title: Text('GD: ${item.maGiaoDich}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                    subtitle: Text(
-                      '${item.phuongThucThanhToan} | ${item.ngayThanhToan != null ? DateFormat('dd/MM/yyyy HH:mm').format(item.ngayThanhToan!.toLocal()) : ''}',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
-                    ),
-                    trailing: Text(
-                      NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(item.soTien),
-                      style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w600, fontSize: 13),
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('GD: ${item.maGiaoDich}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${item.phuongThucThanhToan} | ${item.ngayThanhToan != null ? DateFormat('dd/MM/yyyy HH:mm').format(item.ngayThanhToan!.toLocal()) : ''}',
+                                style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(item.soTien),
+                          style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 15),
+                        ),
+                      ],
                     ),
                   );
                 },
