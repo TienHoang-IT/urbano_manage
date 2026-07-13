@@ -637,8 +637,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       return;
     }
 
-    int? selectedCuDanId = cuDans.first.id;
-    int selectedRoleId = 1; // 1 = Chủ hộ, 2 = Thành viên, 3 = Người thuê
+    int? selectedCuDanId;
     DateTime selectedDate = DateTime.now();
 
     final result = await showDialog<Map<String, dynamic>>(
@@ -653,47 +652,64 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  DropdownButtonFormField<int>(
-                    initialValue: selectedCuDanId,
-                    dropdownColor: AppColors.bgMid,
-                    decoration: const InputDecoration(
-                      labelText: 'Chọn cư dân',
-                      labelStyle: TextStyle(color: AppColors.tealPrimary),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
-                    ),
-                    items: cuDans
-                        .map((c) => DropdownMenuItem(
-                            value: c.id,
-                            child: Text(c.hoTen, style: const TextStyle(color: Colors.white, fontSize: 14))))
-                        .toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setDialogState(() {
-                          selectedCuDanId = val;
-                        });
+                  Autocomplete<CuDan>(
+                    displayStringForOption: (CuDan option) => option.hoTen,
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      if (textEditingValue.text.isEmpty) {
+                        return const Iterable<CuDan>.empty();
                       }
+                      return cuDans.where((CuDan option) {
+                        return option.hoTen.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                      });
                     },
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<int>(
-                    initialValue: selectedRoleId,
-                    dropdownColor: AppColors.bgMid,
-                    decoration: const InputDecoration(
-                      labelText: 'Vai trò',
-                      labelStyle: TextStyle(color: AppColors.tealPrimary),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text('Chủ hộ', style: TextStyle(color: Colors.white, fontSize: 14))),
-                      DropdownMenuItem(value: 2, child: Text('Thành viên', style: TextStyle(color: Colors.white, fontSize: 14))),
-                      DropdownMenuItem(value: 3, child: Text('Người thuê', style: TextStyle(color: Colors.white, fontSize: 14))),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) {
-                        setDialogState(() {
-                          selectedRoleId = val;
-                        });
-                      }
+                    onSelected: (CuDan selection) {
+                      setDialogState(() {
+                        selectedCuDanId = selection.id;
+                      });
+                    },
+                    fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+                      return TextFormField(
+                        controller: textEditingController,
+                        focusNode: focusNode,
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        decoration: const InputDecoration(
+                          labelText: 'Tìm và chọn cư dân',
+                          labelStyle: TextStyle(color: AppColors.tealPrimary),
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.tealPrimary)),
+                        ),
+                      );
+                    },
+                    optionsViewBuilder: (context, onSelected, options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          color: AppColors.bgMid,
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: 200, 
+                              maxWidth: MediaQuery.of(context).size.width * 0.65, // Adjust to dialog width
+                            ),
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: options.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final CuDan option = options.elementAt(index);
+                                return InkWell(
+                                  onTap: () => onSelected(option),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(option.hoTen, style: const TextStyle(color: Colors.white)),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -747,10 +763,15 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                 ),
                 TextButton(
                   onPressed: () {
+                    if (selectedCuDanId == null) {
+                      // Optional: handle validation if needed, but since Autocomplete requires selection
+                      // we can just return or show an error
+                      return;
+                    }
                     Navigator.pop(context, {
                       'cuDanId': selectedCuDanId,
-                      'laChuHo': selectedRoleId == 1,
-                      'vaiTroId': selectedRoleId,
+                      'laChuHo': false,
+                      'vaiTroId': 2,
                       'ngayChuyenDen': selectedDate,
                     });
                   },

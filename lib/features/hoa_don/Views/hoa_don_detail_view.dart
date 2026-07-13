@@ -259,13 +259,13 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
         statusColor = AppColors.red;
         break;
       case 2:
-        statusColor = AppColors.amber;
-        break;
-      case 3:
         statusColor = AppColors.tealPrimary;
         break;
-      case 4:
+      case 3:
         statusColor = AppColors.red;
+        break;
+      case 4:
+        statusColor = AppColors.amber;
         break;
       default:
         statusColor = AppColors.red;
@@ -297,7 +297,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     children: [
                       _buildHeaderCard(statusColor, currencyFormat),
                       const SizedBox(height: 24),
-                      if (_currentHoaDon.displayTrangThai != 3) ...[
+                      if (_currentHoaDon.displayTrangThai != 2) ...[
                         AppButton(
                           label: 'Ghi Nhận Thanh Toán',
                           icon: Icons.payments_rounded,

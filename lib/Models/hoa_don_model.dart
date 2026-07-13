@@ -74,8 +74,8 @@ class HoaDon {
   }
 
   int get displayTrangThai {
-    if (trangThai != 3 && hanThanhToan != null && DateTime.now().isAfter(hanThanhToan!)) {
-      return 4; // Quá hạn thanh toán
+    if (trangThai != 2 && hanThanhToan != null && DateTime.now().isAfter(hanThanhToan!)) {
+      return 3; // Quá hạn
     }
     return trangThai;
   }
@@ -85,11 +85,11 @@ class HoaDon {
       case 1:
         return 'Chưa thanh toán';
       case 2:
-        return 'Thanh toán một phần';
-      case 3:
         return 'Đã thanh toán';
+      case 3:
+        return 'Quá hạn';
       case 4:
-        return 'Quá hạn thanh toán';
+        return '1 phần';
       default:
         return 'Chưa thanh toán';
     }

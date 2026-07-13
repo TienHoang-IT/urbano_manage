@@ -81,11 +81,11 @@ class _HoaDonListViewState extends State<HoaDonListView> {
         children: [
           _tabChip('Tất cả', 0, viewModel),
           const SizedBox(width: 10),
-          _tabChip('Chưa trả', 1, viewModel),
+          _tabChip('Chưa thanh toán', 1, viewModel),
           const SizedBox(width: 10),
-          _tabChip('Đã trả', 2, viewModel),
+          _tabChip('Đã thanh toán', 2, viewModel),
           const SizedBox(width: 10),
-          _tabChip('Trả một phần', 3, viewModel),
+          _tabChip('1 phần', 3, viewModel),
           const SizedBox(width: 10),
           _tabChip('Quá hạn', 4, viewModel),
         ],
@@ -177,13 +177,13 @@ class _HoaDonListViewState extends State<HoaDonListView> {
             statusColor = AppColors.red;
             break;
           case 2:
-            statusColor = AppColors.amber;
-            break;
-          case 3:
             statusColor = AppColors.tealPrimary;
             break;
-          case 4:
+          case 3:
             statusColor = AppColors.red;
+            break;
+          case 4:
+            statusColor = AppColors.amber;
             break;
           default:
             statusColor = AppColors.red;

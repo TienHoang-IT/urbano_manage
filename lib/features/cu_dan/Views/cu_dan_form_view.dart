@@ -219,7 +219,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                               },
                               items: const [
                                 DropdownMenuItem(value: 1, child: Text('Chưa xác thực')),
-                                DropdownMenuItem(value: 2, child: Text('Đang ở')),
+                                DropdownMenuItem(value: 2, child: Text('Đang cư trú')),
                                 DropdownMenuItem(value: 3, child: Text('Đã rời đi')),
                               ],
                             ),

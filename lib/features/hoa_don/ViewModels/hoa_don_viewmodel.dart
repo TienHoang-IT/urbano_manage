@@ -10,7 +10,7 @@ class HoaDonViewModel extends ChangeNotifier {
   List<HoaDon> hoaDons = [];
   bool isLoading = false;
   String? error;
-  int currentTab = 0; // 0: Tất cả, 1: Chưa thanh toán (1), 2: Đã thanh toán (3), 3: Thanh toán một phần (2)
+  int currentTab = 0; // 0: Tất cả, 1: Chưa thanh toán, 2: Đã thanh toán, 3: 1 phần, 4: Quá hạn
 
   // Cache for line items of currently selected invoice
   List<Map<String, dynamic>> currentChiTiets = [];
@@ -24,14 +24,14 @@ class HoaDonViewModel extends ChangeNotifier {
       final allInvoices = await _service.fetchHoaDons();
       if (currentTab == 0) {
         hoaDons = allInvoices;
-      } else if (currentTab == 1) {
+      } else if (currentTab == 1) { // Chưa trả
         hoaDons = allInvoices.where((h) => h.displayTrangThai == 1).toList();
-      } else if (currentTab == 2) {
-        hoaDons = allInvoices.where((h) => h.displayTrangThai == 3).toList();
-      } else if (currentTab == 3) {
+      } else if (currentTab == 2) { // Đã trả
         hoaDons = allInvoices.where((h) => h.displayTrangThai == 2).toList();
-      } else if (currentTab == 4) {
+      } else if (currentTab == 3) { // 1 phần
         hoaDons = allInvoices.where((h) => h.displayTrangThai == 4).toList();
+      } else if (currentTab == 4) { // Quá hạn
+        hoaDons = allInvoices.where((h) => h.displayTrangThai == 3).toList();
       }
       error = null;
     } catch (e) {

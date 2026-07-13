@@ -59,7 +59,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
 
   int? _selectedCanHoId;
   DateTime? _selectedDueDate;
-  int _selectedTrangThai = 1; // 1: Chưa thanh toán, 2: Thanh toán một phần, 3: Đã thanh toán
+  int _selectedTrangThai = 1; // 1: Chưa thanh toán, 2: Đã thanh toán, 3: Quá hạn, 4: 1 phần
 
   List<CanHo> _apartments = [];
   bool _isLoadingApartments = false;
