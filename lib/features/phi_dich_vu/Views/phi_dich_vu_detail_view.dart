@@ -54,7 +54,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
       final success = await context.read<PhiDichVuViewModel>().removePhiDichVu(_currentPhiDichVu.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Xóa phí dịch vụ thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
@@ -82,7 +82,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -139,17 +139,17 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Text(
               'Chi tiết Dịch vụ',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),
@@ -164,7 +164,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
+              child: Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
             ),
           ),
           const SizedBox(width: 8),
@@ -178,7 +178,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
+              child: Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
             ),
           ),
         ],
@@ -203,7 +203,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
             child: CircleAvatar(
               radius: 36,
               backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
-              child: const Icon(Icons.room_service_rounded, color: AppColors.tealPrimary, size: 32),
+              child: Icon(Icons.room_service_rounded, color: AppColors.tealPrimary, size: 32),
             ),
           ),
           const SizedBox(width: 20),
@@ -213,7 +213,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
               children: [
                 Text(
                   _currentPhiDichVu.tenPhiDichVu,
-                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Container(
@@ -225,7 +225,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
                   ),
                   child: Text(
                     _currentPhiDichVu.tenLoaiPhiDichVu,
-                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -244,7 +244,7 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
             sectionTitle,
-            style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
           ),
         ),
         Container(
@@ -272,13 +272,13 @@ class _PhiDichVuDetailViewState extends State<PhiDichVuDetailView> {
           const SizedBox(width: 12),
           Text(
             '$label:',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 14),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
               textAlign: TextAlign.right,
             ),
           ),

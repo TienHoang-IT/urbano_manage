@@ -58,7 +58,7 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
       final success = await context.read<BangTinViewModel>().removeItem(_currentBangTin.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Xóa bài đăng thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
@@ -83,7 +83,7 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -127,8 +127,8 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                           children: [
                             Text(
                               _currentBangTin.tieuDe,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 height: 1.4,
@@ -137,18 +137,18 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                             const SizedBox(height: 12),
                             Row(
                               children: [
-                                const Icon(Icons.person_outline_rounded, size: 14, color: AppColors.tealPrimary),
+                                Icon(Icons.person_outline_rounded, size: 14, color: AppColors.tealPrimary),
                                 const SizedBox(width: 6),
                                 Text(
                                   _currentBangTin.tenNguoiTao.isNotEmpty ? _currentBangTin.tenNguoiTao : 'Ban Quản Lý',
-                                  style: const TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(width: 16),
-                                const Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
+                                Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
                                 const SizedBox(width: 6),
                                 Text(
                                   formattedDate,
-                                  style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
                                 ),
                               ],
                             ),
@@ -156,7 +156,7 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(left: 4, bottom: 8),
                         child: Text(
                           'NỘI DUNG CHI TIẾT',
@@ -178,8 +178,8 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                         ),
                         child: Text(
                           _currentBangTin.noiDung,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
                             fontSize: 14,
                             height: 1.6,
                           ),
@@ -211,17 +211,17 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Text(
               'Chi tiết Bản tin',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),
@@ -236,7 +236,7 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
+              child: Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
             ),
           ),
           const SizedBox(width: 8),
@@ -250,7 +250,7 @@ class _BangTinDetailViewState extends State<BangTinDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
+              child: Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
             ),
           ),
         ],

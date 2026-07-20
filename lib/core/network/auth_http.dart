@@ -49,7 +49,7 @@ class AuthHttp {
 
   static void _showNoPermissionSnackBar() {
     MyApp.messengerKey.currentState?.showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text('Bạn không có quyền'),
         backgroundColor: AppColors.red,
         behavior: SnackBarBehavior.floating,

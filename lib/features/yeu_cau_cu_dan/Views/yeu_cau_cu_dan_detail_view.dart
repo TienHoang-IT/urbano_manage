@@ -66,7 +66,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
         _assignedStaffId = newStaffId;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Đã phân công lại nhân viên xử lý thành công'),
           backgroundColor: AppColors.tealPrimary,
         ),
@@ -144,7 +144,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -214,20 +214,20 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                             const SizedBox(height: 16),
                             Text(
                               widget.yeuCau.tieuDe,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 12),
                             Row(
                               children: [
-                                const Icon(Icons.category_outlined, size: 14, color: AppColors.tealPrimary),
+                                Icon(Icons.category_outlined, size: 14, color: AppColors.tealPrimary),
                                 const SizedBox(width: 6),
                                 Text(
                                   widget.yeuCau.tenLoaiYeuCau,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.tealPrimary,
@@ -246,7 +246,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                                   ),
                                   child: Text(
                                     widget.yeuCau.nhanXet!,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textMuted,
                                       fontSize: 14,
                                       height: 1.5,
@@ -262,12 +262,12 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                       const SizedBox(height: 16),
 
                       // Content Section
-                      const Text(
+                      Text(
                         'Nội dung yêu cầu',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -281,9 +281,9 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                         ),
                         child: Text(
                           widget.yeuCau.noiDung,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white70,
+                            color: AppColors.textPrimary70,
                             height: 1.5,
                           ),
                         ),
@@ -291,12 +291,12 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                       const SizedBox(height: 20),
 
                       // Information details
-                      const Text(
+                      Text(
                         'Thông tin liên quan',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -310,12 +310,12 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                         child: Column(
                           children: [
                             _buildDetailRow('Người gửi', widget.yeuCau.tenCuDan, Icons.person_outline),
-                            const Divider(color: AppColors.borderButton, height: 24),
+                            Divider(color: AppColors.borderButton, height: 24),
                             _buildDetailRow('Ngày gửi', formattedDate, Icons.access_time_rounded),
-                            const Divider(color: AppColors.borderButton, height: 24),
+                            Divider(color: AppColors.borderButton, height: 24),
                             _buildDetailRow('Nhân viên xử lý', assignedStaffName, Icons.badge_outlined),
                             if (formattedCompleteDate != null) ...[
-                              const Divider(color: AppColors.borderButton, height: 24),
+                              Divider(color: AppColors.borderButton, height: 24),
                               _buildDetailRow('Ngày hoàn thành', formattedCompleteDate, Icons.check_circle_outline),
                             ],
                           ],
@@ -325,12 +325,12 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
 
                       // Staff Assignment Selector
                       if (activeRequest) ...[
-                        const Text(
+                        Text(
                           'Phân công nhân viên xử lý',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -342,7 +342,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                             border: Border.all(color: AppColors.borderButton),
                           ),
                           child: employeeViewModel.isLoading
-                              ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                              ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
                               : AppDropdownField<int>(
                                   value: _assignedStaffId,
                                   hint: 'Chọn nhân viên xử lý',
@@ -361,7 +361,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
 
                       // Action Buttons
                       if (viewModel.isLoading)
-                        const Center(
+                        Center(
                           child: CircularProgressIndicator(color: AppColors.tealPrimary),
                         )
                       else
@@ -403,7 +403,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
       final success = await context.read<YeuCauCuDanViewModel>().removeYeuCau(widget.yeuCau.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Xóa yêu cầu thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
@@ -427,13 +427,13 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
         children: [
           _buildButtonBack(context),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Text(
               'Chi tiết Yêu cầu',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),
@@ -448,7 +448,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
+              child: Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
             ),
           ),
         ],
@@ -467,7 +467,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.borderButton),
         ),
-        child: const Icon(Icons.arrow_back, size: 20, color: Colors.white),
+        child: Icon(Icons.arrow_back, size: 20, color: AppColors.textPrimary),
       ),
     );
   }
@@ -479,13 +479,13 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
         const SizedBox(width: 12),
         Text(
           label,
-          style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 14, color: AppColors.textMuted),
         ),
         const Spacer(),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
             textAlign: TextAlign.right,
           ),
         ),
@@ -516,9 +516,9 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
               );
             }
           },
-          child: const Text(
+          child: Text(
             'Nhận xử lý',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
       );
@@ -531,7 +531,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
               height: 50,
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.red),
+                  side: BorderSide(color: AppColors.red),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () async {
@@ -544,7 +544,7 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                     );
                   }
                 },
-                child: const Text(
+                child: Text(
                   'Từ chối',
                   style: TextStyle(color: AppColors.red, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
@@ -570,9 +570,9 @@ class _YeuCauCuDanDetailViewState extends State<YeuCauCuDanDetailView> {
                     );
                   }
                 },
-                child: const Text(
+                child: Text(
                   'Hoàn thành',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),

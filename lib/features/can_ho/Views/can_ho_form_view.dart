@@ -222,7 +222,7 @@ class _CanHoFormViewState extends State<CanHoFormView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -321,9 +321,9 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 16),
-                        const Text(
+                        Text(
                           'DANH SÁCH PHÍ DỊCH VỤ',
-                          style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppColors.textPrimary70, fontSize: 13, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         ..._selectedFees.asMap().entries.map((entry) {
@@ -343,7 +343,7 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Phí dịch vụ #${index + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      Text('Phí dịch vụ #${index + 1}', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                                       if (_selectedFees.length > 1)
                                         GestureDetector(
                                           onTap: () {
@@ -352,7 +352,7 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                                               _selectedFees.removeAt(index);
                                             });
                                           },
-                                          child: const Icon(Icons.delete_outline, color: AppColors.red, size: 20),
+                                          child: Icon(Icons.delete_outline, color: AppColors.red, size: 20),
                                         ),
                                     ],
                                   ),
@@ -399,8 +399,8 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                                 _selectedFees.add(_SelectedFee(donGiaController: TextEditingController()));
                               });
                             },
-                            icon: const Icon(Icons.add_circle_outline, color: AppColors.tealPrimary),
-                            label: const Text('Thêm phí dịch vụ', style: TextStyle(color: AppColors.tealPrimary)),
+                            icon: Icon(Icons.add_circle_outline, color: AppColors.tealPrimary),
+                            label: Text('Thêm phí dịch vụ', style: TextStyle(color: AppColors.tealPrimary)),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -437,17 +437,17 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
               isEdit ? 'Sửa thông tin Căn hộ' : 'Thêm Căn hộ mới',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),

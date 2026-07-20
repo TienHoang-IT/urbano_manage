@@ -91,7 +91,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
+        builder: (context) => Center(
           child: CircularProgressIndicator(color: AppColors.tealPrimary),
         ),
       );
@@ -103,7 +103,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
         Navigator.pop(context); // Pop loading dialog
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Xóa tiện ích thành công'), backgroundColor: AppColors.tealPrimary),
+            SnackBar(content: Text('Xóa tiện ích thành công'), backgroundColor: AppColors.tealPrimary),
           );
           Navigator.pop(context, true);
         } else {
@@ -121,7 +121,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -131,7 +131,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
         ),
         child: SafeArea(
           child: _isLoadingTienIch
-              ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+              ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
               : _errorTienIch != null
                   ? _buildErrorWidget()
                   : _buildContent(context),
@@ -145,12 +145,12 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(_errorTienIch!, style: const TextStyle(color: AppColors.red, fontSize: 14)),
+          Text(_errorTienIch!, style: TextStyle(color: AppColors.red, fontSize: 14)),
           const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
             onPressed: _loadData,
-            child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+            child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary)),
           ),
         ],
       ),
@@ -207,16 +207,16 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
                         children: [
                           Text(
                             item.tenTienIch,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 6),
                           Text(
                             item.tenLoaiTienIch,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               color: AppColors.tealPrimary,
                               fontWeight: FontWeight.w600,
@@ -244,7 +244,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
                     ),
                   ],
                 ),
-                const Divider(color: AppColors.borderButton, height: 32, thickness: 1),
+                Divider(color: AppColors.borderButton, height: 32, thickness: 1),
                 _buildInfoRow(Icons.location_on_rounded, 'Vị trí',
                     item.toaNhaId != null ? '${item.viTri} - ${item.tenToaNha}' : item.viTri),
                 const SizedBox(height: 12),
@@ -268,7 +268,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
                 ),
                 const SizedBox(height: 16),
                 if (item.moTa.isNotEmpty) ...[
-                  const Text(
+                  Text(
                     'MÔ TẢ TIỆN ÍCH',
                     style: TextStyle(
                       fontSize: 13,
@@ -288,7 +288,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
                     ),
                     child: Text(
                       item.moTa,
-                      style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                      style: TextStyle(color: AppColors.textPrimary70, fontSize: 13, height: 1.4),
                     ),
                   ),
                 ],
@@ -310,12 +310,12 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
         const SizedBox(width: 10),
         Text(
           '$label: ',
-          style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+          style: TextStyle(color: AppColors.textMuted, fontSize: 14),
         ),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ),
       ],
@@ -326,7 +326,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'LỊCH ĐẶT SỬ DỤNG',
           style: TextStyle(
             fontSize: 13,
@@ -337,14 +337,14 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
         ),
         const SizedBox(height: 12),
         if (_isLoadingBookings)
-          const Center(
+          Center(
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: CircularProgressIndicator(color: AppColors.tealPrimary),
             ),
           )
         else if (_errorBookings != null)
-          Text(_errorBookings!, style: const TextStyle(color: AppColors.red))
+          Text(_errorBookings!, style: TextStyle(color: AppColors.red))
         else if (_bookings.isEmpty)
           Container(
             width: double.infinity,
@@ -354,7 +354,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.borderButton),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
                 'Chưa có lịch đặt nào cho tiện ích này',
                 style: TextStyle(color: AppColors.textMuted, fontSize: 13),
@@ -415,7 +415,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
             children: [
               Text(
                 booking.tenCuDan,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 14),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -434,23 +434,23 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.home_rounded, size: 14, color: AppColors.iconMuted),
+              Icon(Icons.home_rounded, size: 14, color: AppColors.iconMuted),
               const SizedBox(width: 6),
               Text(
                 'Căn hộ: ${booking.soCanHo.isNotEmpty ? booking.soCanHo : "Chưa chọn"}',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                style: TextStyle(color: AppColors.textMuted, fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
+              Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   timeStr,
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
                 ),
               ),
             ],
@@ -459,7 +459,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
             const SizedBox(height: 6),
             Text(
               'Ghi chú: ${booking.ghiChu}',
-              style: const TextStyle(color: Colors.white70, fontSize: 12, fontStyle: FontStyle.italic),
+              style: TextStyle(color: AppColors.textPrimary70, fontSize: 12, fontStyle: FontStyle.italic),
             ),
           ],
         ],
@@ -475,7 +475,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
         color: AppColors.bgMid,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Center(
+      child: Center(
         child: Icon(
           Icons.image_not_supported_rounded,
           size: 50,
@@ -494,16 +494,16 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Chi tiết Tiện ích',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -511,13 +511,13 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.edit_rounded, color: AppColors.tealPrimary),
+                icon: Icon(Icons.edit_rounded, color: AppColors.tealPrimary),
                 onPressed: () async {
                   final vm = context.read<TienIchViewModel>();
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    builder: (context) => const Center(
+                    builder: (context) => Center(
                       child: CircularProgressIndicator(color: AppColors.tealPrimary),
                     ),
                   );
@@ -544,7 +544,7 @@ class _TienIchDetailViewState extends State<TienIchDetailView> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.delete_rounded, color: AppColors.red),
+                icon: Icon(Icons.delete_rounded, color: AppColors.red),
                 onPressed: () => _deleteItem(context),
               ),
             ],

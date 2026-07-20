@@ -54,7 +54,7 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
       final success = await context.read<ThongBaoViewModel>().removeThongBao(_currentThongBao.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Xóa thông báo thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
@@ -79,7 +79,7 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -110,8 +110,8 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
                           children: [
                             Text(
                               _currentThongBao.tieuDe,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 height: 1.4,
@@ -120,18 +120,18 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
                             const SizedBox(height: 12),
                             Row(
                               children: [
-                                const Icon(Icons.person_outline_rounded, size: 14, color: AppColors.tealPrimary),
+                                Icon(Icons.person_outline_rounded, size: 14, color: AppColors.tealPrimary),
                                 const SizedBox(width: 6),
                                 Text(
                                   _currentThongBao.tenNguoiTao.isNotEmpty ? _currentThongBao.tenNguoiTao : 'Ban Quản Lý',
-                                  style: const TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(width: 16),
-                                const Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
+                                Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
                                 const SizedBox(width: 6),
                                 Text(
                                   formattedDate,
-                                  style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
                                 ),
                               ],
                             ),
@@ -139,7 +139,7 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(left: 4, bottom: 8),
                         child: Text(
                           'NỘI DUNG CHI TIẾT',
@@ -161,8 +161,8 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
                         ),
                         child: Text(
                           _currentThongBao.noiDung,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
                             fontSize: 14,
                             height: 1.6,
                           ),
@@ -194,17 +194,17 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Text(
               'Chi tiết Thông báo',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),
@@ -219,7 +219,7 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
+              child: Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
             ),
           ),
           const SizedBox(width: 8),
@@ -233,7 +233,7 @@ class _ThongBaoDetailViewState extends State<ThongBaoDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
+              child: Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
             ),
           ),
         ],

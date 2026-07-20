@@ -77,11 +77,11 @@ class _CuDanFormViewState extends State<CuDanFormView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.tealPrimary,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.textPrimary,
               surface: AppColors.bgDark,
-              onSurface: Colors.white,
+              onSurface: AppColors.textPrimary,
             ),
           ),
           child: child!,
@@ -157,7 +157,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -298,11 +298,11 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                           height: 50,
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.borderButton),
+                              side: BorderSide(color: AppColors.borderButton),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: viewModel.isLoading ? null : () => _showChangePasswordDialog(context),
-                            child: const Text('Đổi mật khẩu tài khoản', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            child: Text('Đổi mật khẩu tài khoản', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
@@ -333,17 +333,17 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               isEdit ? 'Sửa thông tin Cư dân' : 'Thêm Cư dân mới',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: -0.5,
               ),
             ),
@@ -362,14 +362,14 @@ class _CuDanFormViewState extends State<CuDanFormView> {
           backgroundColor: AppColors.bgMid,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: const BorderSide(color: AppColors.borderButton),
+            side: BorderSide(color: AppColors.borderButton),
           ),
-          title: const Text('Đổi mật khẩu cư dân', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)),
+          title: Text('Đổi mật khẩu cư dân', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Nhập mật khẩu mới cho cư dân này:', style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              Text('Nhập mật khẩu mới cho cư dân này:', style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
               const SizedBox(height: 16),
               AppTextField(
                 label: 'MẬT KHẨU MỚI',
@@ -383,7 +383,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
           actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
           actions: [
             TextButton(
-              child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+              child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             ElevatedButton(
@@ -393,7 +393,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 elevation: 0,
               ),
-              child: const Text('Xác nhận', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text('Xác nhận', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 final pwd = passwordController.text.trim();
                 if (pwd.isEmpty) {
@@ -411,7 +411,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                 if (mounted) {
                   if (success) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đổi mật khẩu thành công'), backgroundColor: AppColors.tealPrimary),
+                      SnackBar(content: Text('Đổi mật khẩu thành công'), backgroundColor: AppColors.tealPrimary),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(

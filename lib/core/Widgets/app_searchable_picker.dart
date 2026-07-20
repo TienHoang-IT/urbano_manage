@@ -126,7 +126,7 @@ class _SearchDialogState<T> extends State<_SearchDialog<T>> {
       backgroundColor: AppColors.bgDark,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.borderButton),
+        side: BorderSide(color: AppColors.borderButton),
       ),
       contentPadding: const EdgeInsets.all(16),
       content: SizedBox(
@@ -144,11 +144,11 @@ class _SearchDialogState<T> extends State<_SearchDialog<T>> {
             SizedBox(
               height: 400,
               child: widget.isLoading
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(color: AppColors.tealPrimary),
                     )
                   : _filteredItems.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             'Không tìm thấy dữ liệu phù hợp',
                             style: TextStyle(color: AppColors.textMuted, fontSize: 14),
@@ -163,13 +163,13 @@ class _SearchDialogState<T> extends State<_SearchDialog<T>> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           title: Text(
                             widget.itemAsString(item),
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                            style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                           ),
                           onTap: () {
                             Navigator.of(context).pop(item);
                           },
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          hoverColor: AppColors.tealPrimary.withOpacity(0.1),
+                          hoverColor: AppColors.tealPrimary.withValues(alpha: 0.1),
                         );
                       },
                     ),

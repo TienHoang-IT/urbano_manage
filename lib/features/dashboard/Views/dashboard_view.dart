@@ -42,7 +42,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildContent(DashboardViewModel viewModel) {
     if (viewModel.isLoading && viewModel.statistics == null) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -56,14 +56,14 @@ class _DashboardViewState extends State<DashboardView> {
             children: [
               Text(
                 viewModel.error!,
-                style: const TextStyle(color: AppColors.red, fontSize: 14),
+                style: TextStyle(color: AppColors.red, fontSize: 14),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
                 onPressed: () => viewModel.fetchDashboardData(),
-                child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+                child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary)),
               ),
             ],
           ),
@@ -142,14 +142,14 @@ class _DashboardViewState extends State<DashboardView> {
 
           if (stats != null) ...[
             // Section Title
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'Tổng quan hoạt động',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -161,14 +161,14 @@ class _DashboardViewState extends State<DashboardView> {
             const SizedBox(height: 40),
             
             // Warnings section
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'Cảnh báo hệ thống',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -210,7 +210,7 @@ class _DashboardViewState extends State<DashboardView> {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.borderButton),
         ),
-        child: const Center(
+        child: Center(
           child: Text('Không có dữ liệu doanh thu', style: TextStyle(color: AppColors.textMuted)),
         ),
       );
@@ -235,10 +235,10 @@ class _DashboardViewState extends State<DashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Doanh thu 6 tháng',
             style: TextStyle(
-              color: Colors.white, 
+              color: AppColors.textPrimary, 
               fontSize: 18, 
               fontWeight: FontWeight.w600,
               letterSpacing: -0.5,
@@ -271,7 +271,7 @@ class _DashboardViewState extends State<DashboardView> {
                       final valStr = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ', decimalDigits: 0).format(rod.toY);
                       return BarTooltipItem(
                         'Tháng ${item.thang}/${item.nam}\n$label: $valStr',
-                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                        TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 12),
                       );
                     },
                   ),
@@ -288,7 +288,7 @@ class _DashboardViewState extends State<DashboardView> {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               'T${list[index].thang}',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w500),
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w500),
                             ),
                           );
                         }
@@ -305,7 +305,7 @@ class _DashboardViewState extends State<DashboardView> {
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Text(
                             _formatYAxisValue(value),
-                            style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                            style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                             textAlign: TextAlign.end,
                           ),
                         );
@@ -361,7 +361,7 @@ class _DashboardViewState extends State<DashboardView> {
           decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
         ),
         const SizedBox(width: 8),
-        Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500)),
+        Text(label, style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500)),
       ],
     );
   }
@@ -383,7 +383,7 @@ class _DashboardViewState extends State<DashboardView> {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.borderButton),
         ),
-        child: const Center(
+        child: Center(
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 24.0),
             child: Text('Không có dữ liệu yêu cầu theo loại', style: TextStyle(color: AppColors.textMuted)),
@@ -418,10 +418,10 @@ class _DashboardViewState extends State<DashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Phân loại Yêu cầu',
             style: TextStyle(
-              color: Colors.white, 
+              color: AppColors.textPrimary, 
               fontSize: 18, 
               fontWeight: FontWeight.w600,
               letterSpacing: -0.5,
@@ -445,7 +445,7 @@ class _DashboardViewState extends State<DashboardView> {
                           color: getSliceColor(index),
                           title: '${item.soLuong}',
                           radius: 36,
-                          titleStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                          titleStyle: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
                         );
                       }),
                     ),
@@ -474,14 +474,14 @@ class _DashboardViewState extends State<DashboardView> {
                           Expanded(
                             child: Text(
                               '${item.tenLoai} ($pct%)',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Text(
                             '${item.soLuong}',
-                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                            style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -586,8 +586,8 @@ class _WarningCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white, 
+                    style: TextStyle(
+                      color: AppColors.textPrimary, 
                       fontSize: 15, 
                       fontWeight: FontWeight.w600,
                       letterSpacing: -0.3,
@@ -607,10 +607,10 @@ class _WarningCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColors.textPrimary.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_forward_rounded, color: AppColors.textMuted, size: 14),
+              child: Icon(Icons.arrow_forward_rounded, color: AppColors.textMuted, size: 14),
             ),
           ],
         ),
@@ -664,20 +664,20 @@ class _StatCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.arrow_forward_rounded, color: AppColors.textMuted, size: 14),
+                  child: Icon(Icons.arrow_forward_rounded, color: AppColors.textMuted, size: 14),
                 ),
               ],
             ),
             const SizedBox(height: 24),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: -1,
                 height: 1.1,
               ),
@@ -685,7 +685,7 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textMuted,
                 fontWeight: FontWeight.w500,

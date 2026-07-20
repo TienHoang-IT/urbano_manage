@@ -79,7 +79,7 @@ class _TienIchListViewState extends State<TienIchListView> {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) => const Center(
+                  builder: (context) => Center(
                     child: CircularProgressIndicator(color: AppColors.tealPrimary),
                   ),
                 );
@@ -102,7 +102,7 @@ class _TienIchListViewState extends State<TienIchListView> {
                   }
                 }
               },
-              child: const Icon(Icons.add_rounded, color: Colors.white),
+              child: Icon(Icons.add_rounded, color: AppColors.textPrimary),
             ),
           ),
         ],
@@ -112,7 +112,7 @@ class _TienIchListViewState extends State<TienIchListView> {
 
   Widget _buildContent(TienIchViewModel viewModel) {
     if (viewModel.isLoading && viewModel.items.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -124,14 +124,14 @@ class _TienIchListViewState extends State<TienIchListView> {
           children: [
             Text(
               viewModel.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 14),
+              style: TextStyle(color: AppColors.red, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
               onPressed: () => viewModel.fetchTienIchs(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+              child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary)),
             ),
           ],
         ),
@@ -141,7 +141,7 @@ class _TienIchListViewState extends State<TienIchListView> {
     final list = viewModel.filteredItems;
 
     if (list.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không tìm thấy tiện ích nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 15),
@@ -223,10 +223,10 @@ class _TienIchListViewState extends State<TienIchListView> {
                           Expanded(
                             child: Text(
                               item.tenTienIch,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ),
@@ -252,7 +252,7 @@ class _TienIchListViewState extends State<TienIchListView> {
                       const SizedBox(height: 8),
                       Text(
                         item.tenLoaiTienIch,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.tealPrimary,
                           fontWeight: FontWeight.w500,
@@ -261,14 +261,14 @@ class _TienIchListViewState extends State<TienIchListView> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          const Icon(Icons.location_on_rounded, size: 16, color: AppColors.iconMuted),
+                          Icon(Icons.location_on_rounded, size: 16, color: AppColors.iconMuted),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
                               item.toaNhaId != null
                                   ? '${item.viTri} - ${item.tenToaNha}'
                                   : item.viTri,
-                              style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -281,14 +281,14 @@ class _TienIchListViewState extends State<TienIchListView> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.monetization_on_rounded, size: 16, color: AppColors.iconMuted),
+                              Icon(Icons.monetization_on_rounded, size: 16, color: AppColors.iconMuted),
                               const SizedBox(width: 6),
                               Text(
                                 feeText,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                             ],
@@ -298,7 +298,7 @@ class _TienIchListViewState extends State<TienIchListView> {
                               children: [
                                 Icon(Icons.check_circle_outline_rounded, size: 16, color: AppColors.tealPrimary.withValues(alpha: 0.8)),
                                 const SizedBox(width: 4),
-                                const Text(
+                                Text(
                                   'Cần đặt trước',
                                   style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                                 ),
@@ -322,7 +322,7 @@ class _TienIchListViewState extends State<TienIchListView> {
       height: 160,
       width: double.infinity,
       color: AppColors.bgMid,
-      child: const Center(
+      child: Center(
         child: Icon(
           Icons.image_not_supported_rounded,
           size: 40,

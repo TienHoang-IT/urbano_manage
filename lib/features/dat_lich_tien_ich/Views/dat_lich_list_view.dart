@@ -57,7 +57,7 @@ class _DatLichListViewState extends State<DatLichListView> {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) => const Center(
+                  builder: (context) => Center(
                     child: CircularProgressIndicator(color: AppColors.tealPrimary),
                   ),
                 );
@@ -80,7 +80,7 @@ class _DatLichListViewState extends State<DatLichListView> {
                   }
                 }
               },
-              child: const Icon(Icons.add_rounded, color: Colors.white),
+              child: Icon(Icons.add_rounded, color: AppColors.textPrimary),
             ),
           ),
         ],
@@ -139,7 +139,7 @@ class _DatLichListViewState extends State<DatLichListView> {
 
   Widget _buildContent(DatLichTienIchViewModel viewModel) {
     if (viewModel.isLoading && viewModel.bookings.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -151,14 +151,14 @@ class _DatLichListViewState extends State<DatLichListView> {
           children: [
             Text(
               viewModel.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 14),
+              style: TextStyle(color: AppColors.red, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
               onPressed: () => viewModel.fetchBookings(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+              child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary)),
             ),
           ],
         ),
@@ -166,7 +166,7 @@ class _DatLichListViewState extends State<DatLichListView> {
     }
 
     if (viewModel.bookings.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không có lịch đặt nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 15),
@@ -243,10 +243,10 @@ class _DatLichListViewState extends State<DatLichListView> {
                     Expanded(
                       child: Text(
                         item.tenTienIch,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -274,11 +274,11 @@ class _DatLichListViewState extends State<DatLichListView> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.person_rounded, size: 14, color: AppColors.iconMuted),
+                    Icon(Icons.person_rounded, size: 14, color: AppColors.iconMuted),
                     const SizedBox(width: 6),
                     Text(
                       'Người đặt: ${item.tenCuDan}',
-                      style: const TextStyle(fontSize: 13, color: Colors.white70),
+                      style: TextStyle(fontSize: 13, color: AppColors.textPrimary70),
                     ),
                   ],
                 ),
@@ -286,11 +286,11 @@ class _DatLichListViewState extends State<DatLichListView> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.apartment_rounded, size: 14, color: AppColors.iconMuted),
+                      Icon(Icons.apartment_rounded, size: 14, color: AppColors.iconMuted),
                       const SizedBox(width: 6),
                       Text(
                         'Căn hộ: ${item.soCanHo}',
-                        style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
                       ),
                     ],
                   ),
@@ -298,12 +298,12 @@ class _DatLichListViewState extends State<DatLichListView> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
+                    Icon(Icons.access_time_rounded, size: 14, color: AppColors.iconMuted),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         timeStr,
-                        style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                        style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                       ),
                     ),
                   ],
@@ -312,7 +312,7 @@ class _DatLichListViewState extends State<DatLichListView> {
                   const SizedBox(height: 8),
                   Text(
                     'Ghi chú: ${item.ghiChu}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textMuted,
                       fontStyle: FontStyle.italic,

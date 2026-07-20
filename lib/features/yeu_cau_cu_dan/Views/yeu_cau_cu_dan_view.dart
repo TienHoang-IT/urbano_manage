@@ -93,7 +93,7 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
 
   Widget _buildContent(YeuCauCuDanViewModel viewModel) {
     if (viewModel.isLoading && viewModel.yeuCaus.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -105,14 +105,14 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
           children: [
             Text(
               viewModel.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 14),
+              style: TextStyle(color: AppColors.red, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
               onPressed: () => viewModel.fetchRequests(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+              child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary)),
             ),
           ],
         ),
@@ -120,7 +120,7 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
     }
 
     if (viewModel.yeuCaus.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không có yêu cầu nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 15),
@@ -200,10 +200,10 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
                     yc.tieuDe,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -231,13 +231,13 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
               yc.noiDung,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColors.textMuted,
               ),
             ),
             const SizedBox(height: 12),
-            const Divider(color: AppColors.borderButton, height: 1),
+            Divider(color: AppColors.borderButton, height: 1),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -247,20 +247,20 @@ class _YeuCauCuDanViewState extends State<YeuCauCuDanView> {
                   children: [
                     Text(
                       'Cư dân: ${yc.tenCuDan}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white70,
+                        color: AppColors.textPrimary70,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        const Icon(Icons.access_time_rounded, size: 12, color: AppColors.iconMuted),
+                        Icon(Icons.access_time_rounded, size: 12, color: AppColors.iconMuted),
                         const SizedBox(width: 4),
                         Text(
                           formattedDate,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: AppColors.textMuted,
                           ),

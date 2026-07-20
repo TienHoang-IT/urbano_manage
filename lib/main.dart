@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
+import 'package:urbano_manage/core/theme_provider.dart';
 import 'package:urbano_manage/features/yeu_cau_cu_dan/ViewModels/yeu_cau_cu_dan_viewmodel.dart';
 import 'package:urbano_manage/core/network/signalr_service.dart';
 import 'package:urbano_manage/features/auth/ViewModels/login_viewmodel.dart';
@@ -32,9 +33,13 @@ void main() async {
       statusBarBrightness: Brightness.dark,
     ),
   );
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadFromPrefs();
+
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => SignalRService()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => YeuCauCuDanViewModel()),
@@ -65,21 +70,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: navigatorKey,
-      scaffoldMessengerKey: messengerKey,
-      title: 'Urbano Manage',
-      theme: ThemeData(
-        scaffoldBackgroundColor: AppColors.bgDark,
-        canvasColor: AppColors.bgDark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.tealPrimary,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const AuthGate(),
+    return Consumer<ThemeProvider>(
+      builder: (context, theme, child) {
+        return MaterialApp(
+          key: ValueKey(theme.isDarkMode), // Force full rebuild on theme change
+          navigatorKey: navigatorKey,
+          scaffoldMessengerKey: messengerKey,
+          title: 'Urbano Manage',
+          theme: ThemeData(
+            scaffoldBackgroundColor: AppColors.bgDark,
+            canvasColor: AppColors.bgDark,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.tealPrimary,
+              brightness: theme.isDarkMode ? Brightness.dark : Brightness.light,
+            ),
+            useMaterial3: true,
+          ),
+          debugShowCheckedModeBanner: false,
+          home: const AuthGate(),
+        );
+      },
     );
   }
 }

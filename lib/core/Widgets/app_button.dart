@@ -34,15 +34,15 @@ class AppButton extends StatelessWidget {
           icon: icon != null ? Icon(icon, size: 18) : const SizedBox.shrink(),
           label: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.textPrimary,
             disabledBackgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             overlayColor: AppColors.tealPrimary,

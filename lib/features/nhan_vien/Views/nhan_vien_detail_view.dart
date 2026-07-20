@@ -70,7 +70,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
       final success = await context.read<NhanVienViewModel>().removeNhanVien(_currentNhanVien.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Xóa nhân viên thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
@@ -106,7 +106,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -168,17 +168,17 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Text(
               'Chi tiết Nhân viên',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),
@@ -193,7 +193,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
+              child: Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
             ),
           ),
           const SizedBox(width: 8),
@@ -207,7 +207,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
+              child: Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
             ),
           ),
         ],
@@ -234,7 +234,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
               backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
               child: Text(
                 initial,
-                style: const TextStyle(color: AppColors.tealPrimary, fontSize: 32, fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppColors.tealPrimary, fontSize: 32, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -245,7 +245,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
               children: [
                 Text(
                   _currentNhanVien.hoTen,
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Container(
@@ -257,7 +257,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
                   ),
                   child: Text(
                     role,
-                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -276,7 +276,7 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
             sectionTitle,
-            style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
           ),
         ),
         Container(
@@ -304,13 +304,13 @@ class _NhanVienDetailViewState extends State<NhanVienDetailView> {
           const SizedBox(width: 12),
           Text(
             '$label:',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 14),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
               textAlign: TextAlign.right,
             ),
           ),

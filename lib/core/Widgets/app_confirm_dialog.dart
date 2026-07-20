@@ -44,14 +44,14 @@ class AppConfirmDialog extends StatelessWidget {
       backgroundColor: AppColors.bgMid,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.borderButton),
+        side: BorderSide(color: AppColors.borderButton),
       ),
-      title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-      content: Text(content, style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+      title: Text(title, style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16)),
+      content: Text(content, style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(cancelText, style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+          child: Text(cancelText, style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
         ),
         TextButton(
           style: TextButton.styleFrom(

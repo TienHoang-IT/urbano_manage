@@ -32,11 +32,11 @@ class AppDatePicker extends StatelessWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.tealPrimary,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.textPrimary,
               surface: AppColors.bgDark,
-              onSurface: Colors.white,
+              onSurface: AppColors.textPrimary,
             ),
           ),
           child: child!,

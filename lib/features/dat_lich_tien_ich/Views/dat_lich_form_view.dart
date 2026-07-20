@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
-import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/ViewModels/dat_lich_tien_ich_viewmodel.dart';
 import 'package:urbano_manage/Models/cu_dan_model.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
@@ -64,11 +63,11 @@ class _DatLichFormViewState extends State<DatLichFormView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.tealPrimary,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.textPrimary,
               surface: AppColors.bgDark,
-              onSurface: Colors.white,
+              onSurface: AppColors.textPrimary,
             ),
           ),
           child: child!,
@@ -84,11 +83,11 @@ class _DatLichFormViewState extends State<DatLichFormView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.tealPrimary,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.textPrimary,
               surface: AppColors.bgDark,
-              onSurface: Colors.white,
+              onSurface: AppColors.textPrimary,
             ),
           ),
           child: child!,
@@ -143,7 +142,7 @@ class _DatLichFormViewState extends State<DatLichFormView> {
     if (mounted) {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Tạo lịch đặt tiện ích thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
@@ -169,7 +168,7 @@ class _DatLichFormViewState extends State<DatLichFormView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -320,7 +319,7 @@ class _DatLichFormViewState extends State<DatLichFormView> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'PHÍ SỬ DỤNG DỰ KIẾN:',
                               style: TextStyle(
                                 color: AppColors.textMuted,
@@ -330,8 +329,8 @@ class _DatLichFormViewState extends State<DatLichFormView> {
                             ),
                             Text(
                               currencyFormatter.format(_phiSuDung),
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -341,7 +340,7 @@ class _DatLichFormViewState extends State<DatLichFormView> {
                       ),
                       const SizedBox(height: 32),
                       vm.isLoading
-                          ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                          ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
                           : AppButton(
                               label: 'XÁC NHẬN ĐẶT LỊCH',
                               onPressed: _saveForm,
@@ -364,16 +363,16 @@ class _DatLichFormViewState extends State<DatLichFormView> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
             onPressed: () => Navigator.of(context).pop(),
           ),
           const SizedBox(width: 8),
-          const Text(
+          Text(
             'Đặt lịch Tiện ích Mới',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ],

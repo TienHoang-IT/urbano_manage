@@ -75,7 +75,7 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
                   }
                 });
               },
-              child: const Icon(Icons.add_rounded, color: Colors.white),
+              child: Icon(Icons.add_rounded, color: AppColors.textPrimary),
             ),
           ),
         ],
@@ -93,14 +93,14 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
             _searchQuery = val;
           });
         },
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: 'Tìm kiếm phương tiện (Biển số, Tên, Căn hộ)...',
-          hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
-          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.iconMuted),
+          hintStyle: TextStyle(color: AppColors.textHint, fontSize: 14),
+          prefixIcon: Icon(Icons.search_rounded, color: AppColors.iconMuted),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, color: AppColors.iconMuted),
+                  icon: Icon(Icons.clear_rounded, color: AppColors.iconMuted),
                   onPressed: () {
                     _searchController.clear();
                     setState(() {
@@ -114,15 +114,15 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
           contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.borderButton),
+            borderSide: BorderSide(color: AppColors.borderButton),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.tealPrimary),
+            borderSide: BorderSide(color: AppColors.tealPrimary),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.borderButton),
+            borderSide: BorderSide(color: AppColors.borderButton),
           ),
         ),
       ),
@@ -131,7 +131,7 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
 
   Widget _buildContent(PhuongTienViewModel viewModel, List<PhuongTien> filteredList) {
     if (viewModel.isLoading && viewModel.items.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -143,13 +143,13 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
           children: [
             Text(
               viewModel.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 14),
+              style: TextStyle(color: AppColors.red, fontSize: 14),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
               onPressed: () => viewModel.fetchItems(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+              child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary)),
             ),
           ],
         ),
@@ -157,7 +157,7 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
     }
 
     if (filteredList.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không tìm thấy phương tiện nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 14),
@@ -179,7 +179,7 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
             tileColor: AppColors.nenContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.borderButton),
+              side: BorderSide(color: AppColors.borderButton),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
@@ -199,7 +199,7 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
                 Expanded(
                   child: Text(
                     pt.tenPhuongTien,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -224,27 +224,27 @@ class _PhuongTienListViewState extends State<PhuongTienListView> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.tag_rounded, size: 12, color: AppColors.iconMuted),
+                    Icon(Icons.tag_rounded, size: 12, color: AppColors.iconMuted),
                     const SizedBox(width: 6),
                     Text('Biển số: ${pt.bienSo}',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                        style: TextStyle(color: AppColors.textPrimary70, fontSize: 12, fontWeight: FontWeight.w600)),
                     const Spacer(),
-                    const Icon(Icons.apartment_rounded, size: 12, color: AppColors.iconMuted),
+                    Icon(Icons.apartment_rounded, size: 12, color: AppColors.iconMuted),
                     const SizedBox(width: 4),
-                    Text('Căn hộ: ${pt.soCanHo}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                    Text('Căn hộ: ${pt.soCanHo}', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.category_rounded, size: 12, color: AppColors.iconMuted),
+                    Icon(Icons.category_rounded, size: 12, color: AppColors.iconMuted),
                     const SizedBox(width: 6),
-                    Text('Loại xe: ${pt.tenLoaiPhuongTien}', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                    Text('Loại xe: ${pt.tenLoaiPhuongTien}', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
                   ],
                 ),
               ],
             ),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
+            trailing: Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
             onTap: () {
               Navigator.push(
                 context,

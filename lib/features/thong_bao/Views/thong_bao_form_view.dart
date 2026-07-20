@@ -111,7 +111,7 @@ class _ThongBaoFormViewState extends State<ThongBaoFormView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -136,7 +136,7 @@ class _ThongBaoFormViewState extends State<ThongBaoFormView> {
                         prefixIcon: Icons.title_rounded,
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'NỘI DUNG *',
                         style: TextStyle(
                           fontSize: 13,
@@ -148,21 +148,21 @@ class _ThongBaoFormViewState extends State<ThongBaoFormView> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _noiDungController,
-                        style: const TextStyle(fontSize: 13, color: Colors.white),
+                        style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
                         maxLines: 8,
                         decoration: InputDecoration(
                           hintText: 'Nhập nội dung chi tiết thông báo...',
-                          hintStyle: const TextStyle(fontSize: 13, color: AppColors.textHint),
+                          hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
                           filled: true,
                           fillColor: AppColors.inputFill,
                           contentPadding: const EdgeInsets.all(14),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.borderSide, width: 1.5),
+                            borderSide: BorderSide(color: AppColors.borderSide, width: 1.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.tealPrimary, width: 1.5),
+                            borderSide: BorderSide(color: AppColors.tealPrimary, width: 1.5),
                           ),
                         ),
                       ),
@@ -199,17 +199,17 @@ class _ThongBaoFormViewState extends State<ThongBaoFormView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
               isEdit ? 'Chỉnh sửa Thông báo' : 'Tạo Thông báo mới',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),

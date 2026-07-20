@@ -53,7 +53,7 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
@@ -116,12 +116,12 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Chào mừng trở lại 👋',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 18),
+          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500, fontSize: 18),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           'Đăng nhập tài khoản nhân viên ban quản lý',
           style: TextStyle(
             color: AppColors.textMuted,
@@ -174,7 +174,7 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: const Text(
+        child: Text(
           'Quên mật khẩu?',
           style: TextStyle(fontSize: 12, color: AppColors.tealPrimary),
         ),
@@ -218,13 +218,13 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
       child: Text.rich(
         TextSpan(
           children: [
-            const TextSpan(
+            TextSpan(
               text: 'Gặp sự cố đăng nhập? ',
               style: TextStyle(color: AppColors.textMuted),
             ),
             TextSpan(
               text: 'Liên hệ Kỹ thuật',
-              style: const TextStyle(color: AppColors.tealDark),
+              style: TextStyle(color: AppColors.tealDark),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   showModalBottomSheet(
@@ -238,23 +238,23 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
+                          Text(
                             'Hỗ trợ kỹ thuật',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 16),
                           ListTile(
-                            leading: const Icon(Icons.phone, color: AppColors.tealPrimary),
-                            title: const Text('Hotline: 1900 xxxx', style: TextStyle(color: Colors.white)),
+                            leading: Icon(Icons.phone, color: AppColors.tealPrimary),
+                            title: Text('Hotline: 1900 xxxx', style: TextStyle(color: AppColors.textPrimary)),
                             onTap: () {},
                           ),
                           ListTile(
-                            leading: const Icon(Icons.email, color: AppColors.tealPrimary),
-                            title: const Text('Email: tech@urbano.vn', style: TextStyle(color: Colors.white)),
+                            leading: Icon(Icons.email, color: AppColors.tealPrimary),
+                            title: Text('Email: tech@urbano.vn', style: TextStyle(color: AppColors.textPrimary)),
                             onTap: () {},
                           ),
                           const SizedBox(height: 15),

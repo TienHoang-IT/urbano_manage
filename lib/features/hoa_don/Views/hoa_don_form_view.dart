@@ -183,11 +183,11 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
               backgroundColor: AppColors.bgMid,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
-                side: const BorderSide(color: AppColors.borderButton),
+                side: BorderSide(color: AppColors.borderButton),
               ),
               title: Text(
                 isNew ? 'Thêm phí dịch vụ' : 'Sửa phí dịch vụ', 
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -205,12 +205,10 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                       itemAsString: (p) => p.tenPhiDichVu,
                       searchFn: (p, q) => p.tenPhiDichVu.toLowerCase().contains(q.toLowerCase()),
                       onChanged: (val) {
-                        if (val != null) {
-                          setStateDialog(() {
-                            item.tenController.text = val.tenPhiDichVu;
-                            item.donGiaController.text = val.donGia.toStringAsFixed(0);
-                          });
-                        }
+                        setStateDialog(() {
+                          item.tenController.text = val.tenPhiDichVu;
+                          item.donGiaController.text = val.donGia.toStringAsFixed(0);
+                        });
                       },
                     ),
                     const SizedBox(height: 16),
@@ -281,7 +279,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                     }
                     Navigator.pop(context);
                   },
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+                  child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
@@ -320,7 +318,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                     _calculateTongTien();
                     Navigator.pop(context);
                   },
-                  child: Text(isNew ? 'Thêm' : 'Cập nhật', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Text(isNew ? 'Thêm' : 'Cập nhật', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                 ),
               ],
             );
@@ -452,7 +450,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -478,7 +476,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                       ),
                       const SizedBox(height: 16),
                       _isLoadingApartments
-                          ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                          ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
                           : AppSearchablePicker<CanHo>(
                               label: 'CĂN HỘ *',
                               value: _apartments.cast<CanHo?>().firstWhere(
@@ -542,10 +540,10 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Danh sách phí dịch vụ',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.5,
@@ -560,7 +558,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: AppColors.tealPrimary.withValues(alpha: 0.3)),
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
                                   Icon(Icons.add_circle_outline_rounded, color: AppColors.tealPrimary, size: 18),
                                   SizedBox(width: 6),
@@ -576,7 +574,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                       ),
                       const SizedBox(height: 16),
                       _isLoadingChiTiets 
-                        ? const Center(child: Padding(
+                        ? Center(child: Padding(
                             padding: EdgeInsets.all(20.0),
                             child: CircularProgressIndicator(color: AppColors.tealPrimary),
                           ))
@@ -607,13 +605,13 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(item.tenController.text.isEmpty ? 'Chưa chọn dịch vụ' : item.tenController.text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                                          Text(item.tenController.text.isEmpty ? 'Chưa chọn dịch vụ' : item.tenController.text, style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 15)),
                                           const SizedBox(height: 6),
-                                          Text('${soLuong.toStringAsFixed(0)} x ${donGia.toStringAsFixed(0)} = ${total.toStringAsFixed(0)} VND', style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                                          Text('${soLuong.toStringAsFixed(0)} x ${donGia.toStringAsFixed(0)} = ${total.toStringAsFixed(0)} VND', style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
                                           if (item.chiSoCuController.text.isNotEmpty && item.chiSoMoiController.text.isNotEmpty)
                                             Padding(
                                               padding: const EdgeInsets.only(top: 6.0),
-                                              child: Text('Chỉ số: ${item.chiSoCuController.text} ➔ ${item.chiSoMoiController.text}', style: const TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
+                                              child: Text('Chỉ số: ${item.chiSoCuController.text} ➔ ${item.chiSoMoiController.text}', style: TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
                                             ),
                                         ],
                                       ),
@@ -632,7 +630,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                                           color: AppColors.red.withValues(alpha: 0.15),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: const Icon(Icons.delete_rounded, color: AppColors.red, size: 20),
+                                        child: Icon(Icons.delete_rounded, color: AppColors.red, size: 20),
                                       ),
                                     ),
                                   ],
@@ -691,17 +689,17 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               isEdit ? 'Sửa Hóa đơn' : 'Tạo Hóa đơn mới',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: -0.5,
               ),
             ),

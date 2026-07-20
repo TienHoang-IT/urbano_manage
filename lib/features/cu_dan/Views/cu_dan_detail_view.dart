@@ -68,14 +68,14 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
           backgroundColor: AppColors.bgMid,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: const BorderSide(color: AppColors.borderButton),
+            side: BorderSide(color: AppColors.borderButton),
           ),
-          title: const Text('Xác nhận xóa', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)),
-          content: Text('Bạn có chắc chắn muốn xóa cư dân ${_currentCuDan.hoTen}?', style: const TextStyle(color: AppColors.textMuted, fontSize: 15)),
+          title: Text('Xác nhận xóa', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)),
+          content: Text('Bạn có chắc chắn muốn xóa cư dân ${_currentCuDan.hoTen}?', style: TextStyle(color: AppColors.textMuted, fontSize: 15)),
           actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
           actions: <Widget>[
             TextButton(
-              child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+              child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             ElevatedButton(
@@ -85,7 +85,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 elevation: 0,
               ),
-              child: const Text('Xóa', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text('Xóa', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 final vm = context.read<CuDanViewModel>();
                 final messenger = ScaffoldMessenger.of(context);
@@ -95,7 +95,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                 if (mounted) {
                   if (success) {
                     messenger.showSnackBar(
-                      const SnackBar(content: Text('Xóa cư dân thành công'), backgroundColor: AppColors.tealPrimary),
+                      SnackBar(content: Text('Xóa cư dân thành công'), backgroundColor: AppColors.tealPrimary),
                     );
                     navigator.pop(); // Back to list view
                   } else {
@@ -116,7 +116,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+      builder: (_) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
     );
     
     List<CanHo> canHoList = [];
@@ -150,9 +150,9 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
               backgroundColor: AppColors.bgMid,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
-                side: const BorderSide(color: AppColors.borderButton),
+                side: BorderSide(color: AppColors.borderButton),
               ),
-              title: const Text('Xác thực Cư dân', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)),
+              title: Text('Xác thực Cư dân', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 20, letterSpacing: -0.5)),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -160,10 +160,10 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                   children: [
                     Text(
                       'Bạn đang xác thực cho cư dân:\n${_currentCuDan.hoTen}',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 14),
                     ),
                     const SizedBox(height: 24),
-                    const Text('CHỌN CĂN HỘ', style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                    Text('CHỌN CĂN HỘ', style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -176,9 +176,9 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                         child: DropdownButton<int>(
                           isExpanded: true,
                           dropdownColor: AppColors.bgMid,
-                          hint: const Text('Chọn Căn hộ', style: TextStyle(color: AppColors.textHint, fontSize: 14)),
-                          icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
+                          hint: Text('Chọn Căn hộ', style: TextStyle(color: AppColors.textHint, fontSize: 14)),
+                          icon: Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                           value: selectedCanHoId,
                           items: canHoList.map((ch) {
                             return DropdownMenuItem<int>(
@@ -193,7 +193,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('VAI TRÒ', style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                    Text('VAI TRÒ', style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -206,9 +206,9 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                         child: DropdownButton<int>(
                           isExpanded: true,
                           dropdownColor: AppColors.bgMid,
-                          hint: const Text('Chọn Vai trò', style: TextStyle(color: AppColors.textHint, fontSize: 14)),
-                          icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
+                          hint: Text('Chọn Vai trò', style: TextStyle(color: AppColors.textHint, fontSize: 14)),
+                          icon: Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
                           value: selectedVaiTroId,
                           items: roles.map((r) {
                             return DropdownMenuItem<int>(
@@ -228,7 +228,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
               actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+                  child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
                   onPressed: () => Navigator.of(dialogContext).pop(),
                 ),
                 ElevatedButton(
@@ -247,7 +247,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                     if (mounted) {
                       if (success) {
                         messenger.showSnackBar(
-                          const SnackBar(content: Text('Xác thực cư dân thành công'), backgroundColor: AppColors.tealPrimary),
+                          SnackBar(content: Text('Xác thực cư dân thành công'), backgroundColor: AppColors.tealPrimary),
                         );
                         final updated = vm.cuDans.firstWhere(
                           (c) => c.id == _currentCuDan.id,
@@ -264,7 +264,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                       }
                     }
                   },
-                  child: const Text('Xác thực', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Text('Xác thực', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                 ),
               ],
             );
@@ -285,7 +285,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -355,17 +355,17 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Text(
               'Chi tiết Cư dân',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: -0.5,
               ),
             ),
@@ -381,7 +381,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.borderButton),
                 ),
-                child: const Icon(Icons.verified_user_rounded, color: AppColors.blue, size: 20),
+                child: Icon(Icons.verified_user_rounded, color: AppColors.blue, size: 20),
               ),
             ),
           if (_currentCuDan.trangThai == 1) const SizedBox(width: 10),
@@ -410,7 +410,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.edit_rounded, size: 20, color: AppColors.tealPrimary),
+              child: Icon(Icons.edit_rounded, size: 20, color: AppColors.tealPrimary),
             ),
           ),
           const SizedBox(width: 10),
@@ -424,7 +424,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 20, color: AppColors.red),
+              child: Icon(Icons.delete_rounded, size: 20, color: AppColors.red),
             ),
           ),
         ],
@@ -452,7 +452,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
               backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
               child: Text(
                 initial,
-                style: const TextStyle(color: AppColors.tealPrimary, fontSize: 32, fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppColors.tealPrimary, fontSize: 32, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -463,8 +463,8 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
               children: [
                 Text(
                   _currentCuDan.hoTen,
-                  style: const TextStyle(
-                    color: Colors.white, 
+                  style: TextStyle(
+                    color: AppColors.textPrimary, 
                     fontSize: 20, 
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.5,
@@ -479,7 +479,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                   ),
                   child: Text(
                     _currentCuDan.trangThaiText.isNotEmpty ? _currentCuDan.trangThaiText : 'Hoạt động',
-                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -498,7 +498,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
           padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             sectionTitle,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, letterSpacing: -0.5),
+            style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 18, letterSpacing: -0.5),
           ),
         ),
         Container(
@@ -525,7 +525,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: AppColors.textPrimary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: AppColors.textMuted, size: 18),
@@ -537,12 +537,12 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -556,11 +556,11 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             'Lịch sử Căn hộ đã ở',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, letterSpacing: -0.5),
+            style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 18, letterSpacing: -0.5),
           ),
         ),
         Container(
@@ -572,12 +572,12 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
             border: Border.all(color: AppColors.borderButton),
           ),
           child: _isLoadingHistory
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.symmetric(vertical: 24.0),
                   child: Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
                 )
               : _history.isEmpty
-                  ? const Padding(
+                  ? Padding(
                       padding: EdgeInsets.symmetric(vertical: 24.0),
                       child: Center(
                         child: Text(
@@ -590,7 +590,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: _history.length,
-                      separatorBuilder: (_, __) => const Divider(color: AppColors.borderButton, height: 24),
+                      separatorBuilder: (_, _) => Divider(color: AppColors.borderButton, height: 24),
                       itemBuilder: (context, index) {
                         final item = _history[index];
                         final isActive = item.ngayChuyenDi == null;
@@ -613,7 +613,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                                         children: [
                                           Text(
                                             'Căn hộ ${item.soCanHo}',
-                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
+                                            style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 15),
                                           ),
                                           const SizedBox(width: 8),
                                           Container(
@@ -636,13 +636,13 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                                       const SizedBox(height: 8),
                                       Text(
                                         'Tòa nhà: ${item.tenToaNha.isNotEmpty ? item.tenToaNha : '—'}',
-                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                                        style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         'Thời gian ở: $fromStr → $toStr',
                                         style: TextStyle(
-                                          color: isActive ? Colors.white : AppColors.textMuted,
+                                          color: isActive ? AppColors.textPrimary : AppColors.textMuted,
                                           fontSize: 13,
                                           fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
                                         ),
@@ -650,7 +650,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
                                     ],
                                   ),
                                 ),
-                                const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.iconMuted, size: 16),
+                                Icon(Icons.arrow_forward_ios_rounded, color: AppColors.iconMuted, size: 16),
                               ],
                             ),
                           ),
@@ -666,7 +666,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+      builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
     );
     try {
       final canHo = await _canHoService.fetchCanHoById(canHoId);

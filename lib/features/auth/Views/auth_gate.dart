@@ -13,7 +13,7 @@ class AuthGate extends StatelessWidget {
       future: _getToken(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
+          return Scaffold(
             backgroundColor: AppColors.bgDark,
             body: Center(
               child: CircularProgressIndicator(color: AppColors.tealPrimary),

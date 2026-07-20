@@ -52,7 +52,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
                   }
                 });
               },
-              child: const Icon(Icons.add_rounded, color: Colors.white),
+              child: Icon(Icons.add_rounded, color: AppColors.textPrimary),
             ),
           ),
         ],
@@ -62,7 +62,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
 
   Widget _buildContent(ThongBaoViewModel viewModel) {
     if (viewModel.isLoading && viewModel.thongBaos.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -74,13 +74,13 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
           children: [
             Text(
               viewModel.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 14),
+              style: TextStyle(color: AppColors.red, fontSize: 14),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.tealPrimary),
               onPressed: () => viewModel.fetchThongBaos(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+              child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary)),
             ),
           ],
         ),
@@ -88,7 +88,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
     }
 
     if (viewModel.thongBaos.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không có thông báo nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 14),
@@ -109,7 +109,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
             tileColor: AppColors.nenContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.borderButton),
+              side: BorderSide(color: AppColors.borderButton),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: Container(
@@ -118,7 +118,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
                 color: AppColors.tealPrimary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.campaign_rounded, color: AppColors.tealPrimary, size: 20),
+              child: Icon(Icons.campaign_rounded, color: AppColors.tealPrimary, size: 20),
             ),
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -126,7 +126,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
                 Expanded(
                   child: Text(
                     t.tieuDe,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -134,7 +134,7 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
                 const SizedBox(width: 8),
                 Text(
                   formattedDate,
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 10),
                 ),
               ],
             ),
@@ -144,24 +144,24 @@ class _ThongBaoListViewState extends State<ThongBaoListView> {
                 const SizedBox(height: 6),
                 Text(
                   t.noiDung,
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 13),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.person_outline_rounded, size: 12, color: AppColors.tealPrimary),
+                    Icon(Icons.person_outline_rounded, size: 12, color: AppColors.tealPrimary),
                     const SizedBox(width: 4),
                     Text(
                       t.tenNguoiTao.isNotEmpty ? t.tenNguoiTao : 'Ban Quản Lý',
-                      style: const TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: AppColors.tealPrimary, fontSize: 11, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
               ],
             ),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
+            trailing: Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.iconMuted),
             onTap: () {
               Navigator.push(
                 context,

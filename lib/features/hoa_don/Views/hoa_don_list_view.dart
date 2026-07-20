@@ -65,7 +65,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
                   }
                 });
               },
-              child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+              child: Icon(Icons.add_rounded, color: AppColors.textPrimary, size: 28),
             ),
           ),
         ],
@@ -122,7 +122,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
 
   Widget _buildContent(HoaDonViewModel viewModel) {
     if (viewModel.isLoading && viewModel.hoaDons.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -134,7 +134,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
           children: [
             Text(
               viewModel.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 14),
+              style: TextStyle(color: AppColors.red, fontSize: 14),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -147,7 +147,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
                 elevation: 0,
               ),
               onPressed: () => viewModel.fetchHoaDons(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -155,7 +155,7 @@ class _HoaDonListViewState extends State<HoaDonListView> {
     }
 
     if (viewModel.hoaDons.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không có hóa đơn nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 15, fontWeight: FontWeight.w500),
@@ -214,8 +214,8 @@ class _HoaDonListViewState extends State<HoaDonListView> {
                   children: [
                     Text(
                       h.maThanhToan,
-                      style: const TextStyle(
-                        color: Colors.white, 
+                      style: TextStyle(
+                        color: AppColors.textPrimary, 
                         fontWeight: FontWeight.w600, 
                         fontSize: 16, 
                         letterSpacing: -0.5,
@@ -247,22 +247,22 @@ class _HoaDonListViewState extends State<HoaDonListView> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.apartment_rounded, color: AppColors.iconMuted, size: 14),
+                              Icon(Icons.apartment_rounded, color: AppColors.iconMuted, size: 14),
                               const SizedBox(width: 6),
                               Text(
                                 'Căn hộ: ${h.soCanHo.isNotEmpty ? h.soCanHo : h.canHo}', 
-                                style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                                style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(Icons.calendar_view_month_rounded, color: AppColors.iconMuted, size: 14),
+                              Icon(Icons.calendar_view_month_rounded, color: AppColors.iconMuted, size: 14),
                               const SizedBox(width: 6),
                               Text(
                                 'Kỳ: T${h.thang}/${h.nam}', 
-                                style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                                style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -271,8 +271,8 @@ class _HoaDonListViewState extends State<HoaDonListView> {
                     ),
                     Text(
                       currencyFormat.format(h.tongTien),
-                      style: const TextStyle(
-                        color: Colors.white, 
+                      style: TextStyle(
+                        color: AppColors.textPrimary, 
                         fontWeight: FontWeight.w700, 
                         fontSize: 18, 
                         letterSpacing: -0.5,

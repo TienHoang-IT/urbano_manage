@@ -118,7 +118,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       final success = await context.read<CanHoViewModel>().removeCanHo(_currentCanHo.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Xóa căn hộ thành công'),
             backgroundColor: AppColors.tealPrimary,
           ),
@@ -158,7 +158,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -219,17 +219,17 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+              child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Text(
               'Chi tiết Căn hộ',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),
@@ -244,7 +244,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
+              child: Icon(Icons.edit_rounded, size: 18, color: AppColors.tealPrimary),
             ),
           ),
           const SizedBox(width: 8),
@@ -258,7 +258,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.borderButton),
               ),
-              child: const Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
+              child: Icon(Icons.delete_rounded, size: 18, color: AppColors.red),
             ),
           ),
         ],
@@ -283,7 +283,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
             child: CircleAvatar(
               radius: 36,
               backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
-              child: const Icon(Icons.apartment_rounded, color: AppColors.tealPrimary, size: 36),
+              child: Icon(Icons.apartment_rounded, color: AppColors.tealPrimary, size: 36),
             ),
           ),
           const SizedBox(width: 20),
@@ -293,7 +293,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
               children: [
                 Text(
                   'Căn hộ ${_currentCanHo.soCanHo}',
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Container(
@@ -324,7 +324,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
             sectionTitle,
-            style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
+            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.8),
           ),
         ),
         Container(
@@ -352,13 +352,13 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
           const SizedBox(width: 12),
           Text(
             '$label:',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 14),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
               textAlign: TextAlign.right,
             ),
           ),
@@ -371,7 +371,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
             'Phí dịch vụ',
@@ -387,12 +387,12 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
             border: Border.all(color: AppColors.borderButton),
           ),
           child: _isLoadingFees
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.symmetric(vertical: 24.0),
                   child: Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
                 )
               : _serviceFees.isEmpty
-                  ? const Padding(
+                  ? Padding(
                       padding: EdgeInsets.symmetric(vertical: 24.0),
                       child: Center(
                         child: Text(
@@ -416,13 +416,13 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                           margin: const EdgeInsets.symmetric(vertical: 6.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: AppColors.borderButton),
+                            side: BorderSide(color: AppColors.borderButton),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             child: Row(
                               children: [
-                                const Icon(Icons.monetization_on_rounded, color: AppColors.tealPrimary, size: 24),
+                                Icon(Icons.monetization_on_rounded, color: AppColors.tealPrimary, size: 24),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
@@ -430,12 +430,12 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                     children: [
                                       Text(
                                         fee['tenPhiDichVu'] ?? '',
-                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                        style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         'Đơn giá: $formattedDonGia/tháng',
-                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                        style: TextStyle(color: AppColors.textMuted, fontSize: 12),
                                       ),
                                     ],
                                   ),
@@ -458,7 +458,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 4, bottom: 8),
               child: Text(
                 'Cư dân trong căn hộ',
@@ -466,7 +466,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.add_circle_outline_rounded, color: AppColors.tealPrimary, size: 20),
+              icon: Icon(Icons.add_circle_outline_rounded, color: AppColors.tealPrimary, size: 20),
               onPressed: _showAddResidentDialog,
               tooltip: 'Thêm cư dân',
             ),
@@ -481,12 +481,12 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
             border: Border.all(color: AppColors.borderButton),
           ),
           child: _isLoadingResidents
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.symmetric(vertical: 24.0),
                   child: Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
                 )
               : _residents.isEmpty
-                  ? const Padding(
+                  ? Padding(
                       padding: EdgeInsets.symmetric(vertical: 24.0),
                       child: Center(
                         child: Text(
@@ -537,7 +537,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                           children: [
                                             Text(
                                               item.tenCuDan,
-                                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                              style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
                                             ),
                                             const SizedBox(width: 8),
                                             Container(
@@ -560,13 +560,13 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                         const SizedBox(height: 6),
                                         Text(
                                           'SĐT: ${item.sdtCuDan.isNotEmpty ? item.sdtCuDan : '—'}',
-                                          style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                                          style: TextStyle(color: AppColors.textMuted, fontSize: 12),
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
                                           'Thời gian ở: $fromStr → $toStr',
                                           style: TextStyle(
-                                            color: isActive ? Colors.white70 : AppColors.textMuted,
+                                            color: isActive ? AppColors.textPrimary70 : AppColors.textMuted,
                                             fontSize: 11,
                                             fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
                                           ),
@@ -577,8 +577,8 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                   if (isActive) ...[
                                     TextButton.icon(
                                       onPressed: () => _checkoutResident(item),
-                                      icon: const Icon(Icons.logout_rounded, size: 14, color: AppColors.amber),
-                                      label: const Text(
+                                      icon: Icon(Icons.logout_rounded, size: 14, color: AppColors.amber),
+                                      label: Text(
                                         'Chuyển đi',
                                         style: TextStyle(color: AppColors.amber, fontSize: 11, fontWeight: FontWeight.bold),
                                       ),
@@ -590,7 +590,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                     ),
                                   ],
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.red),
+                                    icon: Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.red),
                                     onPressed: () => _deleteAssignment(item),
                                     constraints: const BoxConstraints(),
                                     padding: const EdgeInsets.only(left: 8),
@@ -611,7 +611,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+      builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
     );
     List<CuDan> cuDans = [];
     try {
@@ -631,7 +631,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
     if (cuDans.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Chưa có cư dân nào trong hệ thống'), backgroundColor: AppColors.red),
+          SnackBar(content: Text('Chưa có cư dân nào trong hệ thống'), backgroundColor: AppColors.red),
         );
       }
       return;
@@ -648,7 +648,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
             return AlertDialog(
               backgroundColor: AppColors.bgMid,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Thêm cư dân vào căn hộ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              title: Text('Thêm cư dân vào căn hộ', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -671,8 +671,8 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                       return TextFormField(
                         controller: textEditingController,
                         focusNode: focusNode,
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                        decoration: InputDecoration(
                           labelText: 'Tìm và chọn cư dân',
                           labelStyle: TextStyle(color: AppColors.tealPrimary),
                           enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
@@ -702,7 +702,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                   onTap: () => onSelected(option),
                                   child: Padding(
                                     padding: const EdgeInsets.all(12.0),
-                                    child: Text(option.hoTen, style: const TextStyle(color: Colors.white)),
+                                    child: Text(option.hoTen, style: TextStyle(color: AppColors.textPrimary)),
                                   ),
                                 );
                               },
@@ -723,11 +723,11 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                         builder: (context, child) {
                           return Theme(
                             data: Theme.of(context).copyWith(
-                              colorScheme: const ColorScheme.dark(
+                              colorScheme: ColorScheme.dark(
                                 primary: AppColors.tealPrimary,
-                                onPrimary: Colors.white,
+                                onPrimary: AppColors.textPrimary,
                                 surface: AppColors.bgMid,
-                                onSurface: Colors.white,
+                                onSurface: AppColors.textPrimary,
                               ), dialogTheme: DialogThemeData(backgroundColor: AppColors.bgDark),
                             ),
                             child: child!,
@@ -745,10 +745,10 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Ngày chuyển đến:', style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                          Text('Ngày chuyển đến:', style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
                           Text(
                             DateFormat('dd/MM/yyyy').format(selectedDate),
-                            style: const TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                            style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                         ],
                       ),
@@ -759,7 +759,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+                  child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -775,7 +775,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                       'ngayChuyenDen': selectedDate,
                     });
                   },
-                  child: const Text('Thêm', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
+                  child: Text('Thêm', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
                 ),
               ],
             );
@@ -788,7 +788,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+        builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
       );
 
       try {
@@ -805,12 +805,12 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
 
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Thêm cư dân thành công'), backgroundColor: AppColors.tealPrimary),
+            SnackBar(content: Text('Thêm cư dân thành công'), backgroundColor: AppColors.tealPrimary),
           );
           _loadResidents();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Không thể thêm cư dân'), backgroundColor: AppColors.red),
+            SnackBar(content: Text('Không thể thêm cư dân'), backgroundColor: AppColors.red),
           );
         }
       } catch (e) {
@@ -834,7 +834,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+        builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
       );
       try {
         final success = await _cuDanCanHoService.chuyenDi(item.id);
@@ -842,7 +842,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
         Navigator.pop(context); // Dismiss loading
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Ghi nhận chuyển đi thành công'), backgroundColor: AppColors.tealPrimary),
+            SnackBar(content: Text('Ghi nhận chuyển đi thành công'), backgroundColor: AppColors.tealPrimary),
           );
           _loadResidents();
         }
@@ -868,7 +868,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+        builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
       );
       try {
         final success = await _cuDanCanHoService.delete(item.id);
@@ -876,7 +876,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
         Navigator.pop(context); // Dismiss loading
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Xóa liên kết thành công'), backgroundColor: AppColors.tealPrimary),
+            SnackBar(content: Text('Xóa liên kết thành công'), backgroundColor: AppColors.tealPrimary),
           );
           _loadResidents();
         }
@@ -895,7 +895,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+      builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
     );
     try {
       final cuDan = await _cuDanService.fetchCuDanById(cuDanId);

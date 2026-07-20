@@ -22,7 +22,7 @@ class GlobalSearchDelegate extends SearchDelegate<dynamic> {
   GlobalSearchDelegate()
       : super(
           searchFieldLabel: 'Tìm kiếm toàn cục...',
-          searchFieldStyle: const TextStyle(color: Colors.white, fontSize: 16),
+          searchFieldStyle: TextStyle(color: AppColors.textPrimary, fontSize: 16),
         );
 
   @override
@@ -32,9 +32,9 @@ class GlobalSearchDelegate extends SearchDelegate<dynamic> {
       appBarTheme: theme.appBarTheme.copyWith(
         backgroundColor: AppColors.bgDark,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.tealPrimary),
+        iconTheme: IconThemeData(color: AppColors.tealPrimary),
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         hintStyle: TextStyle(color: AppColors.textHint),
         border: InputBorder.none,
       ),
@@ -46,7 +46,7 @@ class GlobalSearchDelegate extends SearchDelegate<dynamic> {
     return [
       if (query.isNotEmpty)
         IconButton(
-          icon: const Icon(Icons.clear_rounded, color: AppColors.textMuted),
+          icon: Icon(Icons.clear_rounded, color: AppColors.textMuted),
           onPressed: () {
             query = '';
           },
@@ -57,7 +57,7 @@ class GlobalSearchDelegate extends SearchDelegate<dynamic> {
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back_rounded, color: AppColors.tealPrimary),
+      icon: Icon(Icons.arrow_back_rounded, color: AppColors.tealPrimary),
       onPressed: () {
         close(context, null);
       },
@@ -78,7 +78,7 @@ class GlobalSearchDelegate extends SearchDelegate<dynamic> {
     if (query.trim().isEmpty) {
       return Container(
         color: AppColors.bgDark,
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -172,7 +172,7 @@ class GlobalSearchDelegate extends SearchDelegate<dynamic> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
+      builder: (context) => Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       ),
     );
@@ -270,14 +270,14 @@ class _SearchSuggestionsViewState extends State<SearchSuggestionsView> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary));
+      return Center(child: CircularProgressIndicator(color: AppColors.tealPrimary));
     }
 
     if (_error != null) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Text(_error!, style: const TextStyle(color: AppColors.red), textAlign: TextAlign.center),
+          child: Text(_error!, style: TextStyle(color: AppColors.red), textAlign: TextAlign.center),
         ),
       );
     }
@@ -290,7 +290,7 @@ class _SearchSuggestionsViewState extends State<SearchSuggestionsView> {
     final total = res.canHo.length + res.cuDan.length + res.hoaDon.length + res.phuongTien.length;
 
     if (total == 0) {
-      return const Center(
+      return Center(
         child: Text('Không tìm thấy kết quả nào', style: TextStyle(color: AppColors.textMuted)),
       );
     }
@@ -351,8 +351,8 @@ class _SearchSuggestionsViewState extends State<SearchSuggestionsView> {
           const SizedBox(width: 6),
           Text(
             '$label ($count)',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
@@ -374,20 +374,20 @@ class _SearchSuggestionsViewState extends State<SearchSuggestionsView> {
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: AppColors.borderButton),
+        side: BorderSide(color: AppColors.borderButton),
       ),
       child: ListTile(
         dense: true,
         leading: Icon(icon, color: AppColors.textMuted, size: 20),
         title: Text(
           title,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+          style: TextStyle(color: AppColors.textMuted, fontSize: 11),
         ),
-        trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.iconMuted),
+        trailing: Icon(Icons.chevron_right_rounded, color: AppColors.iconMuted),
         onTap: onTap,
       ),
     );

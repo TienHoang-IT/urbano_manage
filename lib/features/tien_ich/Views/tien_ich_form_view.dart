@@ -91,11 +91,11 @@ class _TienIchFormViewState extends State<TienIchFormView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.tealPrimary,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.textPrimary,
               surface: AppColors.bgDark,
-              onSurface: Colors.white,
+              onSurface: AppColors.textPrimary,
             ),
           ),
           child: child!,
@@ -200,7 +200,7 @@ class _TienIchFormViewState extends State<TienIchFormView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -362,11 +362,11 @@ class _TienIchFormViewState extends State<TienIchFormView> {
                         ),
                         child: SwitchListTile(
                           activeThumbColor: AppColors.tealPrimary,
-                          title: const Text(
+                          title: Text(
                             'Cần đặt trước lịch sử dụng',
-                            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                            style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
                           ),
-                          subtitle: const Text(
+                          subtitle: Text(
                             'Cư dân cần gửi đăng ký thuê/đặt trước khi sử dụng tiện ích này',
                             style: TextStyle(color: AppColors.textMuted, fontSize: 11),
                           ),
@@ -380,7 +380,7 @@ class _TienIchFormViewState extends State<TienIchFormView> {
                       ),
                       const SizedBox(height: 32),
                       vm.isLoading
-                          ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                          ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
                           : AppButton(
                               label: isEdit ? 'CẬP NHẬT' : 'THÊM MỚI',
                               onPressed: _saveForm,
@@ -403,16 +403,16 @@ class _TienIchFormViewState extends State<TienIchFormView> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
             onPressed: () => Navigator.of(context).pop(),
           ),
           const SizedBox(width: 8),
           Text(
             isEdit ? 'Chỉnh sửa Tiện ích' : 'Thêm Tiện ích Mới',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ],

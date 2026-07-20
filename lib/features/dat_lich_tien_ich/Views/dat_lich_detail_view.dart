@@ -83,7 +83,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
+        builder: (context) => Center(
           child: CircularProgressIndicator(color: AppColors.tealPrimary),
         ),
       );
@@ -94,7 +94,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       Navigator.pop(context); // Pop loading
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã duyệt yêu cầu đặt lịch'), backgroundColor: AppColors.tealPrimary),
+          SnackBar(content: Text('Đã duyệt yêu cầu đặt lịch'), backgroundColor: AppColors.tealPrimary),
         );
         _reloadBooking();
       } else {
@@ -113,12 +113,12 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.bgMid,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Từ chối đặt lịch', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text('Từ chối đặt lịch', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Vui lòng nhập lý do từ chối đặt lịch tiện ích này:',
               style: TextStyle(color: AppColors.textMuted, fontSize: 13),
             ),
@@ -133,19 +133,19 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+            child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
               if (reasonController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Vui lòng nhập lý lý do từ chối'), backgroundColor: AppColors.red),
+                  SnackBar(content: Text('Vui lòng nhập lý lý do từ chối'), backgroundColor: AppColors.red),
                 );
                 return;
               }
               Navigator.pop(context, true);
             },
-            child: const Text('Xác nhận', style: TextStyle(color: AppColors.red, fontWeight: FontWeight.bold)),
+            child: Text('Xác nhận', style: TextStyle(color: AppColors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -163,7 +163,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
+        builder: (context) => Center(
           child: CircularProgressIndicator(color: AppColors.tealPrimary),
         ),
       );
@@ -174,7 +174,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       Navigator.pop(context); // Pop loading
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã từ chối đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
+          SnackBar(content: Text('Đã từ chối đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
         );
         _reloadBooking();
       } else {
@@ -201,7 +201,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
+        builder: (context) => Center(
           child: CircularProgressIndicator(color: AppColors.tealPrimary),
         ),
       );
@@ -212,7 +212,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       Navigator.pop(context); // Pop loading
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã hủy đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
+          SnackBar(content: Text('Đã hủy đặt lịch thành công'), backgroundColor: AppColors.tealPrimary),
         );
         _reloadBooking();
       } else {
@@ -257,7 +257,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -271,7 +271,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
               _buildAppbar(context),
               Expanded(
                 child: _isLoadingInfo
-                    ? const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                    ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
                     : SingleChildScrollView(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
@@ -293,10 +293,10 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
                                       Expanded(
                                         child: Text(
                                           _booking.tenTienIch,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.white,
+                                            color: AppColors.textPrimary,
                                           ),
                                         ),
                                       ),
@@ -322,9 +322,9 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
                                   const SizedBox(height: 6),
                                   Text(
                                     'Mã đặt lịch: ${_booking.maDatLich}',
-                                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+                                    style: TextStyle(color: AppColors.tealPrimary, fontSize: 13, fontWeight: FontWeight.w500),
                                   ),
-                                  const Divider(color: AppColors.borderButton, height: 24, thickness: 1),
+                                  Divider(color: AppColors.borderButton, height: 24, thickness: 1),
                                   _buildDetailRow(Icons.person_rounded, 'Cư dân', _booking.tenCuDan),
                                   const SizedBox(height: 12),
                                   _buildDetailRow(Icons.apartment_rounded, 'Căn hộ',
@@ -357,7 +357,7 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
                                   children: [
                                     Text(
                                       _booking.trangThai == 2 ? 'THÔNG TIN PHÊ DUYỆT' : 'THÔNG TIN HỦY/TỪ CHỐI',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textMuted,
@@ -393,8 +393,8 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
                                   children: [
                                     Expanded(
                                       child: ElevatedButton.icon(
-                                        icon: const Icon(Icons.check_rounded, color: Colors.white),
-                                        label: const Text('PHÊ DUYỆT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                        icon: Icon(Icons.check_rounded, color: AppColors.textPrimary),
+                                        label: Text('PHÊ DUYỆT', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: AppColors.tealPrimary,
                                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -406,8 +406,8 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: ElevatedButton.icon(
-                                        icon: const Icon(Icons.close_rounded, color: Colors.white),
-                                        label: const Text('TỪ CHỐI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                        icon: Icon(Icons.close_rounded, color: AppColors.textPrimary),
+                                        label: Text('TỪ CHỐI', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: AppColors.red,
                                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -421,15 +421,15 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
                                 const SizedBox(height: 16),
                               ],
                               ElevatedButton.icon(
-                                icon: const Icon(Icons.cancel_rounded, color: Colors.white),
-                                label: const Text('HỦY ĐẶT LỊCH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                icon: Icon(Icons.cancel_rounded, color: AppColors.textPrimary),
+                                label: Text('HỦY ĐẶT LỊCH', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.bgMid,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: AppColors.textPrimary,
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    side: const BorderSide(color: AppColors.borderButton),
+                                    side: BorderSide(color: AppColors.borderButton),
                                   ),
                                 ),
                                 onPressed: _handleHuy,
@@ -455,12 +455,12 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
         const SizedBox(width: 8),
         Text(
           '$label: ',
-          style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+          style: TextStyle(color: AppColors.textMuted, fontSize: 13),
         ),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
           ),
         ),
       ],
@@ -473,16 +473,16 @@ class _DatLichDetailViewState extends State<DatLichDetailView> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.tealPrimary),
             onPressed: () => Navigator.of(context).pop(true),
           ),
           const SizedBox(width: 8),
-          const Text(
+          Text(
             'Chi tiết Đặt lịch Tiện ích',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ],

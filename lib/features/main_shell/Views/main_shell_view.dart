@@ -15,6 +15,7 @@ import 'package:urbano_manage/features/thong_bao/ViewModels/thong_bao_viewmodel.
 import 'package:urbano_manage/features/dat_lich_tien_ich/ViewModels/dat_lich_tien_ich_viewmodel.dart';
 import 'package:urbano_manage/features/main_shell/Views/global_search_delegate.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
+import 'package:urbano_manage/core/theme_provider.dart';
 import 'package:urbano_manage/core/constants/navigation_tabs.dart';
 import 'package:urbano_manage/Models/nhan_vien_model.dart';
 import 'package:urbano_manage/features/auth/Views/login_view.dart';
@@ -27,7 +28,6 @@ import 'package:urbano_manage/features/nhan_vien/Views/nhan_vien_list_view.dart'
 import 'package:urbano_manage/features/can_ho/Views/can_ho_list_view.dart';
 import 'package:urbano_manage/features/phi_dich_vu/Views/phi_dich_vu_list_view.dart';
 import 'package:urbano_manage/features/bang_tin/Views/bang_tin_list_view.dart';
-import 'dart:async';
 import 'package:urbano_manage/features/phuong_tien/Views/phuong_tien_list_view.dart';
 import 'package:urbano_manage/features/nhat_ky_he_thong/Views/nhat_ky_he_thong_list_view.dart';
 import 'package:urbano_manage/features/tien_ich/Views/tien_ich_list_view.dart';
@@ -195,11 +195,11 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: AppColors.bgMid,
-          title: const Text('Xác nhận đăng xuất', style: TextStyle(color: Colors.white)),
-          content: const Text('Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng?', style: TextStyle(color: AppColors.textMuted)),
+          title: Text('Xác nhận đăng xuất', style: TextStyle(color: AppColors.textPrimary)),
+          content: Text('Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng?', style: TextStyle(color: AppColors.textMuted)),
           actions: <Widget>[
             TextButton(
-              child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+              child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
@@ -310,7 +310,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.borderButton),
                 ),
-                child: const Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
+                child: Icon(Icons.menu_rounded, size: 22, color: AppColors.tealPrimary),
               ),
             ),
           ),
@@ -318,16 +318,16 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 letterSpacing: 1,
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.search_rounded, color: AppColors.tealPrimary),
+            icon: Icon(Icons.search_rounded, color: AppColors.tealPrimary),
             tooltip: 'Tìm kiếm toàn cục',
             onPressed: () {
               showSearch(
@@ -336,14 +336,28 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               );
             },
           ),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return IconButton(
+                icon: Icon(
+                  themeProvider.isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                  color: AppColors.amber,
+                ),
+                tooltip: 'Đổi giao diện',
+                onPressed: () {
+                  themeProvider.toggleTheme();
+                },
+              );
+            },
+          ),
           if (_currentIndex == NavigationTabs.hoaDon && isKeToan) ...[
             IconButton(
-              icon: const Icon(Icons.auto_awesome_rounded, color: AppColors.tealPrimary),
+              icon: Icon(Icons.auto_awesome_rounded, color: AppColors.tealPrimary),
               tooltip: 'Tạo hóa đơn tháng',
               onPressed: _showAutoBillingDialog,
             ),
             IconButton(
-              icon: const Icon(Icons.download_rounded, color: AppColors.tealPrimary),
+              icon: Icon(Icons.download_rounded, color: AppColors.tealPrimary),
               tooltip: 'Xuất báo cáo',
               onPressed: _showExportBottomSheet,
             ),
@@ -365,11 +379,11 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
             return AlertDialog(
               backgroundColor: AppColors.bgMid,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Tạo hóa đơn tháng', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              title: Text('Tạo hóa đơn tháng', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Hệ thống sẽ tự động tạo hóa đơn dịch vụ cho tất cả căn hộ trong tháng đã chọn.',
                     style: TextStyle(color: AppColors.textMuted, fontSize: 13),
                   ),
@@ -380,13 +394,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                         child: DropdownButtonFormField<int>(
                           initialValue: selectedMonth,
                           dropdownColor: AppColors.bgMid,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Tháng',
                             labelStyle: TextStyle(color: AppColors.tealPrimary),
                             enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
                           ),
                           items: List.generate(12, (index) => index + 1)
-                              .map((m) => DropdownMenuItem(value: m, child: Text('$m', style: const TextStyle(color: Colors.white))))
+                              .map((m) => DropdownMenuItem(value: m, child: Text('$m', style: TextStyle(color: AppColors.textPrimary))))
                               .toList(),
                           onChanged: (val) {
                             if (val != null) {
@@ -402,13 +416,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                         child: DropdownButtonFormField<int>(
                           initialValue: selectedYear,
                           dropdownColor: AppColors.bgMid,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Năm',
                             labelStyle: TextStyle(color: AppColors.tealPrimary),
                             enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
                           ),
                           items: List.generate(5, (index) => DateTime.now().year - 2 + index)
-                              .map((y) => DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(color: Colors.white))))
+                              .map((y) => DropdownMenuItem(value: y, child: Text('$y', style: TextStyle(color: AppColors.textPrimary))))
                               .toList(),
                           onChanged: (val) {
                             if (val != null) {
@@ -426,13 +440,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+                  child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context, {'month': selectedMonth, 'year': selectedYear});
                   },
-                  child: const Text('Xác nhận', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
+                  child: Text('Xác nhận', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
                 ),
               ],
             );
@@ -450,7 +464,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+        builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
       );
 
       try {
@@ -468,15 +482,15 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
             context: context,
             builder: (context) => AlertDialog(
               backgroundColor: AppColors.bgMid,
-              title: const Text('Kết quả', style: TextStyle(color: Colors.white)),
+              title: Text('Kết quả', style: TextStyle(color: AppColors.textPrimary)),
               content: Text(
                 'Tạo hóa đơn thành công cho tháng $month/$year.\n- Đã tạo: $totalCreated hóa đơn\n- Bỏ qua: $skipped hóa đơn (đã tồn tại)',
-                style: const TextStyle(color: Colors.white70),
+                style: TextStyle(color: AppColors.textPrimary70),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Đóng', style: TextStyle(color: AppColors.tealPrimary)),
+                  child: Text('Đóng', style: TextStyle(color: AppColors.tealPrimary)),
                 )
               ],
             ),
@@ -486,15 +500,15 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
             context: context,
             builder: (context) => AlertDialog(
               backgroundColor: AppColors.bgMid,
-              title: const Text('Thất bại', style: TextStyle(color: AppColors.red)),
+              title: Text('Thất bại', style: TextStyle(color: AppColors.red)),
               content: Text(
                 vm.error ?? 'Có lỗi xảy ra khi tạo hóa đơn tự động.',
-                style: const TextStyle(color: Colors.white70),
+                style: TextStyle(color: AppColors.textPrimary70),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Đóng', style: TextStyle(color: AppColors.red)),
+                  child: Text('Đóng', style: TextStyle(color: AppColors.red)),
                 )
               ],
             ),
@@ -524,21 +538,21 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Xuất Báo Cáo',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Chọn loại báo cáo bạn muốn tải xuống máy của mình.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.textMuted, fontSize: 13),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                icon: const Icon(Icons.receipt_long_rounded, color: Colors.white),
-                label: const Text('Báo cáo hóa đơn tháng (Excel)', style: TextStyle(color: Colors.white)),
+                icon: Icon(Icons.receipt_long_rounded, color: AppColors.textPrimary),
+                label: Text('Báo cáo hóa đơn tháng (Excel)', style: TextStyle(color: AppColors.textPrimary)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.tealPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -551,14 +565,14 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 12),
               ElevatedButton.icon(
-                icon: const Icon(Icons.monetization_on_rounded, color: Colors.white),
-                label: const Text('Báo cáo thu phí tháng (Excel)', style: TextStyle(color: Colors.white)),
+                icon: Icon(Icons.monetization_on_rounded, color: AppColors.textPrimary),
+                label: Text('Báo cáo thu phí tháng (Excel)', style: TextStyle(color: AppColors.textPrimary)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.bgDark,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.borderButton),
+                    side: BorderSide(color: AppColors.borderButton),
                   ),
                 ),
                 onPressed: () {
@@ -588,7 +602,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 isHoaDon ? 'Xuất báo cáo Hóa đơn' : 'Xuất báo cáo Thu phí',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               content: Row(
                 children: [
@@ -596,13 +610,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                     child: DropdownButtonFormField<int>(
                       initialValue: selectedMonth,
                       dropdownColor: AppColors.bgMid,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Tháng',
                         labelStyle: TextStyle(color: AppColors.tealPrimary),
                         enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
                       ),
                       items: List.generate(12, (index) => index + 1)
-                          .map((m) => DropdownMenuItem(value: m, child: Text('$m', style: const TextStyle(color: Colors.white))))
+                          .map((m) => DropdownMenuItem(value: m, child: Text('$m', style: TextStyle(color: AppColors.textPrimary))))
                           .toList(),
                       onChanged: (val) {
                         if (val != null) {
@@ -618,13 +632,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                     child: DropdownButtonFormField<int>(
                       initialValue: selectedYear,
                       dropdownColor: AppColors.bgMid,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Năm',
                         labelStyle: TextStyle(color: AppColors.tealPrimary),
                         enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.borderButton)),
                       ),
                       items: List.generate(5, (index) => DateTime.now().year - 2 + index)
-                          .map((y) => DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(color: Colors.white))))
+                          .map((y) => DropdownMenuItem(value: y, child: Text('$y', style: TextStyle(color: AppColors.textPrimary))))
                           .toList(),
                       onChanged: (val) {
                         if (val != null) {
@@ -640,13 +654,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+                  child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context, {'month': selectedMonth, 'year': selectedYear});
                   },
-                  child: const Text('Xuất', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
+                  child: Text('Xuất', style: TextStyle(color: AppColors.tealPrimary, fontWeight: FontWeight.bold)),
                 ),
               ],
             );
@@ -666,7 +680,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   Future<void> _exportExcelReport({required bool isHoaDon, required int month, required int year}) async {
     if (kIsWeb) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Xuất Excel không khả dụng trên Flutter Web'), backgroundColor: AppColors.red),
+        SnackBar(content: Text('Xuất Excel không khả dụng trên Flutter Web'), backgroundColor: AppColors.red),
       );
       return;
     }
@@ -674,7 +688,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+      builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
     );
 
     try {
@@ -747,7 +761,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
@@ -765,8 +779,8 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       color: AppColors.red,
-                      child: const Text('Mất kết nối', textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 12)),
+                      child: Text('Mất kết nối', textAlign: TextAlign.center,
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 12)),
                     );
                   }
                   return const SizedBox.shrink();
@@ -844,10 +858,10 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                   ),
                 ),
                 if (isQuanLy) _buildDrawerItem(NavigationTabs.nhatKyHeThong, 'Lịch sử hoạt động', Icons.history_rounded),
-                const Divider(color: AppColors.borderButton, height: 20, thickness: 1),
+                Divider(color: AppColors.borderButton, height: 20, thickness: 1),
                 ListTile(
-                  leading: const Icon(Icons.logout_rounded, color: AppColors.red),
-                  title: const Text(
+                  leading: Icon(Icons.logout_rounded, color: AppColors.red),
+                  title: Text(
                     'Đăng xuất',
                     style: TextStyle(color: AppColors.red, fontWeight: FontWeight.w600, fontSize: 14),
                   ),
@@ -874,7 +888,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   Widget _buildDrawerHeader() {
     final String initial = _employeeName.isNotEmpty ? _employeeName[0].toUpperCase() : 'A';
     return DrawerHeader(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.bgMid,
         border: Border(
           bottom: BorderSide(color: AppColors.borderButton, width: 1),
@@ -891,7 +905,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
               backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
               child: Text(
                 initial,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.tealPrimary,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -909,8 +923,8 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                   _employeeName.isNotEmpty ? _employeeName : 'Nhân viên',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -918,7 +932,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
                 const SizedBox(height: 4),
                 Text(
                   _employeeCode.isNotEmpty ? 'Mã NV: $_employeeCode' : 'Ban quản lý',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 12,
                   ),
@@ -941,7 +955,7 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
       title: Text(
         title,
         style: TextStyle(
-          color: isSelected ? Colors.white : AppColors.textMuted,
+          color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           fontSize: 14,
         ),
@@ -962,13 +976,13 @@ class _MainShellState extends State<MainShell> with WidgetsBindingObserver {
   Widget _buildBadge(int count) {
     return Container(
       padding: const EdgeInsets.all(6),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.red,
         shape: BoxShape.circle,
       ),
       child: Text(
         '$count',
-        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+        style: TextStyle(color: AppColors.textPrimary, fontSize: 10, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -985,14 +999,14 @@ class _PlaceholderPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.construction_rounded, size: 48, color: AppColors.tealPrimary),
+          Icon(Icons.construction_rounded, size: 48, color: AppColors.tealPrimary),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Đang phát triển',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),

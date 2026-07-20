@@ -73,7 +73,7 @@ class _CuDanListViewState extends State<CuDanListView> {
                   MaterialPageRoute(builder: (_) => const CuDanFormView()),
                 );
               },
-              child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+              child: Icon(Icons.add_rounded, color: AppColors.textPrimary, size: 28),
             ),
           ),
         ],
@@ -91,14 +91,14 @@ class _CuDanListViewState extends State<CuDanListView> {
             _searchQuery = val;
           });
         },
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: 'Tìm kiếm cư dân (Tên, SĐT, Email)...',
-          hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
-          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.iconMuted),
+          hintStyle: TextStyle(color: AppColors.textHint, fontSize: 14),
+          prefixIcon: Icon(Icons.search_rounded, color: AppColors.iconMuted),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, color: AppColors.iconMuted),
+                  icon: Icon(Icons.clear_rounded, color: AppColors.iconMuted),
                   onPressed: () {
                     _searchController.clear();
                     setState(() {
@@ -112,15 +112,15 @@ class _CuDanListViewState extends State<CuDanListView> {
           contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.borderButton),
+            borderSide: BorderSide(color: AppColors.borderButton),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.tealPrimary),
+            borderSide: BorderSide(color: AppColors.tealPrimary),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.borderButton),
+            borderSide: BorderSide(color: AppColors.borderButton),
           ),
         ),
       ),
@@ -129,7 +129,7 @@ class _CuDanListViewState extends State<CuDanListView> {
 
   Widget _buildContent(CuDanViewModel viewModel, List filteredList) {
     if (viewModel.isLoading && viewModel.cuDans.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.tealPrimary),
       );
     }
@@ -141,7 +141,7 @@ class _CuDanListViewState extends State<CuDanListView> {
           children: [
             Text(
               viewModel.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 14),
+              style: TextStyle(color: AppColors.red, fontSize: 14),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -154,7 +154,7 @@ class _CuDanListViewState extends State<CuDanListView> {
                 elevation: 0,
               ),
               onPressed: () => viewModel.fetchCuDans(),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text('Thử lại', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
             )
           ],
         ),
@@ -162,7 +162,7 @@ class _CuDanListViewState extends State<CuDanListView> {
     }
 
     if (filteredList.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không tìm thấy cư dân nào',
           style: TextStyle(color: AppColors.textMuted, fontSize: 15, fontWeight: FontWeight.w500),
@@ -199,7 +199,7 @@ class _CuDanListViewState extends State<CuDanListView> {
                   backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
                   child: Text(
                     initial,
-                    style: const TextStyle(color: AppColors.tealPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.tealPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -209,8 +209,8 @@ class _CuDanListViewState extends State<CuDanListView> {
                     children: [
                       Text(
                         c.hoTen,
-                        style: const TextStyle(
-                          color: Colors.white, 
+                        style: TextStyle(
+                          color: AppColors.textPrimary, 
                           fontWeight: FontWeight.w600, 
                           fontSize: 16,
                           letterSpacing: -0.5,
@@ -219,21 +219,21 @@ class _CuDanListViewState extends State<CuDanListView> {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(Icons.phone_rounded, size: 14, color: AppColors.iconMuted),
+                          Icon(Icons.phone_rounded, size: 14, color: AppColors.iconMuted),
                           const SizedBox(width: 6),
                           Text(c.sdt.isNotEmpty ? c.sdt : 'Chưa cập nhật SĐT',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500)),
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500)),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.email_rounded, size: 14, color: AppColors.iconMuted),
+                          Icon(Icons.email_rounded, size: 14, color: AppColors.iconMuted),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
                               c.email.isNotEmpty ? c.email : 'Chưa cập nhật Email',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -255,7 +255,7 @@ class _CuDanListViewState extends State<CuDanListView> {
                           color: AppColors.red.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Chưa xác thực',
                           style: TextStyle(color: AppColors.red, fontSize: 11, fontWeight: FontWeight.bold),
                         ),

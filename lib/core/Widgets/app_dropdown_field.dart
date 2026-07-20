@@ -27,7 +27,7 @@ class AppDropdownField<T> extends StatelessWidget {
         if (label != null) ...[
           Text(
             label!,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColors.textMuted,
               fontWeight: FontWeight.w500,
@@ -55,11 +55,11 @@ class AppDropdownField<T> extends StatelessWidget {
                     value: value,
                     hint: Text(
                       hint,
-                      style: const TextStyle(color: AppColors.textHint, fontSize: 13),
+                      style: TextStyle(color: AppColors.textHint, fontSize: 13),
                     ),
                     dropdownColor: AppColors.bgMid,
-                    icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    icon: Icon(Icons.arrow_drop_down_rounded, color: AppColors.iconMuted),
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
                     isExpanded: true,
                     onChanged: onChanged,
                     items: items,
