@@ -769,10 +769,11 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                       // we can just return or show an error
                       return;
                     }
+                    bool hasActiveChuHo = _residents.any((r) => r.ngayChuyenDi == null && (r.vaiTroId == 1 || r.tenVaiTro.toLowerCase().contains('chủ hộ')));
                     Navigator.pop(context, {
                       'cuDanId': selectedCuDanId,
-                      'laChuHo': false,
-                      'vaiTroId': 2,
+                      'laChuHo': !hasActiveChuHo,
+                      'vaiTroId': !hasActiveChuHo ? 1 : 2,
                       'ngayChuyenDen': selectedDate,
                     });
                   },
@@ -824,7 +825,78 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
     }
   }
 
+  Future<CuDanCanHo?> _showSelectNewChuHoDialog(List<CuDanCanHo> otherActive) async {
+    return showDialog<CuDanCanHo>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.bgMid,
+          title: Text('Chọn Chủ Hộ Mới', style: TextStyle(color: AppColors.textPrimary)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Chủ hộ hiện tại sắp chuyển đi hoặc bị xóa. Vui lòng chọn một cư dân đang ở khác làm chủ hộ thay thế.', style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
+              const SizedBox(height: 16),
+              ...otherActive.map((r) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(r.tenCuDan, style: TextStyle(color: AppColors.textPrimary)),
+                subtitle: Text(r.sdtCuDan.isNotEmpty ? r.sdtCuDan : 'Không có SĐT', style: TextStyle(color: AppColors.textMuted)),
+                trailing: Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.tealPrimary),
+                onTap: () {
+                  Navigator.pop(context, r);
+                },
+              )),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _checkoutResident(CuDanCanHo item) async {
+    bool isChuHo = item.vaiTroId == 1 || item.tenVaiTro.toLowerCase().contains('chủ hộ');
+    List<CuDanCanHo> otherActive = _residents.where((r) => r.id != item.id && r.ngayChuyenDi == null).toList();
+
+    if (isChuHo && otherActive.isNotEmpty) {
+      final newChuHo = await _showSelectNewChuHoDialog(otherActive);
+      if (newChuHo == null) return;
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+      );
+      try {
+        final successNew = await _cuDanCanHoService.assignCuDanCanHo({
+          'cuDanId': newChuHo.cuDanId,
+          'canHoId': _currentCanHo.id,
+          'laChuHo': true,
+          'vaiTroId': 1,
+          'ngayChuyenDen': newChuHo.ngayChuyenDen?.toIso8601String(),
+        });
+        if (!mounted) return;
+        Navigator.pop(context);
+        if (!successNew) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Không thể cập nhật Chủ hộ mới'), backgroundColor: AppColors.red));
+          return;
+        }
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.red));
+        return;
+      }
+    }
+
     final confirm = await AppConfirmDialog.show(
       context,
       title: 'Xác nhận chuyển đi',
@@ -859,6 +931,41 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
   }
 
   Future<void> _deleteAssignment(CuDanCanHo item) async {
+    bool isChuHo = item.vaiTroId == 1 || item.tenVaiTro.toLowerCase().contains('chủ hộ');
+    List<CuDanCanHo> otherActive = _residents.where((r) => r.id != item.id && r.ngayChuyenDi == null).toList();
+
+    if (isChuHo && otherActive.isNotEmpty) {
+      final newChuHo = await _showSelectNewChuHoDialog(otherActive);
+      if (newChuHo == null) return;
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(child: CircularProgressIndicator(color: AppColors.tealPrimary)),
+      );
+      try {
+        final successNew = await _cuDanCanHoService.assignCuDanCanHo({
+          'cuDanId': newChuHo.cuDanId,
+          'canHoId': _currentCanHo.id,
+          'laChuHo': true,
+          'vaiTroId': 1,
+          'ngayChuyenDen': newChuHo.ngayChuyenDen?.toIso8601String(),
+        });
+        if (!mounted) return;
+        Navigator.pop(context);
+        if (!successNew) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Không thể cập nhật Chủ hộ mới'), backgroundColor: AppColors.red));
+          return;
+        }
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.red));
+        return;
+      }
+    }
+
     final confirm = await AppConfirmDialog.show(
       context,
       title: 'Xác nhận xóa liên kết',
