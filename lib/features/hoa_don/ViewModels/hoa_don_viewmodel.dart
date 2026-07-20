@@ -22,6 +22,7 @@ class HoaDonViewModel extends ChangeNotifier {
 
     try {
       final allInvoices = await _service.fetchHoaDons();
+      allInvoices.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (currentTab == 0) {
         hoaDons = allInvoices;
       } else if (currentTab == 1) { // Chưa trả

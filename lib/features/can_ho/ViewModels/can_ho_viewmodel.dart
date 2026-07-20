@@ -124,7 +124,19 @@ class CanHoViewModel extends ChangeNotifier {
   /// Fetches fees for a specific apartment.
   Future<List<Map<String, dynamic>>> getFeesForCanHo(int canHoId) async {
     try {
-      return await _service.fetchFeesByCanHoId(canHoId);
+      final fees = await _service.fetchFeesByCanHoId(canHoId);
+      for (var fee in fees) {
+        if (fee['tenDonViTinh'] == null || fee['tenDonViTinh'] == '') {
+          final phiDichVuId = fee['phiDichVuId'];
+          if (phiDichVuId != null) {
+            final match = serviceFees.where((f) => f.id == phiDichVuId).toList();
+            if (match.isNotEmpty) {
+              fee['tenDonViTinh'] = match.first.tenDonViTinh;
+            }
+          }
+        }
+      }
+      return fees;
     } catch (e) {
       debugPrint('Error fetching fees: $e');
       return [];

@@ -434,7 +434,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        'Đơn giá: $formattedDonGia/tháng',
+                                        'Đơn giá: $formattedDonGia/${fee['tenDonViTinh'] ?? 'tháng'}',
                                         style: TextStyle(color: AppColors.textMuted, fontSize: 12),
                                       ),
                                     ],
