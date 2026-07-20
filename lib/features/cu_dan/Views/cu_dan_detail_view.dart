@@ -41,6 +41,7 @@ class _CuDanDetailViewState extends State<CuDanDetailView> {
     try {
       final list = await _cuDanCanHoService.fetchByCuDan(_currentCuDan.id);
       list.sort((a, b) {
+        if (a.ngayChuyenDen == null && b.ngayChuyenDen == null) return 0;
         if (a.ngayChuyenDen == null) return 1;
         if (b.ngayChuyenDen == null) return -1;
         return b.ngayChuyenDen!.compareTo(a.ngayChuyenDen!);

@@ -20,7 +20,7 @@ class AppColors {
 
   //màu chữ
   static Color get textPrimary => isDarkMode ? const Color(0xFFFFFFFF) : const Color(0xDD000000);
-  static Color get textPrimary70 => isDarkMode ? AppColors.textPrimary70 : Colors.black87.withValues(alpha: 0.7);
+  static Color get textPrimary70 => isDarkMode ? const Color(0xB3FFFFFF) : Colors.black87.withValues(alpha: 0.7);
   static Color get textHint => isDarkMode ? const Color(0x33FFFFFF) : const Color(0x4D000000);
   static Color get textMuted => isDarkMode ? const Color(0x66FFFFFF) : const Color(0x99000000);
 

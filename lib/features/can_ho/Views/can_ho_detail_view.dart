@@ -69,6 +69,7 @@ class _CanHoDetailViewState extends State<CanHoDetailView> {
     try {
       final list = await _cuDanCanHoService.fetchByCanHo(_currentCanHo.id);
       list.sort((a, b) {
+        if (a.ngayChuyenDen == null && b.ngayChuyenDen == null) return 0;
         if (a.ngayChuyenDen == null) return 1;
         if (b.ngayChuyenDen == null) return -1;
         return b.ngayChuyenDen!.compareTo(a.ngayChuyenDen!);
