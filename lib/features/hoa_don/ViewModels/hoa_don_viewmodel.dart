@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:urbano_manage/Models/hoa_don_model.dart';
 import 'package:urbano_manage/Services/hoa_don_service.dart';
+import 'package:urbano_manage/Services/can_ho_service.dart';
 
 class HoaDonViewModel extends ChangeNotifier {
   final HoaDonService _service;
@@ -173,14 +174,40 @@ class HoaDonViewModel extends ChangeNotifier {
     }
   }
 
-  /// Runs auto-billing for a specific month/year.
-  Future<Map<String, dynamic>?> runAutoBilling(int thang, int nam, int nguoiTao) async {
+  List<Map<String, dynamic>> buildings = [];
+
+  /// Fetches buildings for form scope dropdowns.
+  Future<void> fetchBuildings() async {
+    try {
+      final response = await _service.fetchHoaDons(); // fallback check
+      buildings = [];
+    } catch (_) {
+      buildings = [];
+    }
+  }
+
+  /// Runs auto-billing for a specific month/year with optional filters.
+  Future<Map<String, dynamic>?> runAutoBilling(
+    int thang, 
+    int nam, 
+    int nguoiTao, {
+    int? toaNhaId, 
+    DateTime? hanThanhToan,
+    List<String>? feeTypes,
+  }) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final result = await _service.autoBilling(thang, nam, nguoiTao);
+      final result = await _service.autoBilling(
+        thang, 
+        nam, 
+        nguoiTao, 
+        toaNhaId: toaNhaId, 
+        hanThanhToan: hanThanhToan,
+        feeTypes: feeTypes,
+      );
       await fetchHoaDons();
       return result;
     } catch (e) {
@@ -189,6 +216,86 @@ class HoaDonViewModel extends ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Saves meter readings in bulk.
+  Future<bool> submitBulkMeterReadings(
+    int thang, 
+    int nam, 
+    List<Map<String, dynamic>> readings,
+  ) async {
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final success = await _service.saveBulkMeterReadings(thang, nam, readings);
+      if (success) {
+        await fetchHoaDons();
+        return true;
+      }
+      error = 'Không thể lưu chỉ số điện nước hàng loạt';
+      return false;
+    } catch (e) {
+      error = e.toString().replaceFirst('Exception: ', '');
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Fetches metered service fees for a specific apartment from DB.
+  Future<List<Map<String, dynamic>>> fetchMeteredServicesForCanHo(int canHoId) async {
+    try {
+      final fees = await CanHoService().fetchFeesByCanHoId(canHoId);
+      // Filter fees that require meter readings (e.g. unit contains kWh, m3, số or fee name contains điện, nước, gas, chỉ số)
+      return fees.where((f) {
+        final unit = (f['tenDonViTinh'] as String? ?? '').toLowerCase();
+        final name = (f['tenPhiDichVu'] as String? ?? '').toLowerCase();
+        return unit.contains('kwh') ||
+            unit.contains('m³') ||
+            unit.contains('m3') ||
+            unit.contains('số') ||
+            unit.contains('chỉ số') ||
+            name.contains('điện') ||
+            name.contains('nước') ||
+            name.contains('gas') ||
+            name.contains('đo đếm') ||
+            name.contains('chỉ số');
+      }).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Gets the accurate previous meter reading (chiSoCu) from the latest invoice line for an apartment.
+  Future<int> getLatestMeterReading(int canHoId, String tenPhiDichVu) async {
+    try {
+      if (hoaDons.isEmpty) {
+        final all = await _service.fetchHoaDons();
+        hoaDons = all;
+      }
+      final apartmentInvoices = hoaDons.where((h) => h.canHo == canHoId).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      if (apartmentInvoices.isEmpty) return 0;
+
+      final latestInvoice = apartmentInvoices.first;
+      final details = await _service.fetchChiTietHoaDons(latestInvoice.id);
+
+      for (var d in details) {
+        final serviceName = d['tenPhiDichVu'] as String? ?? '';
+        if (serviceName.toLowerCase() == tenPhiDichVu.toLowerCase() ||
+            serviceName.toLowerCase().contains(tenPhiDichVu.toLowerCase())) {
+          final chiSoMoi = d['chiSoMoi'] as num? ?? d['chiSoCu'] as num? ?? 0;
+          return chiSoMoi.toInt();
+        }
+      }
+      return 0;
+    } catch (_) {
+      return 0;
     }
   }
 }

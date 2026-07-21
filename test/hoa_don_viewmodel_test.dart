@@ -14,6 +14,21 @@ class FakeHoaDonService extends HoaDonService {
     if (shouldFail) throw Exception('Failed to fetch');
     return list;
   }
+  @override
+  Future<Map<String, dynamic>> autoBilling(int thang, int nam, int nguoiTao, {int? toaNhaId, DateTime? hanThanhToan, List<String>? feeTypes}) async {
+    if (shouldFail) throw Exception('Auto billing failed');
+    return {
+      'createdCount': 10,
+      'skippedCount': 2,
+      'totalAmount': 25000000.0,
+    };
+  }
+
+  @override
+  Future<bool> saveBulkMeterReadings(int thang, int nam, List<Map<String, dynamic>> readings) async {
+    if (shouldFail) throw Exception('Bulk meter save failed');
+    return true;
+  }
 }
 
 void main() {
@@ -68,6 +83,24 @@ void main() {
       expect(viewModel.isLoading, isFalse);
       expect(viewModel.error, isNotNull);
       expect(viewModel.hoaDons, isEmpty);
+    });
+
+    test('runAutoBilling and submitBulkMeterReadings execute successfully', () async {
+      final service = FakeHoaDonService(list: [testInvoice]);
+      final viewModel = HoaDonViewModel(service: service);
+
+      final result = await viewModel.runAutoBilling(7, 2026, 1, toaNhaId: 1);
+      expect(result, isNotNull);
+      expect(result!['createdCount'], 10);
+      expect(result['skippedCount'], 2);
+
+      final meterSuccess = await viewModel.submitBulkMeterReadings(7, 2026, [
+        {'canHoId': 1, 'phiDichVuId': 5, 'chiSoCu': 100, 'chiSoMoi': 150}
+      ]);
+      expect(meterSuccess, isTrue);
+
+      final meteredServices = await viewModel.fetchMeteredServicesForCanHo(1);
+      expect(meteredServices, isA<List>());
     });
 
     test('displayTrangThai evaluates due date accurately', () {

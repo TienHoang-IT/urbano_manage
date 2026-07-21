@@ -5,6 +5,8 @@ import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 import 'package:urbano_manage/features/hoa_don/Views/hoa_don_detail_view.dart';
 import 'package:urbano_manage/features/hoa_don/Views/hoa_don_form_view.dart';
+import 'package:urbano_manage/features/hoa_don/Views/batch_invoice_dialog.dart';
+import 'package:urbano_manage/features/hoa_don/Views/bulk_meter_entry_dialog.dart';
 
 class HoaDonListView extends StatefulWidget {
   const HoaDonListView({super.key});
@@ -33,6 +35,8 @@ class _HoaDonListViewState extends State<HoaDonListView> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildHeaderActions(context),
+              const SizedBox(height: 12),
               _buildTabs(viewModel),
               const SizedBox(height: 12),
               Expanded(
@@ -66,6 +70,83 @@ class _HoaDonListViewState extends State<HoaDonListView> {
                 });
               },
               child: Icon(Icons.add_rounded, color: AppColors.textPrimary, size: 28),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderActions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.tealPrimary.withValues(alpha: 0.15),
+                foregroundColor: AppColors.tealPrimary,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(color: AppColors.tealPrimary.withValues(alpha: 0.3)),
+                ),
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const BatchInvoiceDialog(),
+                ).then((val) {
+                  if (val == true && context.mounted) {
+                    context.read<HoaDonViewModel>().fetchHoaDons();
+                  }
+                });
+              },
+              icon: Icon(Icons.auto_mode_rounded, size: 18, color: AppColors.tealPrimary),
+              label: Text(
+                'TẠO HÀNG LOẠT',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.inputFill,
+                foregroundColor: AppColors.textPrimary,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(color: AppColors.borderButton),
+                ),
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const BulkMeterEntryDialog(),
+                ).then((val) {
+                  if (val == true && context.mounted) {
+                    context.read<HoaDonViewModel>().fetchHoaDons();
+                  }
+                });
+              },
+              icon: Icon(Icons.speed_rounded, size: 18, color: AppColors.amber),
+              label: Text(
+                'NHẬP CHỈ SỐ HÀNG LOẠT',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
           ),
         ],

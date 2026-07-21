@@ -129,20 +129,49 @@ class HoaDonService {
     }
   }
 
-  /// Runs auto-billing for a specific month and year.
-  Future<Map<String, dynamic>> autoBilling(int thang, int nam, int nguoiTao) async {
+  /// Runs auto-billing for a specific month and year with optional building and due date parameters.
+  Future<Map<String, dynamic>> autoBilling(
+    int thang, 
+    int nam, 
+    int nguoiTao, {
+    int? toaNhaId, 
+    DateTime? hanThanhToan,
+    List<String>? feeTypes,
+  }) async {
+    final Map<String, dynamic> payload = {
+      'thang': thang,
+      'nam': nam,
+      'nguoiTao': nguoiTao,
+    };
+    if (toaNhaId != null) payload['toaNhaId'] = toaNhaId;
+    if (hanThanhToan != null) payload['hanThanhToan'] = hanThanhToan.toIso8601String();
+    if (feeTypes != null) payload['feeTypes'] = feeTypes;
+
     final response = await AuthHttp.post(
       Uri.parse('$apiUrl/auto-billing'),
-      body: jsonEncode({
-        'thang': thang,
-        'nam': nam,
-        'nguoiTao': nguoiTao,
-      }),
+      body: jsonEncode(payload),
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
     }
     throw Exception('Tự động tạo hóa đơn thất bại (${response.statusCode})');
+  }
+
+  /// Bulk saves/updates electricity and water meter readings for apartments.
+  Future<bool> saveBulkMeterReadings(
+    int thang, 
+    int nam, 
+    List<Map<String, dynamic>> readings,
+  ) async {
+    final response = await AuthHttp.post(
+      Uri.parse('$apiUrl/bulk-meter-readings'),
+      body: jsonEncode({
+        'thang': thang,
+        'nam': nam,
+        'readings': readings,
+      }),
+    );
+    return response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204;
   }
 
   /// Fetches an invoice details by ID.
