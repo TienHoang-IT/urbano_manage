@@ -69,5 +69,47 @@ void main() {
       expect(viewModel.error, isNotNull);
       expect(viewModel.hoaDons, isEmpty);
     });
+
+    test('displayTrangThai evaluates due date accurately', () {
+      final now = DateTime.now();
+      
+      // Due today -> Should NOT be marked overdue today
+      final dueToday = HoaDon(
+        id: 2,
+        maThanhToan: 'HD2',
+        canHo: 1,
+        soCanHo: '101',
+        thang: 7,
+        nam: 2026,
+        tongTien: 500000.0,
+        soTienDaThanhToan: 0.0,
+        chiPhi: 500000.0,
+        hanThanhToan: now,
+        trangThai: 1,
+        tenNguoiCapNhat: 'Manager',
+        createdAt: now,
+        updatedAt: now,
+      );
+      expect(dueToday.displayTrangThai, 1);
+
+      // Due 2 days ago -> Should be marked overdue
+      final pastDue = HoaDon(
+        id: 3,
+        maThanhToan: 'HD3',
+        canHo: 1,
+        soCanHo: '101',
+        thang: 7,
+        nam: 2026,
+        tongTien: 500000.0,
+        soTienDaThanhToan: 0.0,
+        chiPhi: 500000.0,
+        hanThanhToan: now.subtract(const Duration(days: 2)),
+        trangThai: 1,
+        tenNguoiCapNhat: 'Manager',
+        createdAt: now,
+        updatedAt: now,
+      );
+      expect(pastDue.displayTrangThai, 3);
+    });
   });
 }

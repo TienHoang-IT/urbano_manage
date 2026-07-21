@@ -18,7 +18,7 @@ class DashboardViewModel extends ChangeNotifier {
     dynamic yeuCauService,
   })  : _dashboardService = dashboardService ?? DashboardService(),
         _cuDanService = cuDanService as CuDanService?,
-        _hoaDonService = hoaDonService as HoaDonService?,
+        _hoaDonService = (hoaDonService as HoaDonService?) ?? HoaDonService(),
         _yeuCauService = yeuCauService as YeuCauCuDanService?;
 
   bool isLoading = false;
@@ -91,11 +91,26 @@ class DashboardViewModel extends ChangeNotifier {
       final dtList = detailedStats['doanhThu6Thang'] as List? ?? [];
       final ycList = detailedStats['yeuCauTheoLoai'] as List? ?? [];
 
+      int? overdueCalculatedCount;
+      if (_hoaDonService != null) {
+        try {
+          final invoices = await _hoaDonService!.fetchHoaDons();
+          overdueCalculatedCount = invoices.where((h) => h.displayTrangThai == 3).length;
+        } catch (_) {}
+      }
+
+      final cb = CanhBao.fromJson(cbJson);
+      final finalCanhBao = CanhBao(
+        hoaDonQuaHan: overdueCalculatedCount ?? cb.hoaDonQuaHan,
+        yeuCauQuaHan7Ngay: cb.yeuCauQuaHan7Ngay,
+        canHoTrong: cb.canHoTrong,
+      );
+
       statistics = DashboardStatistics(
         tongQuan: TongQuan.fromJson(tqJson),
         doanhThu6Thang: dtList.map((e) => DoanhThuThang.fromJson(e as Map<String, dynamic>)).toList(),
         yeuCauTheoLoai: ycList.map((e) => YeuCauTheoLoai.fromJson(e as Map<String, dynamic>)).toList(),
-        canhBao: CanhBao.fromJson(cbJson),
+        canhBao: finalCanhBao,
       );
       error = null;
     } catch (e) {
@@ -133,6 +148,14 @@ class DashboardViewModel extends ChangeNotifier {
           pendingReqCount = fallbackStats['yeuCauChoXuLy'] as int?;
         }
 
+        int overdueFallbackCount = 0;
+        if (_hoaDonService != null) {
+          try {
+            final invoices = await _hoaDonService!.fetchHoaDons();
+            overdueFallbackCount = invoices.where((h) => h.displayTrangThai == 3).length;
+          } catch (_) {}
+        }
+
         statistics = DashboardStatistics(
           tongQuan: TongQuan(
             totalCuDan: rCount ?? 0,
@@ -142,7 +165,7 @@ class DashboardViewModel extends ChangeNotifier {
           ),
           doanhThu6Thang: [],
           yeuCauTheoLoai: [],
-          canhBao: CanhBao(hoaDonQuaHan: 0, yeuCauQuaHan7Ngay: 0, canHoTrong: 0),
+          canhBao: CanhBao(hoaDonQuaHan: overdueFallbackCount, yeuCauQuaHan7Ngay: 0, canHoTrong: 0),
         );
         error = null;
       } catch (fallbackError) {

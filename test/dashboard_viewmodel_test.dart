@@ -5,6 +5,7 @@ import 'package:urbano_manage/Services/cu_dan_service.dart';
 import 'package:urbano_manage/Services/hoa_don_service.dart';
 import 'package:urbano_manage/Services/yeu_cau_cu_dan_service.dart';
 import 'package:urbano_manage/Models/yeu_cau_cu_dan_model.dart';
+import 'package:urbano_manage/Models/hoa_don_model.dart';
 
 class FakeDashboardService extends DashboardService {
   final bool shouldFail;
@@ -44,13 +45,20 @@ class FakeCuDanService extends CuDanService {
 
 class FakeHoaDonService extends HoaDonService {
   final int count;
+  final List<HoaDon> invoices;
   final bool shouldFail;
-  FakeHoaDonService({required this.count, this.shouldFail = false});
+  FakeHoaDonService({this.count = 0, this.invoices = const [], this.shouldFail = false});
 
   @override
   Future<int> getUnpaidCount() async {
     if (shouldFail) throw Exception('Failed to get unpaid count');
     return count;
+  }
+
+  @override
+  Future<List<HoaDon>> fetchHoaDons() async {
+    if (shouldFail) throw Exception('Failed to fetch invoices');
+    return invoices;
   }
 }
 
@@ -178,6 +186,66 @@ void main() {
       expect(viewModel.residentCount, isNull);
       expect(viewModel.unpaidBillCount, isNull);
       expect(viewModel.pendingRequestCount, isNull);
+    });
+
+    test('fetchDashboardData accurately recalculates overdue bill count from HoaDonService', () async {
+      final now = DateTime.now();
+      final dashboardService = FakeDashboardService(
+        shouldFail: false,
+        response: {
+          'tongQuan': {'totalCuDan': 5, 'totalCanHo': 10, 'hoaDonChuaThanhToan': 2, 'yeuCauChoXuLy': 1},
+          'canhBao': {'hoaDonQuaHan': 0, 'yeuCauQuaHan7Ngay': 0, 'canHoTrong': 0},
+        },
+      );
+      final hoaDonService = FakeHoaDonService(
+        invoices: [
+          // Overdue invoice (2 days past due)
+          HoaDon(
+            id: 101,
+            maThanhToan: 'HD101',
+            canHo: 1,
+            soCanHo: '101',
+            thang: 7,
+            nam: 2026,
+            tongTien: 1000000.0,
+            soTienDaThanhToan: 0.0,
+            chiPhi: 1000000.0,
+            hanThanhToan: now.subtract(const Duration(days: 2)),
+            trangThai: 1,
+            tenNguoiCapNhat: 'Staff',
+            createdAt: now,
+            updatedAt: now,
+          ),
+          // Normal unpaid invoice (due tomorrow)
+          HoaDon(
+            id: 102,
+            maThanhToan: 'HD102',
+            canHo: 2,
+            soCanHo: '102',
+            thang: 7,
+            nam: 2026,
+            tongTien: 500000.0,
+            soTienDaThanhToan: 0.0,
+            chiPhi: 500000.0,
+            hanThanhToan: now.add(const Duration(days: 1)),
+            trangThai: 1,
+            tenNguoiCapNhat: 'Staff',
+            createdAt: now,
+            updatedAt: now,
+          ),
+        ],
+      );
+
+      final viewModel = DashboardViewModel(
+        dashboardService: dashboardService,
+        hoaDonService: hoaDonService,
+      );
+
+      await viewModel.fetchDashboardData();
+
+      expect(viewModel.isLoading, isFalse);
+      expect(viewModel.error, isNull);
+      expect(viewModel.statistics?.canhBao.hoaDonQuaHan, 1);
     });
   });
 }

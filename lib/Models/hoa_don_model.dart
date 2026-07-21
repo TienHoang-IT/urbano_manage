@@ -74,8 +74,19 @@ class HoaDon {
   }
 
   int get displayTrangThai {
-    if (trangThai != 2 && hanThanhToan != null && DateTime.now().isAfter(hanThanhToan!)) {
-      return 3; // Quá hạn
+    if (trangThai != 2 && hanThanhToan != null) {
+      final endOfDueDate = DateTime(
+        hanThanhToan!.year,
+        hanThanhToan!.month,
+        hanThanhToan!.day,
+        23,
+        59,
+        59,
+        999,
+      );
+      if (DateTime.now().isAfter(endOfDueDate)) {
+        return 3; // Quá hạn
+      }
     }
     return trangThai;
   }
