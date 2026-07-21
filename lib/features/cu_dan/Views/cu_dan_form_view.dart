@@ -7,6 +7,7 @@ import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/cu_dan_model.dart';
 import 'package:urbano_manage/features/cu_dan/ViewModels/cu_dan_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 
 class CuDanFormView extends StatefulWidget {
   final CuDan? cuDan;
@@ -18,6 +19,7 @@ class CuDanFormView extends StatefulWidget {
 }
 
 class _CuDanFormViewState extends State<CuDanFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _hoTenDemController = TextEditingController();
   final _tenController = TextEditingController();
   final _sdtController = TextEditingController();
@@ -97,14 +99,15 @@ class _CuDanFormViewState extends State<CuDanFormView> {
   }
 
   Future<void> _saveForm() async {
-    final hoTenDem = _hoTenDemController.text.trim();
-    final ten = _tenController.text.trim();
-    if (hoTenDem.isEmpty || ten.isEmpty) {
+    if (!(_formKey.currentState?.validate() ?? false)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập Họ tên đệm và Tên')),
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
       );
       return;
     }
+
+    final hoTenDem = _hoTenDemController.text.trim();
+    final ten = _tenController.text.trim();
 
     final data = {
       'hoTenDem': hoTenDem,
@@ -172,96 +175,103 @@ class _CuDanFormViewState extends State<CuDanFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextField(
-                        label: 'HỌ VÀ TÊN ĐỆM *',
-                        hint: 'Nhập họ và tên đệm',
-                        controller: _hoTenDemController,
-                        prefixIcon: Icons.person_outline_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'TÊN CƯ DÂN *',
-                        hint: 'Nhập tên cư dân',
-                        controller: _tenController,
-                        prefixIcon: Icons.person_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppDropdownField<int>(
-                              label: 'GIỚI TÍNH',
-                              hint: 'Chọn giới tính',
-                              value: _selectedGender,
-                              prefixIcon: Icons.wc_rounded,
-                              onChanged: (val) {
-                                if (val != null) setState(() => _selectedGender = val);
-                              },
-                              items: const [
-                                DropdownMenuItem(value: 0, child: Text('Nam')),
-                                DropdownMenuItem(value: 1, child: Text('Nữ')),
-                                DropdownMenuItem(value: 2, child: Text('Khác')),
-                              ],
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          label: 'HỌ VÀ TÊN ĐỆM *',
+                          hint: 'Nhập họ và tên đệm',
+                          controller: _hoTenDemController,
+                          prefixIcon: Icons.person_outline_rounded,
+                          validator: (v) => AppValidators.validateName(v, fieldName: 'Họ và tên đệm'),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'TÊN CƯ DÂN *',
+                          hint: 'Nhập tên cư dân',
+                          controller: _tenController,
+                          prefixIcon: Icons.person_rounded,
+                          validator: (v) => AppValidators.validateName(v, fieldName: 'Tên cư dân'),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: AppDropdownField<int>(
+                                label: 'GIỚI TÍNH',
+                                hint: 'Chọn giới tính',
+                                value: _selectedGender,
+                                prefixIcon: Icons.wc_rounded,
+                                onChanged: (val) {
+                                  if (val != null) setState(() => _selectedGender = val);
+                                },
+                                items: const [
+                                  DropdownMenuItem(value: 0, child: Text('Nam')),
+                                  DropdownMenuItem(value: 1, child: Text('Nữ')),
+                                  DropdownMenuItem(value: 2, child: Text('Khác')),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: AppDropdownField<int>(
-                              label: 'TRẠNG THÁI',
-                              hint: 'Chọn trạng thái',
-                              value: _selectedStatus,
-                              prefixIcon: Icons.toggle_on_rounded,
-                              onChanged: (val) {
-                                if (val != null) setState(() => _selectedStatus = val);
-                              },
-                              items: const [
-                                DropdownMenuItem(value: 1, child: Text('Chưa xác thực')),
-                                DropdownMenuItem(value: 2, child: Text('Đang cư trú')),
-                                DropdownMenuItem(value: 3, child: Text('Đã rời đi')),
-                              ],
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: AppDropdownField<int>(
+                                label: 'TRẠNG THÁI',
+                                hint: 'Chọn trạng thái',
+                                value: _selectedStatus,
+                                prefixIcon: Icons.toggle_on_rounded,
+                                onChanged: (val) {
+                                  if (val != null) setState(() => _selectedStatus = val);
+                                },
+                                items: const [
+                                  DropdownMenuItem(value: 1, child: Text('Chưa xác thực')),
+                                  DropdownMenuItem(value: 2, child: Text('Đang cư trú')),
+                                  DropdownMenuItem(value: 3, child: Text('Đã rời đi')),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      GestureDetector(
-                        onTap: () => _selectDob(context),
-                        child: AbsorbPointer(
-                          child: AppTextField(
-                            label: 'NGÀY SINH',
-                            hint: 'Chọn ngày sinh',
-                            controller: _ngaySinhController,
-                            prefixIcon: Icons.cake_rounded,
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        GestureDetector(
+                          onTap: () => _selectDob(context),
+                          child: AbsorbPointer(
+                            child: AppTextField(
+                              label: 'NGÀY SINH',
+                              hint: 'Chọn ngày sinh',
+                              controller: _ngaySinhController,
+                              prefixIcon: Icons.cake_rounded,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'SỐ CCCD',
-                        hint: 'Nhập số căn cước công dân',
-                        controller: _cccdController,
-                        prefixIcon: Icons.badge_rounded,
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'SỐ ĐIỆN THOẠI',
-                        hint: 'Nhập số điện thoại',
-                        controller: _sdtController,
-                        prefixIcon: Icons.phone_rounded,
-                        keyboardType: TextInputType.phone,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'EMAIL',
-                        hint: 'Nhập địa chỉ email',
-                        controller: _emailController,
-                        prefixIcon: Icons.email_rounded,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'SỐ CCCD',
+                          hint: 'Nhập số căn cước công dân',
+                          controller: _cccdController,
+                          prefixIcon: Icons.badge_rounded,
+                          keyboardType: TextInputType.number,
+                          validator: (v) => AppValidators.validateCccd(v),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'SỐ ĐIỆN THOẠI',
+                          hint: 'Nhập số điện thoại',
+                          controller: _sdtController,
+                          prefixIcon: Icons.phone_rounded,
+                          keyboardType: TextInputType.phone,
+                          validator: (v) => AppValidators.validatePhone(v),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'EMAIL',
+                          hint: 'Nhập địa chỉ email',
+                          controller: _emailController,
+                          prefixIcon: Icons.email_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (v) => AppValidators.validateEmail(v),
+                        ),
                       const SizedBox(height: 16),
                       AppTextField(
                         label: 'TỈNH / THÀNH PHỐ',
@@ -285,11 +295,9 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                       ),
                       const SizedBox(height: 32),
                       AppButton(
-                        label: viewModel.isLoading
-                            ? 'Đang xử lý...'
-                            : (isEdit ? 'Cập Nhật' : 'Thêm Mới'),
-                        onPressed: viewModel.isLoading ? null : _saveForm,
+                        label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO CƯ DÂN MỚI',
                         isLoading: viewModel.isLoading,
+                        onPressed: _saveForm,
                       ),
                       if (isEdit) ...[
                         const SizedBox(height: 16),
@@ -307,7 +315,8 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                         ),
                       ],
                       const SizedBox(height: 24),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

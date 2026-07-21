@@ -10,6 +10,8 @@ import 'package:urbano_manage/Models/can_ho_model.dart';
 import 'package:urbano_manage/Services/can_ho_service.dart';
 import 'package:urbano_manage/Models/phi_dich_vu_model.dart';
 import 'package:urbano_manage/Services/phi_dich_vu_service.dart';
+import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 import 'package:urbano_manage/features/hoa_don/ViewModels/hoa_don_viewmodel.dart';
 
 class HoaDonFormView extends StatefulWidget {
@@ -50,6 +52,7 @@ class _ChiTietItem {
 }
 
 class _HoaDonFormViewState extends State<HoaDonFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _maThanhToanController = TextEditingController();
   final _thangController = TextEditingController();
   final _namController = TextEditingController();
@@ -221,6 +224,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                             controller: item.donGiaController,
                             prefixIcon: Icons.attach_money_rounded,
                             keyboardType: TextInputType.number,
+                            validator: (v) => AppValidators.validateNonNegativeNumber(v, fieldName: 'Đơn giá'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -231,6 +235,7 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                             controller: item.soLuongController,
                             prefixIcon: Icons.production_quantity_limits_rounded,
                             keyboardType: TextInputType.number,
+                            validator: (v) => AppValidators.validatePositiveNumber(v, fieldName: 'Số lượng'),
                           ),
                         ),
                       ],
@@ -349,6 +354,13 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final maThanhToan = _maThanhToanController.text.trim();
     final thang = int.tryParse(_thangController.text.trim()) ?? 0;
     final nam = int.tryParse(_namController.text.trim()) ?? 0;
@@ -356,20 +368,8 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
     final daThanhToan = double.tryParse(_daThanhToanController.text.trim()) ?? 0.0;
     final chiPhi = double.tryParse(_chiPhiController.text.trim()) ?? 0.0;
 
-    if (maThanhToan.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập Mã thanh toán')));
-      return;
-    }
     if (_selectedCanHoId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng chọn Căn hộ')));
-      return;
-    }
-    if (thang < 1 || thang > 12) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tháng không hợp lệ (1-12)')));
-      return;
-    }
-    if (nam < 2000 || nam > 2100) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Năm không hợp lệ (2000-2100)')));
       return;
     }
 
@@ -465,77 +465,74 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextField(
-                        label: 'MÃ THANH TOÁN *',
-                        hint: 'Nhập mã thanh toán hóa đơn',
-                        controller: _maThanhToanController,
-                        prefixIcon: Icons.qr_code_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      _isLoadingApartments
-                          ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
-                          : AppSearchablePicker<CanHo>(
-                              label: 'CĂN HỘ *',
-                              value: _apartments.cast<CanHo?>().firstWhere(
-                                (c) => c?.id == _selectedCanHoId, 
-                                orElse: () => null,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          label: 'MÃ THANH TOÁN *',
+                          hint: 'Nhập mã thanh toán hóa đơn',
+                          controller: _maThanhToanController,
+                          prefixIcon: Icons.qr_code_rounded,
+                          validator: (v) => AppValidators.validateCode(v, fieldName: 'Mã thanh toán'),
+                        ),
+                        const SizedBox(height: 16),
+                        _isLoadingApartments
+                            ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
+                            : AppSearchablePicker<CanHo>(
+                                label: 'CĂN HỘ *',
+                                value: _apartments.cast<CanHo?>().firstWhere(
+                                  (c) => c?.id == _selectedCanHoId, 
+                                  orElse: () => null,
+                                ),
+                                hint: 'Chọn căn hộ',
+                                prefixIcon: Icons.apartment_rounded,
+                                items: _apartments,
+                                itemAsString: (c) => '${c.tenToaNha} - Căn ${c.soCanHo}',
+                                searchFn: (c, query) {
+                                  return c.tenToaNha.toLowerCase().contains(query) ||
+                                         c.soCanHo.toLowerCase().contains(query);
+                                },
+                                onChanged: (val) {
+                                  setState(() => _selectedCanHoId = val.id);
+                                },
                               ),
-                              hint: 'Chọn căn hộ',
-                              prefixIcon: Icons.apartment_rounded,
-                              items: _apartments,
-                              itemAsString: (c) => '${c.tenToaNha} - Căn ${c.soCanHo}',
-                              searchFn: (c, query) {
-                                return c.tenToaNha.toLowerCase().contains(query) ||
-                                       c.soCanHo.toLowerCase().contains(query);
-                              },
-                              onChanged: (val) {
-                                setState(() => _selectedCanHoId = val.id);
-                              },
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: AppTextField(
+                                label: 'THÁNG *',
+                                hint: 'Nhập tháng',
+                                controller: _thangController,
+                                prefixIcon: Icons.calendar_month_rounded,
+                                keyboardType: TextInputType.number,
+                                validator: (v) {
+                                  final t = int.tryParse(v ?? '');
+                                  if (t == null || t < 1 || t > 12) return 'Tháng (1-12)';
+                                  return null;
+                                },
+                              ),
                             ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppTextField(
-                              label: 'THÁNG *',
-                              hint: 'Nhập tháng',
-                              controller: _thangController,
-                              prefixIcon: Icons.calendar_month_rounded,
-                              keyboardType: TextInputType.number,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: AppTextField(
+                                label: 'NĂM *',
+                                hint: 'Nhập năm',
+                                controller: _namController,
+                                prefixIcon: Icons.calendar_today_rounded,
+                                keyboardType: TextInputType.number,
+                                validator: (v) {
+                                  final n = int.tryParse(v ?? '');
+                                  if (n == null || n < 2000 || n > 2100) return 'Năm (2000-2100)';
+                                  return null;
+                                },
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: AppTextField(
-                              label: 'NĂM *',
-                              hint: 'Nhập năm',
-                              controller: _namController,
-                              prefixIcon: Icons.calendar_today_rounded,
-                              keyboardType: TextInputType.number,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      AppDatePicker(
-                        label: 'HẠN THANH TOÁN',
-                        hint: 'Chọn hạn thanh toán',
-                        selectedDate: _selectedDueDate,
-                        onDateSelected: (date) {
-                          setState(() => _selectedDueDate = date);
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'CHI PHÍ DỊCH VỤ (VND)',
-                        hint: 'Nhập chi phí',
-                        controller: _chiPhiController,
-                        prefixIcon: Icons.room_service_rounded,
-                        keyboardType: TextInputType.number,
-                      ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
                       const SizedBox(height: 32),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -658,12 +655,12 @@ class _HoaDonFormViewState extends State<HoaDonFormView> {
                       ),
                       const SizedBox(height: 40),
                       AppButton(
-                        label: viewModel.isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập Nhật' : 'Tạo Mới'),
-                        onPressed: viewModel.isLoading ? null : _saveForm,
+                        label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO HÓA ĐƠN MỚI',
                         isLoading: viewModel.isLoading,
+                        onPressed: _saveForm,
                       ),
-                      const SizedBox(height: 24),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

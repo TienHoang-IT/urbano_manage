@@ -9,6 +9,7 @@ import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/phuong_tien_model.dart';
 import 'package:urbano_manage/features/phuong_tien/ViewModels/phuong_tien_viewmodel.dart';
 import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
 import 'package:urbano_manage/core/Widgets/app_searchable_picker.dart';
 
@@ -22,6 +23,7 @@ class PhuongTienFormView extends StatefulWidget {
 }
 
 class _PhuongTienFormViewState extends State<PhuongTienFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _tenController = TextEditingController();
   final _bienSoController = TextEditingController();
 
@@ -84,17 +86,15 @@ class _PhuongTienFormViewState extends State<PhuongTienFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final name = _tenController.text.trim();
     final plate = _bienSoController.text.trim();
-
-    if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập tên phương tiện')));
-      return;
-    }
-    if (plate.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập biển số xe')));
-      return;
-    }
     if (_selectedLoaiId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng chọn loại xe')));
       return;
@@ -168,22 +168,26 @@ class _PhuongTienFormViewState extends State<PhuongTienFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextField(
-                        label: 'TÊN PHƯƠNG TIỆN *',
-                        hint: 'Ví dụ: Wave Alpha, Honda City',
-                        controller: _tenController,
-                        prefixIcon: Icons.motorcycle_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'BIỂN SỐ XE *',
-                        hint: 'Ví dụ: 29-A1 12345',
-                        controller: _bienSoController,
-                        prefixIcon: Icons.tag_rounded,
-                      ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          label: 'TÊN PHƯƠNG TIỆN *',
+                          hint: 'Ví dụ: Wave Alpha, Honda City',
+                          controller: _tenController,
+                          prefixIcon: Icons.motorcycle_rounded,
+                          validator: (v) => AppValidators.validateRequiredText(v, fieldName: 'Tên phương tiện'),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'BIỂN SỐ XE *',
+                          hint: 'Ví dụ: 29-A1 12345',
+                          controller: _bienSoController,
+                          prefixIcon: Icons.tag_rounded,
+                          validator: (v) => AppValidators.validateLicensePlate(v),
+                        ),
                       const SizedBox(height: 16),
                       AppDropdownField<int>(
                         label: 'LOẠI XE *',
@@ -229,14 +233,13 @@ class _PhuongTienFormViewState extends State<PhuongTienFormView> {
                       ),
                       const SizedBox(height: 32),
                       AppButton(
-                        label: pvm.isLoading || cvm.isLoading
-                            ? 'Đang tải dữ liệu...'
-                            : (isEdit ? 'Cập Nhật' : 'Thêm Mới'),
-                        onPressed: pvm.isLoading || cvm.isLoading ? null : _saveForm,
+                        label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO PHƯƠNG TIỆN MỚI',
                         isLoading: pvm.isLoading,
+                        onPressed: _saveForm,
                       ),
                       const SizedBox(height: 24),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -6,6 +6,7 @@ import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
 import 'package:urbano_manage/features/can_ho/ViewModels/can_ho_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 
 class CanHoFormView extends StatefulWidget {
   final CanHo? canHo;
@@ -17,6 +18,7 @@ class CanHoFormView extends StatefulWidget {
 }
 
 class _CanHoFormViewState extends State<CanHoFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _soCanHoController = TextEditingController();
   final _tangController = TextEditingController();
   final _giaController = TextEditingController();
@@ -125,6 +127,13 @@ class _CanHoFormViewState extends State<CanHoFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final soCanHo = _soCanHoController.text.trim();
     final tang = int.tryParse(_tangController.text.trim()) ?? 0;
     final gia = double.tryParse(_giaController.text.trim());
@@ -237,46 +246,50 @@ class _CanHoFormViewState extends State<CanHoFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppDropdownField<int>(
-                        label: 'TÒA NHÀ *',
-                        value: _selectedToaNhaId,
-                        hint: 'Chọn tòa nhà',
-                        prefixIcon: Icons.business_rounded,
-                        onChanged: (val) {
-                          setState(() {
-                            _selectedToaNhaId = val;
-                            _updateSoCanHo();
-                          });
-                        },
-                        items: viewModel.buildings
-                            .map((e) => DropdownMenuItem<int>(
-                                  value: e['id'] as int,
-                                  child: Text(e['tenToaNha'] as String? ?? ''),
-                                ))
-                            .toList(),
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'TẦNG *',
-                        hint: 'Nhập số tầng',
-                        controller: _tangController,
-                        prefixIcon: Icons.layers_rounded,
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 16),
-                      if (!isEdit) ...[
-                        AppTextField(
-                          label: 'SỐ PHÒNG *',
-                          hint: 'Nhập số phòng (ví dụ: 1, 2, 10...)',
-                          controller: _soPhongController,
-                          prefixIcon: Icons.meeting_room_rounded,
-                          keyboardType: TextInputType.number,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppDropdownField<int>(
+                          label: 'TÒA NHÀ *',
+                          value: _selectedToaNhaId,
+                          hint: 'Chọn tòa nhà',
+                          prefixIcon: Icons.business_rounded,
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedToaNhaId = val;
+                              _updateSoCanHo();
+                            });
+                          },
+                          items: viewModel.buildings
+                              .map((e) => DropdownMenuItem<int>(
+                                    value: e['id'] as int,
+                                    child: Text(e['tenToaNha'] as String? ?? ''),
+                                  ))
+                              .toList(),
                         ),
                         const SizedBox(height: 16),
-                      ],
+                        AppTextField(
+                          label: 'TẦNG *',
+                          hint: 'Nhập số tầng',
+                          controller: _tangController,
+                          prefixIcon: Icons.layers_rounded,
+                          keyboardType: TextInputType.number,
+                          validator: (v) => AppValidators.validatePositiveInteger(v, fieldName: 'Số tầng'),
+                        ),
+                        const SizedBox(height: 16),
+                        if (!isEdit) ...[
+                          AppTextField(
+                            label: 'SỐ PHÒNG *',
+                            hint: 'Nhập số phòng (ví dụ: 1, 2, 10...)',
+                            controller: _soPhongController,
+                            prefixIcon: Icons.meeting_room_rounded,
+                            keyboardType: TextInputType.number,
+                            validator: (v) => AppValidators.validatePositiveInteger(v, fieldName: 'Số phòng'),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                       AppTextField(
                         label: 'SỐ CĂN HỘ *',
                         hint: 'Số căn hộ tự động sinh',
@@ -314,11 +327,12 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
-                        label: 'GIÁ BÁN/THUÊ (VND)',
-                        hint: 'Nhập giá trị',
+                        label: 'GIÁ CĂN HỘ (VND)',
+                        hint: 'Nhập giá căn hộ',
                         controller: _giaController,
                         prefixIcon: Icons.attach_money_rounded,
                         keyboardType: TextInputType.number,
+                        validator: (v) => AppValidators.validateNonNegativeNumber(v, fieldName: 'Giá căn hộ', required: false),
                       ),
                       const SizedBox(height: 16),
                         Text(
@@ -403,15 +417,15 @@ class _CanHoFormViewState extends State<CanHoFormView> {
                             label: Text('Thêm phí dịch vụ', style: TextStyle(color: AppColors.tealPrimary)),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                      const SizedBox(height: 32),
-                      AppButton(
-                        label: viewModel.isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập Nhật' : 'Thêm Mới'),
-                        onPressed: viewModel.isLoading ? null : _saveForm,
-                        isLoading: viewModel.isLoading,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                        const SizedBox(height: 32),
+                        AppButton(
+                          label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO CĂN HỘ MỚI',
+                          isLoading: viewModel.isLoading,
+                          onPressed: _saveForm,
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
                   ),
                 ),
               ),

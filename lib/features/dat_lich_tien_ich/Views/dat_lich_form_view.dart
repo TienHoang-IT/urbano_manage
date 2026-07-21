@@ -5,6 +5,7 @@ import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/features/dat_lich_tien_ich/ViewModels/dat_lich_tien_ich_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 import 'package:urbano_manage/Models/cu_dan_model.dart';
 import 'package:urbano_manage/Models/can_ho_model.dart';
 import 'package:urbano_manage/Models/tien_ich_model.dart';
@@ -18,6 +19,7 @@ class DatLichFormView extends StatefulWidget {
 }
 
 class _DatLichFormViewState extends State<DatLichFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _soNguoiController = TextEditingController(text: '1');
   final _ghiChuController = TextEditingController();
 
@@ -105,6 +107,13 @@ class _DatLichFormViewState extends State<DatLichFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final count = int.tryParse(_soNguoiController.text.trim()) ?? 1;
     final note = _ghiChuController.text.trim();
 
@@ -300,6 +309,7 @@ class _DatLichFormViewState extends State<DatLichFormView> {
                         controller: _soNguoiController,
                         prefixIcon: Icons.people_rounded,
                         keyboardType: TextInputType.number,
+                        validator: (v) => AppValidators.validatePositiveInteger(v, fieldName: 'Số người sử dụng'),
                       ),
                       const SizedBox(height: 16),
                       AppTextField(

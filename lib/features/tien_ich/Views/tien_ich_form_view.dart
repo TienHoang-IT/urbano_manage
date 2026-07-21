@@ -6,6 +6,7 @@ import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/tien_ich_model.dart';
 import 'package:urbano_manage/features/tien_ich/ViewModels/tien_ich_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 
 class TienIchFormView extends StatefulWidget {
   final TienIch? tienIch;
@@ -17,6 +18,7 @@ class TienIchFormView extends StatefulWidget {
 }
 
 class _TienIchFormViewState extends State<TienIchFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _tenController = TextEditingController();
   final _moTaController = TextEditingController();
   final _viTriController = TextEditingController();
@@ -121,6 +123,13 @@ class _TienIchFormViewState extends State<TienIchFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final name = _tenController.text.trim();
     final desc = _moTaController.text.trim();
     final location = _viTriController.text.trim();
@@ -215,82 +224,88 @@ class _TienIchFormViewState extends State<TienIchFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextField(
-                        label: 'TÊN TIỆN ÍCH *',
-                        hint: 'Ví dụ: Sân Tennis A, Hồ Bơi Vô Cực',
-                        controller: _tenController,
-                        prefixIcon: Icons.pool_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppDropdownField<int>(
-                        label: 'LOẠI TIỆN ÍCH *',
-                        value: _selectedLoaiId,
-                        hint: 'Chọn loại tiện ích',
-                        prefixIcon: Icons.category_rounded,
-                        items: vm.loaiTienIchs.map((loai) {
-                          return DropdownMenuItem<int>(
-                            value: loai['id'] as int,
-                            child: Text(loai['tenLoaiTienIch'] as String),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          setState(() {
-                            _selectedLoaiId = val;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppDropdownField<int>(
-                        label: 'TÒA NHÀ',
-                        value: _selectedToaNhaId,
-                        hint: 'Chọn tòa nhà (nếu có)',
-                        prefixIcon: Icons.apartment_rounded,
-                        items: vm.toaNhas.map((toaNha) {
-                          return DropdownMenuItem<int>(
-                            value: toaNha['id'] as int,
-                            child: Text(toaNha['tenToaNha'] as String),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          setState(() {
-                            _selectedToaNhaId = val;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'VỊ TRÍ *',
-                        hint: 'Ví dụ: Tầng thượng Tòa A, Khu công viên trung tâm',
-                        controller: _viTriController,
-                        prefixIcon: Icons.location_on_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppTextField(
-                              label: 'SỨC CHỨA',
-                              hint: 'Số người',
-                              controller: _sucChuaController,
-                              prefixIcon: Icons.people_rounded,
-                              keyboardType: TextInputType.number,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          label: 'TÊN TIỆN ÍCH *',
+                          hint: 'Ví dụ: Sân Tennis A, Hồ Bơi Vô Cực',
+                          controller: _tenController,
+                          prefixIcon: Icons.pool_rounded,
+                          validator: (v) => AppValidators.validateRequiredText(v, fieldName: 'Tên tiện ích'),
+                        ),
+                        const SizedBox(height: 16),
+                        AppDropdownField<int>(
+                          label: 'LOẠI TIỆN ÍCH *',
+                          value: _selectedLoaiId,
+                          hint: 'Chọn loại tiện ích',
+                          prefixIcon: Icons.category_rounded,
+                          items: vm.loaiTienIchs.map((loai) {
+                            return DropdownMenuItem<int>(
+                              value: loai['id'] as int,
+                              child: Text(loai['tenLoaiTienIch'] as String),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedLoaiId = val;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppDropdownField<int>(
+                          label: 'TÒA NHÀ',
+                          value: _selectedToaNhaId,
+                          hint: 'Chọn tòa nhà (nếu có)',
+                          prefixIcon: Icons.apartment_rounded,
+                          items: vm.toaNhas.map((toaNha) {
+                            return DropdownMenuItem<int>(
+                              value: toaNha['id'] as int,
+                              child: Text(toaNha['tenToaNha'] as String),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedToaNhaId = val;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'VỊ TRÍ *',
+                          hint: 'Ví dụ: Tầng thượng Tòa A, Khu công viên trung tâm',
+                          controller: _viTriController,
+                          prefixIcon: Icons.location_on_rounded,
+                          validator: (v) => AppValidators.validateRequiredText(v, fieldName: 'Vị trí'),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: AppTextField(
+                                label: 'SỨC CHỨA',
+                                hint: 'Số người',
+                                controller: _sucChuaController,
+                                prefixIcon: Icons.people_rounded,
+                                keyboardType: TextInputType.number,
+                                validator: (v) => AppValidators.validatePositiveInteger(v, fieldName: 'Sức chứa', required: false),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: AppTextField(
-                              label: 'PHÍ SỬ DỤNG (VNĐ/LƯỢT)',
-                              hint: 'Ví dụ: 50000',
-                              controller: _phiController,
-                              prefixIcon: Icons.monetization_on_rounded,
-                              keyboardType: TextInputType.number,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: AppTextField(
+                                label: 'PHÍ SỬ DỤNG (VNĐ/LƯỢT)',
+                                hint: 'Ví dụ: 50000',
+                                controller: _phiController,
+                                prefixIcon: Icons.monetization_on_rounded,
+                                keyboardType: TextInputType.number,
+                                validator: (v) => AppValidators.validateNonNegativeNumber(v, fieldName: 'Phí sử dụng', required: false),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -379,14 +394,14 @@ class _TienIchFormViewState extends State<TienIchFormView> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      vm.isLoading
-                          ? Center(child: CircularProgressIndicator(color: AppColors.tealPrimary))
-                          : AppButton(
-                              label: isEdit ? 'CẬP NHẬT' : 'THÊM MỚI',
-                              onPressed: _saveForm,
-                            ),
+                      AppButton(
+                        label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO TIỆN ÍCH MỚI',
+                        isLoading: vm.isLoading,
+                        onPressed: _saveForm,
+                      ),
                       const SizedBox(height: 24),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

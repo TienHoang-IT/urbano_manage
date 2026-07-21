@@ -6,6 +6,7 @@ import 'package:urbano_manage/features/auth/ViewModels/login_viewmodel.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 import 'package:urbano_manage/features/main_shell/Views/main_shell_view.dart';
 
 class LoginView extends StatelessWidget {
@@ -28,6 +29,7 @@ class _LoginViewInner extends StatefulWidget {
 }
 
 class _LoginViewInnerState extends State<_LoginViewInner> {
+  final _formKey = GlobalKey<FormState>();
   final _accountController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -70,25 +72,28 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildLogoSection(),
-                          const SizedBox(height: 20),
-                          _buildGreeting(),
-                          const SizedBox(height: 24),
-                          _buildAccountField(),
-                          const SizedBox(height: 24),
-                          _buildPassword(),
-                          const SizedBox(height: 8),
-                          _buildForgetPassword(),
-                          const SizedBox(height: 50),
-                          _buildButtonLogin(),
-                          const SizedBox(height: 24),
-                          const Spacer(),
-                          _buildBottomNote(),
-                          const SizedBox(height: 18),
-                        ],
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLogoSection(),
+                            const SizedBox(height: 20),
+                            _buildGreeting(),
+                            const SizedBox(height: 24),
+                            _buildAccountField(),
+                            const SizedBox(height: 24),
+                            _buildPassword(),
+                            const SizedBox(height: 8),
+                            _buildForgetPassword(),
+                            const SizedBox(height: 50),
+                            _buildButtonLogin(),
+                            const SizedBox(height: 24),
+                            const Spacer(),
+                            _buildBottomNote(),
+                            const SizedBox(height: 18),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -141,6 +146,7 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
       controller: _accountController,
       prefixIcon: Icons.person_3_rounded,
       keyboardType: TextInputType.text,
+      validator: (v) => AppValidators.validateRequiredText(v, fieldName: 'Mã nhân viên/SĐT/Email'),
     );
   }
 
@@ -151,6 +157,7 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
       controller: _passwordController,
       prefixIcon: Icons.lock_outline_rounded,
       obscureText: _obscurePassword,
+      validator: (v) => AppValidators.validatePassword(v),
       suffixIcon: GestureDetector(
         onTap: () => setState(() => _obscurePassword = !_obscurePassword),
         child: Icon(
@@ -193,6 +200,9 @@ class _LoginViewInnerState extends State<_LoginViewInner> {
       onPressed: isLoading
           ? null
           : () async {
+              if (!(_formKey.currentState?.validate() ?? false)) {
+                return;
+              }
               final vm = context.read<LoginViewModel>();
               final result = await vm.login(
                 _accountController.text,

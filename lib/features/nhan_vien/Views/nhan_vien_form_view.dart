@@ -7,6 +7,7 @@ import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/core/Widgets/app_date_picker.dart';
 import 'package:urbano_manage/Models/nhan_vien_model.dart';
 import 'package:urbano_manage/features/nhan_vien/ViewModels/nhan_vien_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 
 class NhanVienFormView extends StatefulWidget {
   final NhanVien? nhanVien;
@@ -18,6 +19,7 @@ class NhanVienFormView extends StatefulWidget {
 }
 
 class _NhanVienFormViewState extends State<NhanVienFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _hoTenController = TextEditingController();
   final _maNhanVienController = TextEditingController();
   final _sdtController = TextEditingController();
@@ -60,21 +62,15 @@ class _NhanVienFormViewState extends State<NhanVienFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final hoTen = _hoTenController.text.trim();
     final maNv = _maNhanVienController.text.trim();
-
-    if (hoTen.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập Họ tên nhân viên')),
-      );
-      return;
-    }
-    if (maNv.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập Mã nhân viên')),
-      );
-      return;
-    }
     if (widget.nhanVien == null && _matKhauController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui lòng nhập Mật khẩu cho nhân viên mới')),
@@ -156,110 +152,119 @@ class _NhanVienFormViewState extends State<NhanVienFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextField(
-                        label: 'HỌ VÀ TÊN *',
-                        hint: 'Nhập họ và tên nhân viên',
-                        controller: _hoTenController,
-                        prefixIcon: Icons.person_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'MÃ NHÂN VIÊN *',
-                        hint: 'Nhập mã nhân viên (ví dụ: NV001)',
-                        controller: _maNhanVienController,
-                        prefixIcon: Icons.badge_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppDropdownField<int>(
-                        label: 'CHỨC VỤ',
-                        value: _selectedChucVu,
-                        hint: 'Chọn chức vụ',
-                        prefixIcon: Icons.work_rounded,
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedChucVu = val);
-                        },
-                        items: const [
-                          DropdownMenuItem(value: 1, child: Text('Admin')),
-                          DropdownMenuItem(value: 2, child: Text('Kế toán')),
-                          DropdownMenuItem(value: 3, child: Text('Kỹ thuật')),
-                          DropdownMenuItem(value: 4, child: Text('Lễ tân')),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      AppDatePicker(
-                        label: 'NGÀY SINH',
-                        hint: 'Chọn ngày sinh',
-                        selectedDate: _selectedDob,
-                        onDateSelected: (date) {
-                          setState(() => _selectedDob = date);
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'SỐ ĐIỆN THOẠI',
-                        hint: 'Nhập số điện thoại',
-                        controller: _sdtController,
-                        prefixIcon: Icons.phone_rounded,
-                        keyboardType: TextInputType.phone,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'EMAIL',
-                        hint: 'Nhập địa chỉ email',
-                        controller: _emailController,
-                        prefixIcon: Icons.email_rounded,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: isEdit ? 'MẬT KHẨU (BỎ TRỐNG NẾU GIỮ NGUYÊN)' : 'MẬT KHẨU *',
-                        hint: 'Nhập mật khẩu đăng nhập',
-                        controller: _matKhauController,
-                        prefixIcon: Icons.lock_rounded,
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'SỐ CCCD',
-                        hint: 'Nhập số căn cước công dân',
-                        controller: _cccdController,
-                        prefixIcon: Icons.perm_identity_rounded,
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 16),
-                      if (isEdit) ...[
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          label: 'HỌ VÀ TÊN *',
+                          hint: 'Nhập họ và tên nhân viên',
+                          controller: _hoTenController,
+                          prefixIcon: Icons.person_rounded,
+                          validator: (v) => AppValidators.validateName(v, fieldName: 'Họ tên nhân viên'),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'MÃ NHÂN VIÊN *',
+                          hint: 'Nhập mã nhân viên (ví dụ: NV001)',
+                          controller: _maNhanVienController,
+                          prefixIcon: Icons.badge_rounded,
+                          validator: (v) => AppValidators.validateCode(v, fieldName: 'Mã nhân viên'),
+                        ),
+                        const SizedBox(height: 16),
                         AppDropdownField<int>(
-                          label: 'TRẠNG THÁI',
-                          value: _selectedTrangThai,
-                          hint: 'Chọn trạng thái',
-                          prefixIcon: Icons.toggle_on_rounded,
+                          label: 'CHỨC VỤ',
+                          value: _selectedChucVu,
+                          hint: 'Chọn chức vụ',
+                          prefixIcon: Icons.work_rounded,
                           onChanged: (val) {
-                            if (val != null) setState(() => _selectedTrangThai = val);
+                            if (val != null) setState(() => _selectedChucVu = val);
                           },
                           items: const [
-                            DropdownMenuItem(value: 1, child: Text('Đang làm việc')),
-                            DropdownMenuItem(value: 0, child: Text('Đã nghỉ việc')),
+                            DropdownMenuItem(value: 1, child: Text('Admin')),
+                            DropdownMenuItem(value: 2, child: Text('Kế toán')),
+                            DropdownMenuItem(value: 3, child: Text('Kỹ thuật')),
+                            DropdownMenuItem(value: 4, child: Text('Lễ tân')),
                           ],
                         ),
                         const SizedBox(height: 16),
+                        AppDatePicker(
+                          label: 'NGÀY SINH',
+                          hint: 'Chọn ngày sinh',
+                          selectedDate: _selectedDob,
+                          onDateSelected: (date) {
+                            setState(() => _selectedDob = date);
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'SỐ ĐIỆN THOẠI',
+                          hint: 'Nhập số điện thoại',
+                          controller: _sdtController,
+                          prefixIcon: Icons.phone_rounded,
+                          keyboardType: TextInputType.phone,
+                          validator: (v) => AppValidators.validatePhone(v),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'EMAIL',
+                          hint: 'Nhập địa chỉ email',
+                          controller: _emailController,
+                          prefixIcon: Icons.email_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (v) => AppValidators.validateEmail(v),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: isEdit ? 'MẬT KHẨU (BỎ TRỐNG NẾU GIỮ NGUYÊN)' : 'MẬT KHẨU *',
+                          hint: 'Nhập mật khẩu đăng nhập',
+                          controller: _matKhauController,
+                          prefixIcon: Icons.lock_rounded,
+                          obscureText: true,
+                          validator: (v) => AppValidators.validatePassword(v, required: !isEdit),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'SỐ CCCD',
+                          hint: 'Nhập số căn cước công dân',
+                          controller: _cccdController,
+                          prefixIcon: Icons.perm_identity_rounded,
+                          keyboardType: TextInputType.number,
+                          validator: (v) => AppValidators.validateCccd(v),
+                        ),
+                        const SizedBox(height: 16),
+                        if (isEdit) ...[
+                          AppDropdownField<int>(
+                            label: 'TRẠNG THÁI',
+                            value: _selectedTrangThai,
+                            hint: 'Chọn trạng thái',
+                            prefixIcon: Icons.toggle_on_rounded,
+                            onChanged: (val) {
+                              if (val != null) setState(() => _selectedTrangThai = val);
+                            },
+                            items: const [
+                              DropdownMenuItem(value: 1, child: Text('Đang làm việc')),
+                              DropdownMenuItem(value: 0, child: Text('Đã nghỉ việc')),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                        AppTextField(
+                          label: 'GHI CHÚ',
+                          hint: 'Nhập ghi chú (nếu có)',
+                          controller: _ghiChuController,
+                          prefixIcon: Icons.notes_rounded,
+                        ),
+                        const SizedBox(height: 32),
+                        AppButton(
+                          label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO NHÂN VIÊN MỚI',
+                          isLoading: viewModel.isLoading,
+                          onPressed: _saveForm,
+                        ),
+                        const SizedBox(height: 24),
                       ],
-                      AppTextField(
-                        label: 'GHI CHÚ',
-                        hint: 'Nhập ghi chú (nếu có)',
-                        controller: _ghiChuController,
-                        prefixIcon: Icons.notes_rounded,
-                      ),
-                      const SizedBox(height: 32),
-                      AppButton(
-                        label: viewModel.isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập Nhật' : 'Thêm Mới'),
-                        onPressed: viewModel.isLoading ? null : _saveForm,
-                        isLoading: viewModel.isLoading,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   ),
                 ),
               ),

@@ -7,6 +7,7 @@ import 'package:urbano_manage/core/Widgets/app_button.dart';
 import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/Models/thong_bao_model.dart';
 import 'package:urbano_manage/features/thong_bao/ViewModels/thong_bao_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 
 class ThongBaoFormView extends StatefulWidget {
   final ThongBao? thongBao;
@@ -18,6 +19,7 @@ class ThongBaoFormView extends StatefulWidget {
 }
 
 class _ThongBaoFormViewState extends State<ThongBaoFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _tieuDeController = TextEditingController();
   final _noiDungController = TextEditingController();
 
@@ -56,6 +58,13 @@ class _ThongBaoFormViewState extends State<ThongBaoFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final tieuDe = _tieuDeController.text.trim();
     final noiDung = _noiDungController.text.trim();
 
@@ -126,54 +135,67 @@ class _ThongBaoFormViewState extends State<ThongBaoFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextField(
-                        label: 'TIÊU ĐỀ *',
-                        hint: 'Nhập tiêu đề thông báo',
-                        controller: _tieuDeController,
-                        prefixIcon: Icons.title_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'NỘI DUNG *',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.5,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          label: 'TIÊU ĐỀ *',
+                          hint: 'Nhập tiêu đề thông báo',
+                          controller: _tieuDeController,
+                          prefixIcon: Icons.title_rounded,
+                          validator: (v) => AppValidators.validateRequiredText(v, fieldName: 'Tiêu đề'),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _noiDungController,
-                        style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
-                        maxLines: 8,
-                        decoration: InputDecoration(
-                          hintText: 'Nhập nội dung chi tiết thông báo...',
-                          hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
-                          filled: true,
-                          fillColor: AppColors.inputFill,
-                          contentPadding: const EdgeInsets.all(14),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: AppColors.borderSide, width: 1.5),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: AppColors.tealPrimary, width: 1.5),
+                        const SizedBox(height: 16),
+                        Text(
+                          'NỘI DUNG *',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1.5,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 32),
-                      AppButton(
-                        label: viewModel.isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập Nhật' : 'Đăng Thông Báo'),
-                        onPressed: viewModel.isLoading ? null : _saveForm,
-                        isLoading: viewModel.isLoading,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _noiDungController,
+                          style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
+                          maxLines: 8,
+                          validator: (v) => AppValidators.validateRequiredText(v, fieldName: 'Nội dung'),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: InputDecoration(
+                            hintText: 'Nhập nội dung chi tiết thông báo...',
+                            hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
+                            filled: true,
+                            fillColor: AppColors.inputFill,
+                            contentPadding: const EdgeInsets.all(14),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.borderSide, width: 1.5),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.tealPrimary, width: 1.5),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.red, width: 1.5),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppColors.red, width: 1.5),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        AppButton(
+                          label: isEdit ? 'LƯU THAY ĐỔI' : 'ĐĂNG THÔNG BÁO',
+                          isLoading: viewModel.isLoading,
+                          onPressed: _saveForm,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 
 class AppTextField extends StatelessWidget {
@@ -12,6 +13,10 @@ class AppTextField extends StatelessWidget {
   final int maxLines;
   final bool readOnly;
   final void Function(String)? onChanged;
+  final FormFieldValidator<String>? validator;
+  final String? errorText;
+  final List<TextInputFormatter>? inputFormatters;
+  final AutovalidateMode? autovalidateMode;
 
   const AppTextField({
     super.key,
@@ -25,6 +30,10 @@ class AppTextField extends StatelessWidget {
     this.maxLines = 1,
     this.readOnly = false,
     this.onChanged,
+    this.validator,
+    this.errorText,
+    this.inputFormatters,
+    this.autovalidateMode,
   });
 
   @override
@@ -44,13 +53,16 @@ class AppTextField extends StatelessWidget {
           ),
           const SizedBox(height: 8),
         ],
-        TextField(
+        TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
           maxLines: maxLines,
           readOnly: readOnly,
           onChanged: onChanged,
+          validator: validator,
+          inputFormatters: inputFormatters,
+          autovalidateMode: autovalidateMode ?? AutovalidateMode.onUserInteraction,
           style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
@@ -59,10 +71,24 @@ class AppTextField extends StatelessWidget {
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: AppColors.inputFill,
+            errorText: errorText,
+            errorStyle: const TextStyle(fontSize: 11, color: AppColors.red, height: 1.2),
             contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: AppColors.borderSide, width: 1.5),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.tealPrimary, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.red, width: 1.5),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.red, width: 1.5),
             ),
           ),
         ),

@@ -6,6 +6,7 @@ import 'package:urbano_manage/core/Widgets/app_text_field.dart';
 import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/phi_dich_vu_model.dart';
 import 'package:urbano_manage/features/phi_dich_vu/ViewModels/phi_dich_vu_viewmodel.dart';
+import 'package:urbano_manage/core/utils/app_validators.dart';
 
 class PhiDichVuFormView extends StatefulWidget {
   final PhiDichVu? phiDichVu;
@@ -17,6 +18,7 @@ class PhiDichVuFormView extends StatefulWidget {
 }
 
 class _PhiDichVuFormViewState extends State<PhiDichVuFormView> {
+  final _formKey = GlobalKey<FormState>();
   final _tenPhiDichVuController = TextEditingController();
   final _donGiaController = TextEditingController();
 
@@ -56,6 +58,13 @@ class _PhiDichVuFormViewState extends State<PhiDichVuFormView> {
   }
 
   Future<void> _saveForm() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng kiểm tra và điền đúng thông tin theo yêu cầu')),
+      );
+      return;
+    }
+
     final name = _tenPhiDichVuController.text.trim();
     final price = double.tryParse(_donGiaController.text.trim()) ?? 0.0;
 
@@ -140,37 +149,41 @@ class _PhiDichVuFormViewState extends State<PhiDichVuFormView> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppTextField(
-                        label: 'TÊN DỊCH VỤ *',
-                        hint: 'Nhập tên phí dịch vụ (ví dụ: Phí quản lý căn hộ)',
-                        controller: _tenPhiDichVuController,
-                        prefixIcon: Icons.room_service_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppDropdownField<int>(
-                        label: 'LOẠI PHÍ DỊCH VỤ *',
-                        value: _selectedLoaiPhiId,
-                        hint: 'Chọn loại phí',
-                        prefixIcon: Icons.category_rounded,
-                        onChanged: (val) => setState(() => _selectedLoaiPhiId = val),
-                        items: viewModel.feeTypes
-                            .map((e) => DropdownMenuItem<int>(
-                                  value: e['id'] as int,
-                                  child: Text(e['tenLoaiPhiDichVu'] as String? ?? ''),
-                                ))
-                            .toList(),
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'ĐƠN GIÁ (VND) *',
-                        hint: 'Nhập đơn giá dịch vụ',
-                        controller: _donGiaController,
-                        prefixIcon: Icons.attach_money_rounded,
-                        keyboardType: TextInputType.number,
-                      ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          label: 'TÊN DỊCH VỤ *',
+                          hint: 'Nhập tên phí dịch vụ (ví dụ: Phí quản lý căn hộ)',
+                          controller: _tenPhiDichVuController,
+                          prefixIcon: Icons.room_service_rounded,
+                          validator: (v) => AppValidators.validateRequiredText(v, fieldName: 'Tên dịch vụ'),
+                        ),
+                        const SizedBox(height: 16),
+                        AppDropdownField<int>(
+                          label: 'LOẠI PHÍ DỊCH VỤ *',
+                          value: _selectedLoaiPhiId,
+                          hint: 'Chọn loại phí',
+                          prefixIcon: Icons.category_rounded,
+                          onChanged: (val) => setState(() => _selectedLoaiPhiId = val),
+                          items: viewModel.feeTypes
+                              .map((e) => DropdownMenuItem<int>(
+                                    value: e['id'] as int,
+                                    child: Text(e['tenLoaiPhiDichVu'] as String? ?? ''),
+                                  ))
+                              .toList(),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'ĐƠN GIÁ (VND) *',
+                          hint: 'Nhập đơn giá dịch vụ',
+                          controller: _donGiaController,
+                          prefixIcon: Icons.attach_money_rounded,
+                          keyboardType: TextInputType.number,
+                          validator: (v) => AppValidators.validateNonNegativeNumber(v, fieldName: 'Đơn giá'),
+                        ),
                       const SizedBox(height: 16),
                       AppDropdownField<int>(
                         label: 'ĐƠN VỊ TÍNH *',
@@ -201,12 +214,13 @@ class _PhiDichVuFormViewState extends State<PhiDichVuFormView> {
                       ),
                       const SizedBox(height: 32),
                       AppButton(
-                        label: viewModel.isLoading ? 'Đang xử lý...' : (isEdit ? 'Cập Nhật' : 'Thêm Mới'),
-                        onPressed: viewModel.isLoading ? null : _saveForm,
+                        label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO PHÍ DỊCH VỤ MỚI',
                         isLoading: viewModel.isLoading,
+                        onPressed: _saveForm,
                       ),
                       const SizedBox(height: 24),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
