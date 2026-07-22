@@ -26,14 +26,14 @@ class HoaDonViewModel extends ChangeNotifier {
       allInvoices.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (currentTab == 0) {
         hoaDons = allInvoices;
-      } else if (currentTab == 1) { // Chưa trả
+      } else if (currentTab == 1) { // Chưa thanh toán
         hoaDons = allInvoices.where((h) => h.displayTrangThai == 1).toList();
-      } else if (currentTab == 2) { // Đã trả
-        hoaDons = allInvoices.where((h) => h.displayTrangThai == 2).toList();
-      } else if (currentTab == 3) { // 1 phần
-        hoaDons = allInvoices.where((h) => h.displayTrangThai == 4).toList();
-      } else if (currentTab == 4) { // Quá hạn
+      } else if (currentTab == 2) { // Đã thanh toán
         hoaDons = allInvoices.where((h) => h.displayTrangThai == 3).toList();
+      } else if (currentTab == 3) { // 1 phần
+        hoaDons = allInvoices.where((h) => h.displayTrangThai == 2).toList();
+      } else if (currentTab == 4) { // Quá hạn
+        hoaDons = allInvoices.where((h) => h.displayTrangThai == 4).toList();
       }
       error = null;
     } catch (e) {

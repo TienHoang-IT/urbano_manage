@@ -95,7 +95,7 @@ class DashboardViewModel extends ChangeNotifier {
       if (_hoaDonService != null) {
         try {
           final invoices = await _hoaDonService!.fetchHoaDons();
-          overdueCalculatedCount = invoices.where((h) => h.displayTrangThai == 3).length;
+            overdueCalculatedCount = invoices.where((h) => h.displayTrangThai == 4).length;
         } catch (_) {}
       }
 
@@ -152,7 +152,7 @@ class DashboardViewModel extends ChangeNotifier {
         if (_hoaDonService != null) {
           try {
             final invoices = await _hoaDonService!.fetchHoaDons();
-            overdueFallbackCount = invoices.where((h) => h.displayTrangThai == 3).length;
+            overdueFallbackCount = invoices.where((h) => h.displayTrangThai == 4).length;
           } catch (_) {}
         }
 

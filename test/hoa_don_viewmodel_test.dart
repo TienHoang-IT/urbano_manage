@@ -142,7 +142,7 @@ void main() {
         createdAt: now,
         updatedAt: now,
       );
-      expect(pastDue.displayTrangThai, 3);
+      expect(pastDue.displayTrangThai, 4);
     });
   });
 }

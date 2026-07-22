@@ -258,13 +258,13 @@ class _HoaDonListViewState extends State<HoaDonListView> {
             statusColor = AppColors.red;
             break;
           case 2:
-            statusColor = AppColors.tealPrimary;
+            statusColor = AppColors.amber;
             break;
           case 3:
-            statusColor = AppColors.red;
+            statusColor = AppColors.tealPrimary;
             break;
           case 4:
-            statusColor = AppColors.amber;
+            statusColor = AppColors.red;
             break;
           default:
             statusColor = AppColors.red;

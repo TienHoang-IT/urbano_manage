@@ -8,6 +8,7 @@ import 'package:urbano_manage/core/Widgets/app_dropdown_field.dart';
 import 'package:urbano_manage/Models/cu_dan_model.dart';
 import 'package:urbano_manage/features/cu_dan/ViewModels/cu_dan_viewmodel.dart';
 import 'package:urbano_manage/core/utils/app_validators.dart';
+import 'package:urbano_manage/Services/province_service.dart';
 
 class CuDanFormView extends StatefulWidget {
   final CuDan? cuDan;
@@ -32,7 +33,15 @@ class _CuDanFormViewState extends State<CuDanFormView> {
 
   DateTime? _selectedDob;
   int _selectedGender = 0; // 0: Nam, 1: Nữ, 2: Khác
-  int _selectedStatus = 1; // 1: Hoạt động, etc
+  int _selectedStatus = 2; // Mặc định 2: Đang cư trú (Đã xác thực) khi thêm cư dân mới
+
+  final ProvinceService _provinceService = ProvinceService();
+  List<Province> _provinces = [];
+  List<Ward> _wards = [];
+  int? _selectedProvinceCode;
+  int? _selectedWardCode;
+  bool _isLoadingProvinces = false;
+  bool _isLoadingWards = false;
 
   @override
   void initState() {
@@ -48,10 +57,89 @@ class _CuDanFormViewState extends State<CuDanFormView> {
       _xaController.text = c.xa;
       _diaChiController.text = c.diaChi;
       _selectedGender = c.gioiTinh ?? 0;
-      _selectedStatus = [1, 2, 3].contains(c.trangThai) ? c.trangThai : 1;
+      _selectedStatus = [1, 2, 3].contains(c.trangThai) ? c.trangThai : 2;
       if (c.ngaySinh != null) {
         _selectedDob = c.ngaySinh;
         _ngaySinhController.text = DateFormat('dd/MM/yyyy').format(c.ngaySinh!.toLocal());
+      }
+    }
+    _loadLocationData();
+  }
+
+  Future<void> _loadLocationData() async {
+    setState(() => _isLoadingProvinces = true);
+    try {
+      final provincesList = await _provinceService.fetchProvinces();
+      if (!mounted) return;
+      setState(() {
+        _provinces = provincesList;
+        _isLoadingProvinces = false;
+      });
+
+      if (_tinhController.text.isNotEmpty) {
+        final currentTinhText = _tinhController.text.trim().toLowerCase();
+        final matchedProvince = _provinces.firstWhere(
+          (p) => p.name.toLowerCase() == currentTinhText || currentTinhText.contains(p.name.toLowerCase()),
+          orElse: () => Province(code: 0, name: '', codename: '', divisionType: ''),
+        );
+
+        if (matchedProvince.code != 0) {
+          setState(() {
+            _selectedProvinceCode = matchedProvince.code;
+          });
+          await _onProvinceChanged(matchedProvince.code, isInitial: true);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingProvinces = false);
+      }
+    }
+  }
+
+  Future<void> _onProvinceChanged(int? provinceCode, {bool isInitial = false}) async {
+    if (provinceCode == null) return;
+    final selectedProv = _provinces.firstWhere(
+      (p) => p.code == provinceCode,
+      orElse: () => Province(code: provinceCode, name: _tinhController.text, codename: '', divisionType: ''),
+    );
+
+    setState(() {
+      _selectedProvinceCode = provinceCode;
+      if (!isInitial || _tinhController.text.isEmpty) {
+        _tinhController.text = selectedProv.name;
+      }
+      _selectedWardCode = null;
+      if (!isInitial) {
+        _xaController.text = '';
+      }
+      _wards = [];
+      _isLoadingWards = true;
+    });
+
+    try {
+      final wardsList = await _provinceService.fetchWards(provinceCode);
+      if (!mounted) return;
+      setState(() {
+        _wards = wardsList;
+        _isLoadingWards = false;
+      });
+
+      if (isInitial && _xaController.text.isNotEmpty) {
+        final currentXaText = _xaController.text.trim().toLowerCase();
+        final matchedWard = _wards.firstWhere(
+          (w) => w.name.toLowerCase() == currentXaText || currentXaText.contains(w.name.toLowerCase()),
+          orElse: () => Ward(code: 0, name: '', codename: '', divisionType: '', provinceCode: 0),
+        );
+        if (matchedWard.code != 0) {
+          setState(() {
+            _selectedWardCode = matchedWard.code;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingWards = false);
       }
     }
   }
@@ -156,6 +244,9 @@ class _CuDanFormViewState extends State<CuDanFormView> {
     final viewModel = context.watch<CuDanViewModel>();
     final isEdit = widget.cuDan != null;
 
+    final validProvinceCode = _provinces.any((p) => p.code == _selectedProvinceCode) ? _selectedProvinceCode : null;
+    final validWardCode = _wards.any((w) => w.code == _selectedWardCode) ? _selectedWardCode : null;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -165,7 +256,7 @@ class _CuDanFormViewState extends State<CuDanFormView> {
             colors: [AppColors.bgDark, AppColors.bgMid, AppColors.bgDarkest],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            stops: [0.0, 0.5, 1.0],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
@@ -196,41 +287,18 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                           validator: (v) => AppValidators.validateName(v, fieldName: 'Tên cư dân'),
                         ),
                         const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: AppDropdownField<int>(
-                                label: 'GIỚI TÍNH',
-                                hint: 'Chọn giới tính',
-                                value: _selectedGender,
-                                prefixIcon: Icons.wc_rounded,
-                                onChanged: (val) {
-                                  if (val != null) setState(() => _selectedGender = val);
-                                },
-                                items: const [
-                                  DropdownMenuItem(value: 0, child: Text('Nam')),
-                                  DropdownMenuItem(value: 1, child: Text('Nữ')),
-                                  DropdownMenuItem(value: 2, child: Text('Khác')),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: AppDropdownField<int>(
-                                label: 'TRẠNG THÁI',
-                                hint: 'Chọn trạng thái',
-                                value: _selectedStatus,
-                                prefixIcon: Icons.toggle_on_rounded,
-                                onChanged: (val) {
-                                  if (val != null) setState(() => _selectedStatus = val);
-                                },
-                                items: const [
-                                  DropdownMenuItem(value: 1, child: Text('Chưa xác thực')),
-                                  DropdownMenuItem(value: 2, child: Text('Đang cư trú')),
-                                  DropdownMenuItem(value: 3, child: Text('Đã rời đi')),
-                                ],
-                              ),
-                            ),
+                        AppDropdownField<int>(
+                          label: 'GIỚI TÍNH',
+                          hint: 'Chọn giới tính',
+                          value: _selectedGender,
+                          prefixIcon: Icons.wc_rounded,
+                          onChanged: (val) {
+                            if (val != null) setState(() => _selectedGender = val);
+                          },
+                          items: const [
+                            DropdownMenuItem(value: 0, child: Text('Nam')),
+                            DropdownMenuItem(value: 1, child: Text('Nữ')),
+                            DropdownMenuItem(value: 2, child: Text('Khác')),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -272,49 +340,81 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                           keyboardType: TextInputType.emailAddress,
                           validator: (v) => AppValidators.validateEmail(v),
                         ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'TỈNH / THÀNH PHỐ',
-                        hint: 'Nhập tỉnh/thành phố',
-                        controller: _tinhController,
-                        prefixIcon: Icons.location_city_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'PHƯỜNG / XÃ',
-                        hint: 'Nhập phường/xã/quận/huyện',
-                        controller: _xaController,
-                        prefixIcon: Icons.map_rounded,
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        label: 'ĐỊA CHỈ CHI TIẾT',
-                        hint: 'Nhập số nhà, tên đường...',
-                        controller: _diaChiController,
-                        prefixIcon: Icons.location_on_rounded,
-                      ),
-                      const SizedBox(height: 32),
-                      AppButton(
-                        label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO CƯ DÂN MỚI',
-                        isLoading: viewModel.isLoading,
-                        onPressed: _saveForm,
-                      ),
-                      if (isEdit) ...[
                         const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: AppColors.borderButton),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            onPressed: viewModel.isLoading ? null : () => _showChangePasswordDialog(context),
-                            child: Text('Đổi mật khẩu tài khoản', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
-                          ),
+                        AppDropdownField<int>(
+                          label: 'TỈNH / THÀNH PHỐ',
+                          hint: _isLoadingProvinces ? 'Đang tải danh sách Tỉnh/Thành phố...' : 'Chọn Tỉnh / Thành phố',
+                          value: validProvinceCode,
+                          prefixIcon: Icons.location_city_rounded,
+                          onChanged: (val) => _onProvinceChanged(val),
+                          items: _provinces.map((p) {
+                            return DropdownMenuItem<int>(
+                              value: p.code,
+                              child: Text(
+                                p.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
                         ),
-                      ],
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 16),
+                        AppDropdownField<int>(
+                          label: 'PHƯỜNG / XÃ',
+                          hint: _selectedProvinceCode == null
+                              ? 'Vui lòng chọn Tỉnh/Thành phố trước'
+                              : (_isLoadingWards ? 'Đang tải danh sách Phường/Xã...' : 'Chọn Phường / Xã'),
+                          value: validWardCode,
+                          prefixIcon: Icons.map_rounded,
+                          onChanged: (val) {
+                            if (val == null) return;
+                            final w = _wards.firstWhere(
+                              (item) => item.code == val,
+                              orElse: () => Ward(code: val, name: '', codename: '', divisionType: '', provinceCode: 0),
+                            );
+                            setState(() {
+                              _selectedWardCode = val;
+                              _xaController.text = w.name;
+                            });
+                          },
+                          items: _wards.map((w) {
+                            return DropdownMenuItem<int>(
+                              value: w.code,
+                              child: Text(
+                                w.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'ĐỊA CHỈ CHI TIẾT',
+                          hint: 'Nhập số nhà, tên đường...',
+                          controller: _diaChiController,
+                          prefixIcon: Icons.location_on_rounded,
+                        ),
+                        const SizedBox(height: 32),
+                        AppButton(
+                          label: isEdit ? 'LƯU THAY ĐỔI' : 'TẠO CƯ DÂN MỚI',
+                          isLoading: viewModel.isLoading,
+                          onPressed: _saveForm,
+                        ),
+                        if (isEdit) ...[
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: AppColors.borderButton),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              onPressed: viewModel.isLoading ? null : () => _showChangePasswordDialog(context),
+                              child: Text('Đổi mật khẩu tài khoản', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
@@ -411,12 +511,12 @@ class _CuDanFormViewState extends State<CuDanFormView> {
                   );
                   return;
                 }
-                
+
                 Navigator.of(dialogContext).pop(); // close dialog
-                
+
                 final vm = context.read<CuDanViewModel>();
                 final success = await vm.adminResetPassword(widget.cuDan!.id, pwd);
-                
+
                 if (mounted) {
                   if (success) {
                     ScaffoldMessenger.of(context).showSnackBar(

@@ -6,6 +6,7 @@ import 'package:urbano_manage/Models/cu_dan_model.dart';
 class FakeCuDanService extends CuDanService {
   final List<CuDan> list;
   final bool shouldFail;
+  Map<String, dynamic>? lastCreatedData;
 
   FakeCuDanService({required this.list, this.shouldFail = false});
 
@@ -18,6 +19,7 @@ class FakeCuDanService extends CuDanService {
   @override
   Future<CuDan> createCuDan(Map<String, dynamic> data) async {
     if (shouldFail) throw Exception('Failed to create');
+    lastCreatedData = data;
     return CuDan(
       id: 99,
       hoTenDem: data['hoTenDem'] ?? '',
@@ -31,8 +33,8 @@ class FakeCuDanService extends CuDanService {
       xa: data['xa'] ?? '',
       diaChi: data['diaChi'] ?? '',
       diaChiDayDu: '',
-      trangThai: 1,
-      trangThaiText: 'Hoạt động',
+      trangThai: data['trangThai'] ?? 2,
+      trangThaiText: 'Đang cư trú',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -66,8 +68,8 @@ void main() {
       xa: 'Mễ Trì',
       diaChi: 'Số 1',
       diaChiDayDu: 'Số 1, Mễ Trì, Hà Nội',
-      trangThai: 1,
-      trangThaiText: 'Hoạt động',
+      trangThai: 2,
+      trangThaiText: 'Đang cư trú',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -96,18 +98,23 @@ void main() {
       expect(viewModel.cuDans, isEmpty);
     });
 
-    test('addCuDan success calls fetch', () async {
+    test('addCuDan success passes correct data including verified status = 2', () async {
       final service = FakeCuDanService(list: [testResident]);
       final viewModel = CuDanViewModel(service: service);
 
       final success = await viewModel.addCuDan({
         'hoTenDem': 'Trần Thị',
         'ten': 'B',
+        'trangThai': 2,
+        'tinh': 'Thành phố Hà Nội',
+        'xa': 'Phường Ba Đình',
       });
 
       expect(success, isTrue);
       expect(viewModel.error, isNull);
-      expect(viewModel.cuDans.length, 1);
+      expect(service.lastCreatedData?['trangThai'], 2);
+      expect(service.lastCreatedData?['tinh'], 'Thành phố Hà Nội');
+      expect(service.lastCreatedData?['xa'], 'Phường Ba Đình');
     });
 
     test('editCuDan success calls fetch', () async {

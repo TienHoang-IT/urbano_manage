@@ -6,7 +6,11 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import 'package:flutter/services.dart';
 import 'package:urbano_manage/Services/bao_cao_service.dart';
+import 'package:urbano_manage/Services/cau_hinh_thanh_toan_service.dart';
+import 'package:urbano_manage/Models/cau_hinh_thanh_toan_model.dart';
+import 'package:urbano_manage/core/network/signalr_service.dart';
 import 'package:urbano_manage/core/constants/app_colors.dart';
 import 'package:urbano_manage/core/Widgets/app_confirm_dialog.dart';
 import 'package:urbano_manage/core/Widgets/app_button.dart';
@@ -100,20 +104,129 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
 
   Future<void> _showPayDialog() async {
     final vm = context.read<HoaDonViewModel>();
+    final signalR = context.read<SignalRService>();
     final conThieuDialog = _currentHoaDon.tongTien - _currentHoaDon.soTienDaThanhToan;
+    final isSecondPayment = _currentHoaDon.soTienDaThanhToan > 0;
+    final minAmount = isSecondPayment ? conThieuDialog : conThieuDialog * 0.5;
+    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+
     final amountController = TextEditingController(
-      text: (conThieuDialog > 0 ? conThieuDialog.toInt() : 0).toString(),
+      text: isSecondPayment ? conThieuDialog.toInt().toString() : '',
     );
     final refController = TextEditingController(
       text: 'PAY-${DateTime.now().millisecondsSinceEpoch}',
     );
     final noteController = TextEditingController();
     String method = 'Chuyển khoản';
+    bool isQrGenerated = false;
+    double verifiedPayAmount = 0.0;
+
+    final bankConfigs = await CauHinhThanhToanService().fetchConfigs();
+    final bankConfig = bankConfigs.isNotEmpty
+        ? bankConfigs.first
+        : CauHinhThanhToan(
+            id: 1,
+            loaiPhuongThuc: 'ChuyenKhoan',
+            tenNhaCungCap: 'MBBank',
+            dinhDanhThuHuong: '0987654321',
+            maNhanDien: 'MB',
+            tenChuTaiKhoan: 'BQL CHUNG CU URBANO',
+          );
+
+    if (!mounted) return;
 
     await showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return StatefulBuilder(builder: (context, setDialogState) {
+          void signalRListener() async {
+            if (signalR.recentEvents.isNotEmpty) {
+              final latest = signalR.recentEvents.first;
+              final type = latest['_type']?.toString();
+              if (type == 'payment_received' || type == 'payment_confirmed') {
+                final matchId = latest['hoaDonId'] == _currentHoaDon.id;
+                final matchCode = latest['maThanhToan'] != null &&
+                    latest['maThanhToan'].toString().toUpperCase() == _currentHoaDon.maThanhToan.toUpperCase();
+                if (matchId || matchCode) {
+                  signalR.removeListener(signalRListener);
+                  if (Navigator.canPop(dialogContext)) {
+                    Navigator.pop(dialogContext);
+                  }
+                  final updated = await HoaDonService().fetchHoaDonById(_currentHoaDon.id);
+                  if (mounted) {
+                    setState(() {
+                      _currentHoaDon = updated;
+                    });
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(
+                        content: Text('🎉 Nhận được thanh toán chuyển khoản cho hóa đơn ${_currentHoaDon.maThanhToan}!'),
+                        backgroundColor: AppColors.tealPrimary,
+                        duration: const Duration(seconds: 4),
+                      ),
+                    );
+                  }
+                }
+              }
+            }
+          }
+
+          if (isQrGenerated) {
+            signalR.addListener(signalRListener);
+          }
+
+          bool validateAmount() {
+            final rawAmount = amountController.text.trim();
+            if (rawAmount.isEmpty) {
+              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                const SnackBar(content: Text('Vui lòng nhập số tiền thanh toán')),
+              );
+              return false;
+            }
+
+            final amount = double.tryParse(rawAmount);
+            if (amount == null || amount <= 0) {
+              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                const SnackBar(content: Text('Vui lòng nhập số tiền thanh toán hợp lệ')),
+              );
+              return false;
+            }
+
+            if (isSecondPayment) {
+              if ((amount - conThieuDialog).abs() > 0.01) {
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  SnackBar(
+                    content: Text('Do đã thanh toán 1 phần, lần này bắt buộc phải thanh toán toàn bộ số tiền còn thiếu (${currencyFormat.format(conThieuDialog)})'),
+                    backgroundColor: AppColors.red,
+                  ),
+                );
+                return false;
+              }
+            } else {
+              if (amount <= minAmount) {
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  SnackBar(
+                    content: Text('Số tiền thanh toán lần đầu phải lớn hơn 50% số tiền còn thiếu (tối thiểu lớn hơn ${currencyFormat.format(minAmount)})'),
+                    backgroundColor: AppColors.red,
+                  ),
+                );
+                return false;
+              }
+
+              if (amount > conThieuDialog) {
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  SnackBar(
+                    content: Text('Số tiền thanh toán không được vượt quá số tiền còn thiếu (${currencyFormat.format(conThieuDialog)})'),
+                    backgroundColor: AppColors.red,
+                  ),
+                );
+                return false;
+              }
+            }
+
+            verifiedPayAmount = amount;
+            return true;
+          }
+
           return AlertDialog(
             backgroundColor: AppColors.bgMid,
             shape: RoundedRectangleBorder(
@@ -127,13 +240,61 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSecondPayment 
+                          ? AppColors.amber.withValues(alpha: 0.1)
+                          : AppColors.tealPrimary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSecondPayment
+                            ? AppColors.amber.withValues(alpha: 0.4)
+                            : AppColors.tealPrimary.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Số tiền còn thiếu: ${currencyFormat.format(conThieuDialog)}',
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 4),
+                        if (isSecondPayment) ...[
+                          Text(
+                            'Yêu cầu: Thanh toán 100% số tiền còn lại (${currencyFormat.format(conThieuDialog)})',
+                            style: TextStyle(color: AppColors.amber, fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                        ] else ...[
+                          Text(
+                            'Cần thanh toán lần đầu (>50%): > ${currencyFormat.format(minAmount)}',
+                            style: TextStyle(color: AppColors.tealPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   AppTextField(
-                    hint: 'Nhập số tiền',
+                    hint: isSecondPayment
+                        ? 'Số tiền còn lại (${currencyFormat.format(conThieuDialog)})'
+                        : 'Nhập số tiền thanh toán (>50%)',
                     label: 'SỐ TIỀN THANH TOÁN (VND) *',
                     controller: amountController,
                     prefixIcon: Icons.price_check_rounded,
                     keyboardType: TextInputType.number,
+                    readOnly: isQrGenerated,
+                    onChanged: (_) {
+                      if (isQrGenerated) {
+                        setDialogState(() {
+                          isQrGenerated = false;
+                        });
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
                   AppDropdownField<String>(
@@ -142,14 +303,151 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     hint: 'Chọn phương thức',
                     prefixIcon: Icons.payment_rounded,
                     onChanged: (val) {
-                      if (val != null) setDialogState(() => method = val);
+                      if (val != null) {
+                        setDialogState(() {
+                          method = val;
+                          isQrGenerated = false;
+                        });
+                      }
                     },
                     items: const [
                       DropdownMenuItem(value: 'Chuyển khoản', child: Text('Chuyển khoản')),
                       DropdownMenuItem(value: 'Tiền mặt', child: Text('Tiền mặt')),
-                      DropdownMenuItem(value: 'Ví điện tử', child: Text('Ví điện tử')),
                     ],
                   ),
+                  if (method == 'Chuyển khoản') ...[
+                    const SizedBox(height: 16),
+                    if (!isQrGenerated) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.tealPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (validateAmount()) {
+                              setDialogState(() {
+                                isQrGenerated = true;
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.qr_code_2_rounded, color: Colors.white),
+                          label: const Text(
+                            'TẠO MÃ QR THANH TOÁN',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.bgDark,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.tealPrimary.withValues(alpha: 0.5)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.qr_code_2_rounded, color: AppColors.tealPrimary, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'MÃ QR VIETQR KHÓP SỐ TIỀN',
+                                      style: TextStyle(color: AppColors.tealPrimary, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                                    ),
+                                  ],
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    setDialogState(() {
+                                      isQrGenerated = false;
+                                    });
+                                  },
+                                  child: Text(
+                                    'Sửa số tiền',
+                                    style: TextStyle(color: AppColors.textMuted, fontSize: 12, decoration: TextDecoration.underline),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            _buildBankInfoRow('Ngân hàng', bankConfig.tenNhaCungCap, null),
+                            const SizedBox(height: 8),
+                            _buildBankInfoRow('Số tài khoản', bankConfig.dinhDanhThuHuong, () {
+                              Clipboard.setData(ClipboardData(text: bankConfig.dinhDanhThuHuong));
+                              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                const SnackBar(content: Text('Đã sao chép số tài khoản'), duration: Duration(seconds: 2)),
+                              );
+                            }),
+                            const SizedBox(height: 8),
+                            _buildBankInfoRow('Chủ tài khoản', bankConfig.tenChuTaiKhoan, null),
+                            const SizedBox(height: 8),
+                            _buildBankInfoRow('Số tiền chuyển', currencyFormat.format(verifiedPayAmount), null),
+                            const SizedBox(height: 8),
+                            _buildBankInfoRow('Nội dung CK', _currentHoaDon.maThanhToan, () {
+                              Clipboard.setData(ClipboardData(text: _currentHoaDon.maThanhToan));
+                              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                const SnackBar(content: Text('Đã sao chép nội dung chuyển khoản'), duration: Duration(seconds: 2)),
+                              );
+                            }),
+                            const SizedBox(height: 14),
+                            Center(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Image.network(
+                                      'https://img.vietqr.io/image/${bankConfig.maNhanDien}-${bankConfig.dinhDanhThuHuong}-compact2.png?amount=${verifiedPayAmount.toInt()}&addInfo=${Uri.encodeComponent(_currentHoaDon.maThanhToan)}&accountName=${Uri.encodeComponent(bankConfig.tenChuTaiKhoan)}',
+                                      width: 180,
+                                      height: 180,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, __, ___) => Container(
+                                        width: 180,
+                                        height: 180,
+                                        alignment: Alignment.center,
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.qr_code_2_rounded, size: 80, color: Colors.grey),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 12,
+                                        height: 12,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.tealPrimary),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Đang chờ nhận chuyển khoản...',
+                                        style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontStyle: FontStyle.italic),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                   const SizedBox(height: 16),
                   AppTextField(
                     hint: 'Nhập mã giao dịch',
@@ -170,7 +468,10 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
             actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  signalR.removeListener(signalRListener);
+                  Navigator.pop(dialogContext);
+                },
                 child: Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
               ),
               const SizedBox(width: 8),
@@ -184,19 +485,14 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                   elevation: 0,
                 ),
                 onPressed: () async {
-                  final amount = double.tryParse(amountController.text.trim()) ?? 0.0;
+                  if (!validateAmount()) return;
+
+                  final amount = verifiedPayAmount;
                   final ref = refController.text.trim();
-
-                  if (amount <= 0) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Vui lòng nhập số tiền thanh toán hợp lệ')),
-                    );
-                    return;
-                  }
-
                   final note = noteController.text.trim();
                   
-                  Navigator.pop(context); // Close dialog
+                  signalR.removeListener(signalRListener);
+                  Navigator.pop(dialogContext); // Close dialog
                   if (!mounted) return;
 
                   final data = {
@@ -209,7 +505,6 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                   try {
                     final success = await vm.recordPayment(_currentHoaDon.id, data);
                     if (success && mounted) {
-                      // Reload chi tiết từ API
                       final updated = await HoaDonService().fetchHoaDonById(_currentHoaDon.id);
                       if (mounted) {
                         setState(() {
@@ -232,7 +527,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     }
                   }
                 },
-                child: Text('Thanh toán', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+                child: Text('Xác nhận', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -243,6 +538,27 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
     amountController.dispose();
     refController.dispose();
     noteController.dispose();
+  }
+
+  Widget _buildBankInfoRow(String label, String value, VoidCallback? onCopy) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
+        Row(
+          children: [
+            Text(value, style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.bold)),
+            if (onCopy != null) ...[
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: onCopy,
+                child: Icon(Icons.copy_rounded, color: AppColors.tealPrimary, size: 16),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
   }
 
   @override
@@ -259,13 +575,13 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
         statusColor = AppColors.red;
         break;
       case 2:
-        statusColor = AppColors.tealPrimary;
+        statusColor = AppColors.amber;
         break;
       case 3:
-        statusColor = AppColors.red;
+        statusColor = AppColors.tealPrimary;
         break;
       case 4:
-        statusColor = AppColors.amber;
+        statusColor = AppColors.red;
         break;
       default:
         statusColor = AppColors.red;
@@ -297,7 +613,7 @@ class _HoaDonDetailViewState extends State<HoaDonDetailView> {
                     children: [
                       _buildHeaderCard(statusColor, currencyFormat),
                       const SizedBox(height: 24),
-                      if (_currentHoaDon.displayTrangThai != 2) ...[
+                      if (_currentHoaDon.trangThai != 3 && _currentHoaDon.soTienDaThanhToan < _currentHoaDon.tongTien) ...[
                         AppButton(
                           label: 'Ghi Nhận Thanh Toán',
                           icon: Icons.payments_rounded,
